@@ -8,8 +8,7 @@ library(pander)
 library(gridExtra)
 library(plyr)
 
-setwd("~/Documents/yeast_gene")
-
+setwd("~/Scripts/pars")
 ```
 
 ```{r function_summarySE, echo=FALSE, message=FALSE, results='markup'}
@@ -99,20 +98,20 @@ func_comp <- function (seq) {
 }
 ```
 
-## All sheets
+## All results
 
-### sheet [distance]
+### Read data
 
 ```{r load_data, echo=FALSE, results="asis"}
 
-name <- "Scer_9way_Spar"
+name <- "Scer_n8_Spar"
 
 #
-file_gene_property <- "S288Cvsself_gene.csv"
+file_gene_property <- "~/data/mrna-structure/xlsx/S288Cvsself_gene.csv"
 data_gene_property <- read.csv(file_gene_property,  header = TRUE, sep = ",")
 
 #
-file_gene_used <- paste0(name, ".gene_variation.fold_class.tsv", collapse = NULL)
+file_gene_used <- paste0("~/data/mrna-structure/process/", name, ".gene_variation.fold_class.tsv", collapse = NULL)
 data_gene_used <- read.csv(file_gene_used,  header = TRUE, sep = "\t")
 data_gene_used$vars <- rowSums(data_gene_used[c("fold_dot_vars", "fold_left_vars", "fold_right_vars")])
 data_gene_used$loop_length <- rowSums(data_gene_used["fold_dot_length"])
@@ -128,7 +127,7 @@ if (exists('data_gene_used')) rm(list = 'data_gene_used')
 if (exists('file_gene_used')) rm(list = 'file_gene_used') 
 
 #
-file_mvar <- paste0(name, ".mvar.snp.csv", collapse = NULL)
+file_mvar <- paste0("~/data/mrna-structure/xlsx/", name, ".mvar.snp_codon_list.csv", collapse = NULL)
 data_mvar <- read.csv(file_mvar,  header = TRUE, sep = ",")
 dd <- data.frame(name = c("all"),count=c(nrow(data_mvar)))
 data_mvar <- subset(data_mvar, data_mvar$mutant_to != "Complex")
@@ -136,7 +135,7 @@ dd <- rbind(dd, data.frame(name="non_complex", count=nrow(data_mvar) ))
 rownames(data_mvar) <- NULL # suppress rownames
 
 # 
-file_gene <- paste0(name, ".gene_variation.var_pars.tsv", collapse = NULL)
+file_gene <- paste0("~/data/mrna-structure/process/", name, ".gene_variation.var_pars.tsv", collapse = NULL)
 data_gene <- read.csv(file_gene,  header = TRUE, sep = "\t")
 data_gene <- merge(data_gene, data_mvar, by="name")
 data_gene <- merge(data_gene, data_gene_property, by="gene")
@@ -146,14 +145,14 @@ data_gene <- subset(data_gene, data_gene$strand == "+")
 rownames(data_gene) <- NULL # suppress rownames
 
 #
-file_intergenic <- paste0(name, ".intergenic.snp.tsv", collapse = NULL)
+file_intergenic <- paste0("~/data/mrna-structure/process/", name, ".intergenic.snp.tsv", collapse = NULL)
 data_intergenic <- read.csv(file_intergenic,  header = TRUE, sep = "\t")
 data_intergenic <- merge(data_intergenic, data_mvar, by="name")
 dd <- rbind(dd, data.frame(name="intergenic", count=nrow(data_intergenic) ))
 rownames(data_intergenic) <- NULL # suppress rownames
 
 #
-file_utr <- paste0(name, ".utr.snp.tsv", collapse = NULL)
+file_utr <- paste0("~/data/mrna-structure/process/", name, ".utr.snp.tsv", collapse = NULL)
 data_utr <- read.csv(file_utr,  header = TRUE, sep = "\t")
 data_utr <- merge(data_utr, data_mvar, by="name")
 dd <- rbind(dd, data.frame(name="utr", count=nrow(data_utr) ))
@@ -162,11 +161,9 @@ rownames(data_intergenic) <- NULL # suppress rownames
 pandoc.table(dd, style = "rmarkdown")
 ```
 
-**plot**
+### Figure structure pars
 
-plot
-
-```{r plot_S288C, eval=FALSE, echo=FALSE, fig.height=5, fig.width=6.5, dev=c( 'png'), dpi=150}
+```{r plot_structure_pars, echo=FALSE, fig.height=3, fig.width=3, dev=c( 'png'), dpi=150}
 
 dfc1 <- summarySE(data_gene, measurevar="pars", groupvars=c("target", "structure"))
 
@@ -187,9 +184,9 @@ ggplot(dfc1, aes(x=structure, y=pars, fill=target)) +
 
 ```
 
-**plot**
+### Figure structure bases
 
-```{r plot_base, eval=FALSE, echo=FALSE, fig.height=5, fig.width=6.5, dev=c( 'png'), dpi=150}
+```{r plot_structure_bases, echo=FALSE, fig.height=3, fig.width=3, dev=c( 'png'), dpi=150}
 
 dfc2 <- summarySE(data_gene, measurevar="freq", groupvars=c("structure", "gene_base"))
 
