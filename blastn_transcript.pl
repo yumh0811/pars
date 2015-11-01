@@ -3,54 +3,49 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
-use Config::Tiny;
+use Getopt::Long qw(HelpMessage);
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use File::Basename;
+use Path::Tiny;
 use Bio::SearchIO;
 
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
 
-use FindBin;
-
-#use lib "$FindBin::Bin/../lib";
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-# record ARGV and Config
-my $stopwatch = AlignDB::Stopwatch->new(
-    program_name => $0,
-    program_argv => [@ARGV],
-);
 
-my $file;
-my $alignment_view = 0;    # blastall -m
+=head1 NAME
 
-my $identity = 99;
-my $coverage = 1;
+blastn_transcript.pl - get transcripts' genome location
 
-my $output;
+=head1 SYNOPSIS
 
-my $man  = 0;
-my $help = 0;
+    perl blastn_transcript.pl [options]
+      Options:
+        --help          -?          brief help message
+        --file          -f  STR     blast result file
+        --view          -m  INT     blast output format, same as `blastall -m`
+                                    0 => Pairwise
+                                    7 => BLAST XML
+                                    9 => Hit Table
+        --identityi     -i  INT     default is [99]
+        --coverage      -c  INT     default is [1]
 
-$|++;
+=cut
 
 GetOptions(
-    'help|?'       => \$help,
-    'man|m'        => \$man,
-    'f|file=s'     => \$file,
-    'm|view=s'     => \$alignment_view,
-    'i|identity=i' => \$identity,
-    'c|coverage=i' => \$coverage,
-) or pod2usage(2);
+    'help|?'   => sub { HelpMessage(0) },
+    'file|f=s' => \my $file,
+    'view|m=s'     => \( my $alignment_view = 0 ),
+    'identity|i=i' => \( my $identity       = 99 ),
+    'coverage|c=i' => \( my $coverage       = 1 ),
+) or HelpMessage(1);
 
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+$|++;
+my $output;
 
 my $view_name = {
     0 => "blast",         # Pairwise
@@ -63,10 +58,11 @@ my $result_format = $view_name->{$alignment_view};
 #----------------------------------------------------------#
 # init
 #----------------------------------------------------------#
-$stopwatch->start_message("Find paralog...");
+my $stopwatch = AlignDB::Stopwatch->new;
+$stopwatch->start_message("Find transcripts...");
 
 if ( !$output ) {
-    $output = basename($file);
+    $output = path($file)->basename;
     ($output) = grep {defined} split /\./, $output;
     $output = "$output.blast.tsv";
 }
@@ -105,7 +101,7 @@ QUERY: while ( my $result = $searchio->next_result ) {
                 $hsp_strand = "-";
             }
 
-            my $align_obj = $hsp->get_aln;    # a Bio::SimpleAlign object
+            my $align_obj   = $hsp->get_aln;                             # a Bio::SimpleAlign object
             my ($query_obj) = $align_obj->each_seq_with_id($query_name);
             my ($hit_obj)   = $align_obj->each_seq_with_id($hit_name);
 
@@ -152,44 +148,3 @@ $stopwatch->end_message;
 exit;
 
 __END__
-
-=head1 NAME
-
-    update_align_paralog.pl - Add additional paralog info to alignDB
-
-=head1 SYNOPSIS
-
-    update_align_paralog.pl [options]
-      Options:
-        --help               brief help message
-        --man                full documentation
-        --server             MySQL server IP/Domain name
-        --db                 database name
-        --username           username
-        --password           password
-        --datalib|da         blast database
-        --megablast|mega     use megablast or not
-        --view|v             blast output format
-
-    update_align_paralog.pl -d=Nipvs9311 -da=nip_chro --mega=1 -v=9
-
-=head1 OPTIONS
-
-=over 8
-
-=item B<-help>
-
-Print a brief help message and exits.
-
-=item B<-man>
-
-Prints the manual page and exits.
-
-=back
-
-=head1 DESCRIPTION
-
-B<This program> will read the given input file(s) and do someting
-useful with the contents thereof.
-
-=cut

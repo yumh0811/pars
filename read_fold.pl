@@ -3,57 +3,43 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
-use Config::Tiny;
+use Getopt::Long qw(HelpMessage);
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
 use Path::Tiny;
-use Bio::SearchIO;
 
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
 use AlignDB::Util qw(mean);
 
-use FindBin;
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-# record ARGV and Config
-my $stopwatch = AlignDB::Stopwatch->new(
-    program_name => $0,
-    program_argv => [@ARGV],
-);
 
-my $dir_pars  = "PARS10/pubs/PARS10/data";
-my $file_gene = "sce_genes.blast.tsv";
-my $file_pos  = "S288CvsVII_WGS_pop.snp.gene.bed";
-my $file_pos2;
+=head1 SYNOPSIS
 
-my $output;
+    perl ~/Scripts/pars/read_fold.pl \
+        --pars ~/data/mrna-structure/PARS10/pubs/PARS10/data \
+        --gene ~/data/mrna-structure/process/sce_genes.blast.tsv \
+        --pos $NAME.snp.gene.bed  \
+        > fail_pos.txt
 
-my $man  = 0;
-my $help = 0;
-
-$|++;
+=cut
 
 GetOptions(
-    'help|?'     => \$help,
-    'man|m'      => \$man,
-    'pars=s'     => \$dir_pars,
-    'gene=s'     => \$file_gene,
-    'pos=s'      => \$file_pos,
-    'pos2=s'     => \$file_pos2,
-    'output|o=s' => \$output,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?' => sub { HelpMessage(0) },
+    'pars=s' => \my $dir_pars,
+    'gene=s' => \( my $file_gene = "sce_genes.blast.tsv" ),
+    'pos=s'  => \( my $file_pos  = "S288CvsVII_WGS_pop.snp.gene.bed" ),
+    'pos2=s' => \my $file_pos2,
+    'output|o=s' => \my $output,
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
 #----------------------------------------------------------#
+my $stopwatch = AlignDB::Stopwatch->new;
 $stopwatch->start_message("Process folding data...");
 
 if ( !$output ) {

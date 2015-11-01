@@ -3,54 +3,39 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long;
-use Pod::Usage;
-use Config::Tiny;
+use Getopt::Long qw(HelpMessage);
+use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
-use File::Basename;
-use Bio::SearchIO;
+use Path::Tiny;
 
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
 
-use FindBin;
-
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
-# record ARGV and Config
-my $stopwatch = AlignDB::Stopwatch->new(
-    program_name => $0,
-    program_argv => [@ARGV],
-);
 
-my $file = "S288CvsVII_WGS_pop.gene_variation.yml";
+=head1 SYNOPSIS
 
-my $output;
+    perl ~/Scripts/pars/process_vars_in_fold.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.yml
 
-my $man  = 0;
-my $help = 0;
-
-$|++;
+=cut
 
 GetOptions(
-    'help|?'     => \$help,
-    'man|m'      => \$man,
-    'f|file=s'   => \$file,
-    'o|output=s' => \$output,
-) or pod2usage(2);
-
-pod2usage(1) if $help;
-pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+    'help|?'     => sub { HelpMessage(0) },
+    'file|f=s'   => \my $file,
+    'output|o=s' => \my $output,
+) or HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
 #----------------------------------------------------------#
-$stopwatch->start_message("Find paralog...");
+my $stopwatch = AlignDB::Stopwatch->new;
+$stopwatch->start_message("Process folding info...");
 
 if ( !$output ) {
-    $output = basename($file);
+    $output = path($file)->basename;
     ($output) = grep {defined} split /\./, $output;
     $output = "$output.gene_variation";
 }
@@ -104,8 +89,7 @@ for my $gene ( sort keys %{$gene_info_of} ) {
     $info->{pair_pos} = $pair_pos_of;
 
     my $chr_set
-        = AlignDB::IntSpan->new( $info->{start} . "-" . $info->{end} )
-        ;    # gene set in chr, no gap
+        = AlignDB::IntSpan->new( $info->{start} . "-" . $info->{end} );    # gene set in chr, no gap
     $info->{chr_set} = $chr_set;
 
     # vars count
@@ -114,7 +98,7 @@ for my $gene ( sort keys %{$gene_info_of} ) {
     next if $count == 0;
 
     for my $i ( 0 .. $count - 1 ) {
-        my $var = $info->{vars}[$i];    # shortcut, too
+        my $var = $info->{vars}[$i];                                       # shortcut, too
 
         # transform vars coordinate to local
         my $gene_pos = $chr_set->index( $var->{chr_pos} );
@@ -197,8 +181,7 @@ for my $gene ( sort keys %{$gene_info_of} ) {
                 }
             }
             print {$out_fh} $gene . "\t";
-            print {$out_fh} $var->{fold_class} eq "fold_dot" ? "loop" : "stem",
-                "\t";
+            print {$out_fh} $var->{fold_class} eq "fold_dot" ? "loop" : "stem", "\t";
             print {$out_fh} $info->{strand};
             print {$out_fh} "\n";
         }
