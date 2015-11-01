@@ -186,7 +186,7 @@ perl -an -e 'BEGIN{print qq{name\n}}; print qq{$F[0]:$F[1]\n}' ~/data/mrna-struc
 #----------------------------------------------------------#
 # utr (5' and 3')
 #----------------------------------------------------------#
-# FIXME:
+# FIXME: seperate 5' and 3' utrs
 cd ~/data/mrna-structure/process
 
 # produce orf_genomic set
@@ -198,6 +198,16 @@ mv $NAME.snp.gene.bed.bed_diff $NAME.snp.utr.bed
 
 # convert to unique snp name
 perl -an -e 'BEGIN{print qq{name\n}}; print qq{$F[0]:$F[1]\n}' ~/data/mrna-structure/process/$NAME.snp.utr.bed > ~/data/mrna-structure/process/$NAME.utr.snp.tsv
+
+unset NAME
+```
+
+## Pack all things up
+
+```bash
+cd  ~/data
+tar -cf - mrna-structure/ | xz -9 -c - > mrna-structure.tar.xz
+
 ```
 
 ## Stats
