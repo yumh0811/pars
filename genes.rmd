@@ -1,0 +1,320 @@
+# yeast genes
+
+```{r load_library, echo=FALSE, message=FALSE, results='markup'}
+library(ggplot2)
+library(scales)
+library(reshape)
+library(pander)
+library(gridExtra)
+library(plyr)
+
+setwd("~/Documents/yeast_gene")
+
+```
+
+```{r function_summarySE, echo=FALSE, message=FALSE, results='markup'}
+## Summarizes data.
+## Gives count, mean, standard deviation, standard error of the mean, and confidence interval (default 95%).
+##   data: a data frame.
+##   measurevar: the name of a column that contains the variable to be summariezed
+##   groupvars: a vector containing names of columns that contain grouping variables
+##   na.rm: a boolean that indicates whether to ignore NA's
+##   conf.interval: the percent range of the confidence interval (default is 95%)
+summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
+    conf.interval=.95, .drop=TRUE) {
+    
+    # New version of length which can handle NA's: if na.rm==T, don't count them
+    length2 <- function (x, na.rm=FALSE) {
+        if (na.rm) sum(!is.na(x))
+        else       length(x)
+        }
+    
+    # This does the summary. For each group's data frame, return a vector with
+    # N, mean, and sd
+    datac <- ddply(data, groupvars, .drop=.drop,
+        .fun = function(xx, col) {
+            c(N    = length2(xx[[col]], na.rm=na.rm),
+                mean = mean   (xx[[col]], na.rm=na.rm),
+                sd   = sd     (xx[[col]], na.rm=na.rm)
+                )
+            },
+        measurevar
+        )
+    
+    # Rename the "mean" column    
+    datac <- rename(datac, c("mean" = measurevar))
+    
+    datac$se <- datac$sd / sqrt(datac$N)  # Calculate standard error of the mean
+    
+    # Confidence interval multiplier for standard error
+    # Calculate t-statistic for confidence interval: 
+    # e.g., if conf.interval is .95, use .975 (above/below), and use df=N-1
+    ciMult <- qt(conf.interval/2 + .5, datac$N-1)
+    datac$ci <- datac$se * ciMult
+    
+    all_N <- sum(datac$N)
+    datac$proportion <- datac$N / all_N
+    
+    return(datac)
+    }
+```
+
+```{r function_spectrum_plot, echo=FALSE, message=FALSE, results='markup'}
+func_spectrum_plot <- function (plotdata) {
+    
+    size = 8
+    
+    dfc <- summarySE(plotdata, measurevar="freq", groupvars=c("mutant_to"))
+    
+    plot <- ggplot(dfc, aes(x=mutant_to, y=proportion, fill=mutant_to)) + 
+        geom_bar(position=position_dodge(), stat="identity") +
+        scale_y_continuous(labels = comma, limits=c(0, 0.3)) + 
+        xlab("") + ylab("Proportion") + 
+        theme_bw(base_size = size) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0.4)) +
+        guides(fill=FALSE) +
+        theme(panel.grid.major.x = element_blank())
+    
+    return(plot)
+    }
+
+func_char_comp <- function (base) {
+    if (base == "A") { 
+        return("T")
+        } else if (base == "C") { 
+            return("G")
+            } else if (base == "G") { 
+                return("C") 
+                } else if (base == "T") { 
+                    return("A") 
+                    } else { 
+                        return(base)
+                        }
+    }
+
+func_comp <- function (seq) {
+    as_char_vec <- strsplit(seq, "")[[1]]
+    as_char_vec_comp <- laply(as_char_vec, func_char_comp)
+    return(paste(as_char_vec_comp, collapse=""))    
+    }
+
+lm_eqn = function(df){
+    m = lm(y ~ x, df);
+    eq <- substitute(italic(y) == a + b %.% italic(x)*","~~italic(r)^2~"="~r2, 
+        list(a = format(coef(m)[1], digits = 2), 
+            b = format(coef(m)[2], digits = 2), 
+            r2 = format(summary(m)$r.squared, digits = 3)))
+    as.character(as.expression(eq));                 
+    }
+
+#p1 = p + geom_text(aes(x = 25, y = 300, label = lm_eqn(df)), parse = TRUE)
+```
+
+## All sheets
+
+### sheet [distance]
+
+```{r load_data, echo=FALSE, results="asis"}
+
+#
+file_gene_list <- "xlsx/S288CvsVIII_WGS.mvar.gene_list.csv"
+data_gene_list <- read.csv(file_gene_list,  header = TRUE, sep = ",")
+dd <- data.frame(name = c("all"),count=c(nrow(data_gene_list)))
+data_gene_list <- subset(data_gene_list, data_gene_list$gene_is_full == 1)
+dd <- rbind(dd, data.frame(name="full", count=nrow(data_gene_list) ))
+rownames(data_gene_list) <- NULL # suppress rownames
+
+#
+file_gene_property <- "S288Cvsself_gene.csv"
+data_gene_property <- read.csv(file_gene_property,  header = TRUE, sep = ",")
+
+data_gene <- merge(data_gene_property, data_gene_list, by.x="gene", by.y = "gene_stable_id")
+
+pandoc.table(dd, style = "rmarkdown")
+```
+
+**plot**
+
+plot
+
+```{r plot_S288C, eval=FALSE, echo=FALSE, fig.height=5, fig.width=6.5, dev=c( 'png'), dpi=150}
+
+p <- ggplot(data = data_gene , aes(x = log(quan) , y = gene_pi)) +
+    geom_smooth(method = "lm", se=FALSE, color="black", formula = y ~ log(x)) +
+    geom_point()
+
+```
+
+**plot**
+
+```{r plot_base, eval=FALSE, echo=FALSE, fig.height=5, fig.width=6.5, dev=c( 'png'), dpi=150}
+
+dfc2 <- summarySE(mydata, measurevar="freq", groupvars=c("structure", "gene_base"))
+
+ggplot(dfc2, aes(x=structure, y=freq, fill=gene_base)) + 
+    geom_bar(position=position_dodge(), stat="identity") +
+    theme_bw(base_size = 16)
+
+ggplot(dfc2, aes(x=structure, y=N, fill=S288C)) + 
+    geom_bar(position=position_dodge(), stat="identity") +
+    theme_bw(base_size = 16)
+
+ggplot(dfc2, aes(x=structure, y=pars, fill=S288C)) + 
+    geom_bar(position=position_dodge(), stat="identity") +
+    geom_errorbar(aes(ymin=pars, ymax=pars+sd),
+        width=.5,                    # Width of the error bars
+        position=position_dodge(.9)) +
+    theme_bw(base_size = 16)
+
+```
+
+**table freq count**
+
+```{r table_freq_count, echo=FALSE, results="asis"}
+
+func_freq_count <- function (tabledata, name) {
+    
+    dfc <- summarySE(tabledata, measurevar="freq", groupvars=c("freq"))
+    
+    table <- dfc[c(1,2)]
+    
+    names(table)[names(table)=="N"] <- name
+    
+    return(table)
+    }
+
+table_freq <- merge(func_freq_count(data_intergenic, "intergenic"), func_freq_count(data_gene, "gene"),  by="freq")
+
+table_freq <- merge(table_freq, func_freq_count(subset(data_gene, data_gene$syn > 0), "synonymous"),by="freq")
+
+table_freq <- merge(table_freq, func_freq_count(subset(data_gene, data_gene$nsy > 0), "nonsynonymous"),by="freq")
+
+table_freq <- merge(table_freq, func_freq_count(data_utr, "utr"),by="freq")
+
+pandoc.table(table_freq, style = "rmarkdown")
+
+if (exists('table_freq')) rm(list = 'table_freq') 
+
+```
+
+**table freq proportion**
+
+```{r table_freq_proportion, echo=FALSE, results="asis", fig.height=3, fig.width=6, dev=c('png', 'pdf'), dpi=150}
+
+func_freq_table <- function (tabledata, name) {
+    
+    dfc <- summarySE(tabledata, measurevar="freq", groupvars=c("freq"))
+    
+    table <- dfc[c(1,7)]
+    
+    names(table)[names(table)=="proportion"] <- name
+    
+    return(table)
+    }
+
+table_freq <- merge(func_freq_table(data_intergenic, "intergenic"), func_freq_table(data_gene, "gene"),  by="freq")
+
+table_freq <- merge(table_freq, func_freq_table(subset(data_gene, data_gene$syn > 0), "synonymous"),by="freq")
+
+table_freq <- merge(table_freq, func_freq_table(subset(data_gene, data_gene$nsy > 0), "nonsynonymous"),by="freq")
+
+table_freq <- merge(table_freq, func_freq_table(data_utr, "utr"),by="freq")
+
+pandoc.table(table_freq, style = "rmarkdown")
+
+table_freq <- melt(table_freq, id="freq")
+
+ggplot(table_freq, aes(x=freq, y=value, fill=variable)) + 
+    geom_bar(position=position_dodge(), stat="identity") +
+    scale_y_continuous(labels = comma) + 
+    scale_x_discrete(limits=rep(1:7,1)) + 
+    xlab("Substitution frequence") + ylab("Proportion") + 
+    theme_bw(base_size = 8) +
+    theme(panel.grid.major.x = element_blank()) +
+    theme(panel.grid.minor.y = element_blank())
+
+if (exists('table_freq')) rm(list = 'table_freq') 
+
+```
+
+**table freq count**
+
+```{r table_pair_base, echo=FALSE, results="asis"}
+
+stem_lo <- subset(data_gene, (structure == "stem" & target == "o"))[c("gene_base", "pair_base", "mutant_to", "freq", "target")];
+
+write.csv(stem_lo, file="stem_lo.csv", row.names = FALSE)
+
+plot_lo <- func_spectrum_plot(stem_lo)
+grid.arrange(plot_lo, ncol=2, nrow=1)
+
+
+```
+
+```{r plot_expression, echo=FALSE, fig.height=3, fig.width=6, dev=c('png', 'pdf'), dpi=150}
+
+exp_one_forth <- quantile(data_gene_property$quan, probs = seq(0, 1, 0.25), names = FALSE)
+data_gene$exp_level <- with(data_gene, ifelse(quan < exp_one_forth[2], "q1", ifelse(quan < exp_one_forth[3], "q2", ifelse(quan < exp_one_forth[4], "q3", "q4"))))
+
+"low expression level"
+plot_l <- func_spectrum_plot(subset(data_gene, data_gene$exp_level == "q1"))
+
+"high expression level"
+plot_h <- func_spectrum_plot(subset(data_gene, data_gene$exp_level == "q4"))
+
+grid.arrange(plot_l, plot_h, ncol=2, nrow=1)
+
+"intergenic"
+plot_i <- func_spectrum_plot(data_intergenic)
+grid.arrange(plot_i, ncol=2, nrow=1)
+
+if (exists('plot_l')) rm(list = 'plot_l') 
+if (exists('plot_h')) rm(list = 'plot_h') 
+if (exists('plot_i')) rm(list = 'plot_i') 
+
+```
+
+```{r plot_mutant, echo=FALSE, fig.height=3, fig.width=6, dev=c('png', 'pdf'), dpi=150}
+
+"Stem - Occured in S288C"
+plot_so <- func_spectrum_plot(subset(data_gene, (structure == "stem" & target == "o")))
+
+"Stem - Not occured in S288C"
+plot_sx <- func_spectrum_plot(subset(data_gene, (structure == "stem" & target == "x")))
+
+grid.arrange(plot_so, plot_sx, ncol=2, nrow=1)
+
+"Loop - Occured in S288C"
+plot_lo <- func_spectrum_plot(subset(data_gene, (structure == "loop" & target == "o")))
+
+"Loop - Not occured in S288C"
+plot_lx <- func_spectrum_plot(subset(data_gene, (structure == "loop" & target == "x")))
+
+grid.arrange(plot_lo, plot_lx, ncol=2, nrow=1)
+
+if (exists('plot_so')) rm(list = 'plot_so') 
+if (exists('plot_sx')) rm(list = 'plot_sx') 
+if (exists('plot_lo')) rm(list = 'plot_lo') 
+if (exists('plot_lx')) rm(list = 'plot_lx') 
+
+```
+
+## Convert
+
+Select codes and press 'Ctrl-Enter' in RStudio
+
+### knitr html
+
+```r
+library(knitr)
+knit2html('genes.rmd', options = c('toc', markdown::markdownHTMLOptions(TRUE)))
+if(interactive()) browseURL('genes.html')
+```
+
+### knitrBootstrap
+
+```r
+library(knitrBootstrap)
+knit_bootstrap('stats_vars.Rmd', chooser=c('boot','code'))
+if(interactive()) browseURL('stats_vars.html')
+```

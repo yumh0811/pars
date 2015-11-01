@@ -1,0 +1,94 @@
+# yeast genes
+
+## File
+
+```{r load_library, echo=FALSE, message=FALSE, results='markup'}
+setwd("D:/wq/yeast_gene")
+
+library(ggplot2)
+library(scales)
+library(reshape)
+library(pander)
+
+file <- "d:/wq/yeast_gene/S288CvsVII_WGS_pop.gene_variation.fold_class.tsv"
+file
+
+```
+
+## All sheets
+
+### sheet [distance]
+
+```{r sheet_distance_read, echo=FALSE}
+
+mydata <- read.csv(file,  header = TRUE, sep = "\t")
+
+mydata$vars <- rowSums(mydata[c("fold_dot_vars", "fold_left_vars", "fold_right_vars")])
+
+mydata$loop_length <- rowSums(mydata["fold_dot_length"])
+mydata$loop_vars <- rowSums(mydata["fold_dot_vars"])
+
+mydata$stem_length <- rowSums(mydata[c("fold_left_length", "fold_right_length")])
+mydata$stem_vars <- rowSums(mydata[c("fold_left_vars", "fold_right_vars")])
+
+# suppress rownames
+rownames(mydata) <- NULL
+
+mydata <- mydata[c("name", "length", "vars", "mF", "loop_length","loop_vars","stem_length","stem_vars")]
+
+#mydata2 <- subset(mydata, mydata$vars > 0)
+```
+
+**data**
+
+```{r data, echo=FALSE, results="asis"}
+pandoc.table(colSums(mydata[c("loop_length", "loop_vars","stem_length", "stem_vars")]), style = "rmarkdown")
+
+quantile(mydata$mF, probs = seq(0, 1, 0.25))
+smallmf <- subset(mydata, mydata$mF < 0.1226409)
+largemf <- subset(mydata, mydata$mF > 0.3561003)
+
+pandoc.table(colSums(smallmf[c("loop_length", "loop_vars","stem_length", "stem_vars")]), style = "rmarkdown")
+pandoc.table(colSums(largemf[c("loop_length", "loop_vars","stem_length", "stem_vars")]), style = "rmarkdown")
+```
+
+**plot**
+
+```{r plot, echo=FALSE, fig.height=5, fig.width=6.5, dev=c( 'png'), dpi=150}
+ggplot(mydata, aes(x=mF)) + geom_histogram(colour="black", fill="white") +
+    geom_vline(aes(xintercept=mean(mF, na.rm=T)), 
+               color="red", linetype="dashed", size=2) + labs(x = "mF scores")
+
+ggplot(mydata, aes(x=mF, y=vars/length)) +
+    geom_point(shape=1,) + 
+    geom_smooth(stat = "smooth", se=TRUE, size = 2)
+```
+
+## Convert
+
+Select codes and press 'Ctrl-Enter' in RStudio
+
+### knitr html
+
+```r
+library(knitr)
+knit2html('r_xlsx.rmd', options = c('toc', markdown::markdownHTMLOptions(TRUE)))
+if(interactive()) browseURL('r_xlsx.html')
+```
+
+### knitr and pandoc pdf
+
+```r
+library(knitr)
+knit('stats.Rmd')
+system("pandoc stats.md -o stats.pdf --toc")
+if(interactive()) shell.exec("stats.pdf")
+```
+
+### knitrBootstrap
+
+```r
+library(knitrBootstrap)
+knit_bootstrap('stats.Rmd', chooser=c('boot','code'))
+if(interactive()) browseURL('stats.html')
+```
