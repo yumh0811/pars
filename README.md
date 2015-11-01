@@ -28,9 +28,6 @@ mkdir -p ~/data/ensembl82/mysql
 cd ~/data/ensembl82/mysql
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/mysql/saccharomyces_cerevisiae_core_82_4 .
 
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/grch37/release-82/mysql/homo_sapiens_core_82_37 .
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/mysql/mus_musculus_core_82_38 .
-
 mkdir -p ~/data/ensembl82/fasta
 cd ~/data/ensembl82/fasta
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/saccharomyces_cerevisiae .
