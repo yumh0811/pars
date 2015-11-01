@@ -51,7 +51,7 @@ wget -N http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_ge
 find . -name "*.gz" | xargs gunzip
 ```
 
-## Build alignDB
+## Build alignDB for multiple genomes
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -70,6 +70,22 @@ perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     --run all
 ```
 
+Extract `gene_list` from `Scer_n8_Spar.mvar.xlsx`.
+
+Extract `snp_codon_list` from `Scer_n8_Spar.mvar.xlsx`.
+
+```bat
+cd /d d:\data\mrna-structure\xlsx\
+
+perl d:\Scripts\fig_table\collect_excel.pl -f Scer_n8_Spar.mvar.xlsx -s gene_list -n gene_list -o Scer_n8_Spar.mvar.gene_list.xlsx
+perl d:\Scripts\fig_table\xlsx2xls.pl -d Scer_n8_Spar.mvar.gene_list.xlsx --csv
+rm Scer_n8_Spar.mvar.gene_list.xlsx
+
+perl d:\Scripts\fig_table\collect_excel.pl -f Scer_n8_Spar.mvar.xlsx -s snp_codon_list -n snp_codon_list -o Scer_n8_Spar.mvar.snp_codon_list.xlsx
+perl d:\Scripts\fig_table\xlsx2xls.pl -d Scer_n8_Spar.mvar.snp_codon_list.xlsx --csv
+rm Scer_n8_Spar.mvar.snp_codon_list.xlsx
+```
+
 List all valid genes.
 
 ```sql
@@ -83,6 +99,58 @@ and g.gene_description not like "Putative%"
 and g.gene_description not like "Dubious%"
 and g.gene_description not like "Identified%"
 order by w.window_length
+```
+
+## Build self alignDB for gene information
+
+```bash
+perl ~/Scripts/alignDB/init/init_alignDB.pl \
+    -d S288Cvsself_gene \
+    -taxon ~/data/alignment/Fungi/scer_wgs/taxon.csv \
+    -chr ~/data/alignment/Fungi/scer_wgs/chr_length.csv
+
+perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
+    -d S288Cvsself_gene \
+    -t "559292,S288c" \
+    -dir ~/data/alignment/Fungi/scer_wgs/Genomes/S288c \
+    --length 1_000_000 \
+    --parallel 8
+
+perl ~/Scripts/alignDB/gene/insert_gene.pl -d S288Cvsself_gene -e yeast_82 --batch 1 --parallel 8
+
+perl ~/Scripts/alignDB/init/update_sw_cv.pl -d S288Cvsself_gene --batch 1 --parallel 8
+perl ~/Scripts/alignDB/init/update_feature.pl -d S288Cvsself_gene -e yeast_82 --batch 1 --parallel 8
+
+perl ~/Scripts/alignDB/gene/update_gene_yeast_ess.pl -d S288Cvsself_gene
+perl ~/Scripts/alignDB/gene/update_gene_yeast_quan.pl -d S288Cvsself_gene
+
+cat <<EOF > query.tmp
+SELECT
+    g.gene_stable_id gene,
+    g.gene_feature10 quan,
+    g.gene_feature4 ess,
+    g.gene_feature7 interact,
+    g.gene_feature6 rec,
+    AVG(sw.codingsw_cv) avg_cv,
+    AVG(sw.codingsw_intra_cv) avg_intra_cv
+FROM
+    gene g,
+    exon e,
+    codingsw sw,
+    window w
+WHERE
+    1 = 1
+        AND g.gene_id = e.gene_id
+        AND e.exon_id = sw.exon_id
+        AND sw.window_id = w.window_id
+        AND sw.codingsw_distance < 0
+        AND g.gene_feature10 IS NOT NULL
+GROUP BY g.gene_id
+EOF
+
+perl ~/Scripts/alignDB/util/query_sql.pl -d S288Cvsself_gene -f query.tmp -o ~/data/mrna-structure/xlsx/S288Cvsself_gene.csv
+rm query.tmp
+
 ```
 
 ## Blast
@@ -151,8 +219,10 @@ perl ~/Scripts/pars/blastn_transcript.pl -f ~/data/mrna-structure/blast/sce_gene
 
 # produce transcript set
 # YLR167W	568	chrXII	498888	499455	+
-perl -an -e 'print qq{$F[2]\t$F[3]\t$F[4]\n}' ~/data/mrna-structure/process/sce_genes.blast.tsv \
-    | sort > ~/data/mrna-structure/process/sce_genes.bed
+perl -an -e 'print qq{$F[2]\t$F[3]\t$F[4]\n}' \
+    ~/data/mrna-structure/process/sce_genes.blast.tsv \
+    | sort \
+    > ~/data/mrna-structure/process/sce_genes.bed
 
 # snps within transcripts
 perl ~/Scripts/alignDB/ofg/bed_op.pl --op bed_intersect --file ~/data/mrna-structure/process/$NAME.snp.bed --name ~/data/mrna-structure/process/sce_genes.bed
@@ -181,7 +251,12 @@ perl ~/Scripts/alignDB/ofg/bed_op.pl --op bed_intersect --file ~/data/mrna-struc
 mv $NAME.snp.bed.bed_intersect $NAME.snp.intergenic.bed
 
 # convert to unique snp name
-perl -an -e 'BEGIN{print qq{name\n}}; print qq{$F[0]:$F[1]\n}' ~/data/mrna-structure/process/$NAME.snp.intergenic.bed > ~/data/mrna-structure/process/$NAME.intergenic.snp.tsv
+perl -an -e '
+    BEGIN{print qq{name\n}};
+    print qq{$F[0]:$F[1]\n}
+    ' \
+    ~/data/mrna-structure/process/$NAME.snp.intergenic.bed \
+    > ~/data/mrna-structure/process/$NAME.intergenic.snp.tsv
 
 #----------------------------------------------------------#
 # utr (5' and 3')
@@ -197,7 +272,12 @@ perl ~/Scripts/alignDB/ofg/bed_op.pl --op bed_diff --file ~/data/mrna-structure/
 mv $NAME.snp.gene.bed.bed_diff $NAME.snp.utr.bed
 
 # convert to unique snp name
-perl -an -e 'BEGIN{print qq{name\n}}; print qq{$F[0]:$F[1]\n}' ~/data/mrna-structure/process/$NAME.snp.utr.bed > ~/data/mrna-structure/process/$NAME.utr.snp.tsv
+perl -an -e '
+    BEGIN{print qq{name\n}};
+    print qq{$F[0]:$F[1]\n};
+    ' \
+    ~/data/mrna-structure/process/$NAME.snp.utr.bed \
+    > ~/data/mrna-structure/process/$NAME.utr.snp.tsv
 
 unset NAME
 ```
@@ -213,3 +293,8 @@ tar -cf - mrna-structure/ | xz -9 -c - > mrna-structure.tar.xz
 ## Stats
 
 Switch to RStudio, let R do its jobs.
+
+```bash
+open -a RStudio ~/data/mrna-structure
+
+```
