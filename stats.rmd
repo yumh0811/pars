@@ -1,25 +1,22 @@
+---
+output: html_document
+---
 # yeast genes
 
-## File
-
 ```{r load_library, echo=FALSE, message=FALSE, results='markup'}
-setwd("D:/wq/yeast_gene")
-
 library(ggplot2)
 library(scales)
 library(reshape)
 library(pander)
 
-file <- "d:/wq/yeast_gene/S288CvsVII_WGS_pop.gene_variation.fold_class.tsv"
-file
-
+setwd("~/Scripts/pars")
 ```
 
-## All sheets
-
-### sheet [distance]
+## All results
 
 ```{r sheet_distance_read, echo=FALSE}
+
+file <- "~/data/mrna-structure/process/Scer_n8_Spar.gene_variation.fold_class.tsv"
 
 mydata <- read.csv(file,  header = TRUE, sep = "\t")
 
@@ -34,17 +31,15 @@ mydata$stem_vars <- rowSums(mydata[c("fold_left_vars", "fold_right_vars")])
 # suppress rownames
 rownames(mydata) <- NULL
 
-mydata <- mydata[c("name", "length", "vars", "mF", "loop_length","loop_vars","stem_length","stem_vars")]
-
-#mydata2 <- subset(mydata, mydata$vars > 0)
+mydata <- mydata[c("gene", "length", "vars", "mF", "loop_length","loop_vars","stem_length","stem_vars")]
 ```
 
-**data**
+### Table vars in loops and stems
 
 ```{r data, echo=FALSE, results="asis"}
 pandoc.table(colSums(mydata[c("loop_length", "loop_vars","stem_length", "stem_vars")]), style = "rmarkdown")
 
-quantile(mydata$mF, probs = seq(0, 1, 0.25))
+pandoc.table(quantile(mydata$mF, probs = seq(0, 1, 0.25)))
 smallmf <- subset(mydata, mydata$mF < 0.1226409)
 largemf <- subset(mydata, mydata$mF > 0.3561003)
 
@@ -52,7 +47,7 @@ pandoc.table(colSums(smallmf[c("loop_length", "loop_vars","stem_length", "stem_v
 pandoc.table(colSums(largemf[c("loop_length", "loop_vars","stem_length", "stem_vars")]), style = "rmarkdown")
 ```
 
-**plot**
+### Figure mF
 
 ```{r plot, echo=FALSE, fig.height=5, fig.width=6.5, dev=c( 'png'), dpi=150}
 ggplot(mydata, aes(x=mF)) + geom_histogram(colour="black", fill="white") +
@@ -60,29 +55,20 @@ ggplot(mydata, aes(x=mF)) + geom_histogram(colour="black", fill="white") +
                color="red", linetype="dashed", size=2) + labs(x = "mF scores")
 
 ggplot(mydata, aes(x=mF, y=vars/length)) +
-    geom_point(shape=1,) + 
+    geom_point(shape=1) + 
     geom_smooth(stat = "smooth", se=TRUE, size = 2)
 ```
 
 ## Convert
 
-Select codes and press 'Ctrl-Enter' in RStudio
+Select codes and press 'Cmd-Enter' in RStudio
 
 ### knitr html
 
 ```r
 library(knitr)
-knit2html('r_xlsx.rmd', options = c('toc', markdown::markdownHTMLOptions(TRUE)))
-if(interactive()) browseURL('r_xlsx.html')
-```
-
-### knitr and pandoc pdf
-
-```r
-library(knitr)
-knit('stats.Rmd')
-system("pandoc stats.md -o stats.pdf --toc")
-if(interactive()) shell.exec("stats.pdf")
+knit2html('stats.Rmd', options = c('toc', markdown::markdownHTMLOptions(TRUE)))
+if(interactive()) browseURL('stats.html')
 ```
 
 ### knitrBootstrap
