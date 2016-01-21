@@ -59,10 +59,8 @@ perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
     -da ~/data/alignment/Fungi/scer_wgs/Scer_n8_Spar_refined \
     --ensembl yeast_82 \
     --block \
-    --id ~/data/alignment/Fungi/scer_wgs/id2name.csv \
     --outgroup \
-    -taxon ~/data/alignment/Fungi/scer_wgs/taxon.csv \
-    -chr ~/data/alignment/Fungi/scer_wgs/chr_length.csv \
+    --chr ~/data/alignment/Fungi/scer_wgs/chr_length.csv \
     -lt 1000 --parallel 8 --batch 5 \
     --run all
 ```
