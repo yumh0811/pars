@@ -109,7 +109,7 @@ for my $gene ( sort keys %{$gene_info_of} ) {
 
         # var fold class
         for my $class ( keys %{$fold_class} ) {
-            if ( $info->{$class}->contain($gene_pos) ) {
+            if ( $info->{$class}->contains($gene_pos) ) {
                 $var->{fold_class} = $class;
                 my $island = $info->{$class}->find_islands($gene_pos);
                 $var->{fold_length} = $island->size;
