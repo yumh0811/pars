@@ -90,19 +90,23 @@ aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
 find WGS -name "*.gz" | xargs gzip -t
 ```
 
+### Illumina (NCBI ASSEMBLY)
+
 ```bash
 mkdir -p ~/data/mrna-structure/GENOMES/ASSEMBLIES
 cd ~/data/mrna-structure/GENOMES/ASSEMBLIES
 
 # Download, rename files and change fasta headers
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-    -p -f scer_wgs.seq.csv
+    -p -f ~/Scripts/pars/scer_100.seq.csv
 
 ```
 
+## Plans of alignments
+
 ```bash
 # create downloaded genome list
-cat ~/data/mrna-structure/GENOMES/ASSEMBLIES/scer_wgs.seq.csv \
+cat ~/Scripts/pars/scer_100.seq.csv \
     | grep -v "^#" \
     | cut -d',' -f1,3 \
     | uniq \
@@ -124,6 +128,99 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --dd ~/data/mrna-structure/GENOMES/ASSEMBLIES \
     --download "name=S288c;taxon=559292" \
     --download "name=EC1118;taxon=643680" \
+    --download "name=YJM993;taxon=1294331" \
+    --download "name=YJM195;taxon=1294305" \
+    --download "name=YJM270;taxon=1294308" \
+    --download "name=YJM470;taxon=1294313" \
+    --download "name=YJM683;taxon=1294320" \
+    --download "name=YJM689;taxon=1294321" \
+    --download "name=YJM693;taxon=1294322" \
+    --download "name=YJM1248;taxon=1294340" \
+    --download "name=YJM1273;taxon=1294343" \
+    --download "name=YJM1385;taxon=1294357" \
+    --download "name=YJM1388;taxon=1294360" \
+    --download "name=YJM1389;taxon=1294361" \
+    --download "name=YJM1399;taxon=1294362" \
+    --download "name=YJM1402;taxon=1294365" \
+    --download "name=YJM1418;taxon=1294368" \
+    --download "name=YJM1439;taxon=1294372" \
+    --download "name=YJM1443;taxon=1294373" \
+    --download "name=YJM1444;taxon=1294374" \
+    --download "name=YJM1447;taxon=1294375" \
+    --download "name=YJM1460;taxon=1294377" \
+    --download "name=YJM1549;taxon=1294384" \
+    --download "name=YJM1573;taxon=1294385" \
+    --download "name=YJM1592;taxon=1294387" \
+    --download "name=YJM244;taxon=1294306" \
+    --download "name=YJM1083;taxon=1292971" \
+    --download "name=YJM1129;taxon=1293430" \
+    --download "name=YJM193;taxon=1294304" \
+    --download "name=YJM248;taxon=1294307" \
+    --download "name=YJM320;taxon=947042" \
+    --download "name=YJM326;taxon=468558" \
+    --download "name=YJM428;taxon=947044" \
+    --download "name=YJM451;taxon=502869" \
+    --download "name=YJM453;taxon=1294311" \
+    --download "name=YJM456;taxon=1294312" \
+    --download "name=YJM541;taxon=1294314" \
+    --download "name=YJM555;taxon=1294316" \
+    --download "name=YJM627;taxon=1294317" \
+    --download "name=YJM681;taxon=1294318" \
+    --download "name=YJM969;taxon=1294323" \
+    --download "name=YJM972;taxon=1294324" \
+    --download "name=YJM978;taxon=1294326" \
+    --download "name=YJM981;taxon=1294327" \
+    --download "name=YJM984;taxon=1294328" \
+    --download "name=YJM996;taxon=1294332" \
+    --download "name=YJM1190;taxon=1294334" \
+    --download "name=YJM1199;taxon=1294335" \
+    --download "name=YJM1202;taxon=1294336" \
+    --download "name=YJM1250;taxon=1294341" \
+    --download "name=YJM1311;taxon=1294346" \
+    --download "name=YJM1332;taxon=1294348" \
+    --download "name=YJM1338;taxon=1294350" \
+    --download "name=YJM1341;taxon=1294351" \
+    --download "name=YJM1355;taxon=1294353" \
+    --download "name=YJM1356;taxon=1294354" \
+    --download "name=YJM1383;taxon=1294356" \
+    --download "name=YJM1386;taxon=1294358" \
+    --download "name=YJM1400;taxon=1294363" \
+    --download "name=YJM1401;taxon=1294364" \
+    --download "name=YJM1415;taxon=1294366" \
+    --download "name=YJM1433;taxon=1294370" \
+    --download "name=YJM1450;taxon=1294376" \
+    --download "name=YJM1463;taxon=1294378" \
+    --download "name=YJM1478;taxon=1294380" \
+    --download "name=YJM1479;taxon=1294381" \
+    --download "name=YJM1526;taxon=1294382" \
+    --download "name=YJM1527;taxon=1294383" \
+    --download "name=YJM1574;taxon=1294386" \
+    --download "name=YJM1615;taxon=1294388" \
+    --download "name=YJM1304;taxon=1294344" \
+    --download "name=YJM1434;taxon=1294371" \
+    --download "name=YJM1078;taxon=1296266" \
+    --download "name=YJM450;taxon=1294310" \
+    --download "name=YJM990;taxon=1294330" \
+    --download "name=YJM1242;taxon=1294338" \
+    --download "name=YJM1244;taxon=1294339" \
+    --download "name=YJM1307;taxon=1294345" \
+    --download "name=YJM1336;taxon=1294349" \
+    --download "name=YJM1381;taxon=1294355" \
+    --download "name=YJM1387;taxon=1294359" \
+    --download "name=YJM1419;taxon=1294369" \
+    --download "name=YJM1477;taxon=1294379" \
+    --download "name=YJM189;taxon=1294303" \
+    --download "name=YJM271;taxon=1294309" \
+    --download "name=YJM554;taxon=1294315" \
+    --download "name=YJM682;taxon=1294319" \
+    --download "name=YJM975;taxon=1294325" \
+    --download "name=YJM987;taxon=1294329" \
+    --download "name=YJM1133;taxon=1294333" \
+    --download "name=YJM1208;taxon=1294337" \
+    --download "name=YJM1252;taxon=1294342" \
+    --download "name=YJM1326;taxon=1294347" \
+    --download "name=YJM1342;taxon=1294352" \
+    --download "name=YJM1417;taxon=1294367" \
     --plan 'name=Scer_n7_pop;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
     --plan 'name=Scer_n7_Spar;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
     -y
