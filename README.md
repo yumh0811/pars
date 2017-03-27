@@ -1,11 +1,20 @@
 # Processing Yeast PARS Data
 
-## Preparing steps
+[TOC]: # " "
 
-* `withncbi/db`: taxonomy database
-* `withncbi/pop/`: scer_wgs alignments
+- [Download reference data](#download-reference-data)
+- [Other strains and outgroups](#other-strains-and-outgroups)
+    - [Sanger (WGS)](#sanger-wgs)
+- [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes)
+- [Build self alignDB for gene information](#build-self-aligndb-for-gene-information)
+- [Blast](#blast)
+- [SNPs and indels](#snps-and-indels)
+- [Real Processing](#real-processing)
+- [Pack all things up](#pack-all-things-up)
+- [Stats](#stats)
 
-## Download data
+
+## Download reference data
 
 Download PARS10 full site.
 
@@ -16,24 +25,25 @@ cd ~/data/mrna-structure/PARS10
 perl ~/Scripts/download/list.pl -u http://genie.weizmann.ac.il/pubs/PARS10/
 perl ~/Scripts/download/download.pl -i pubs_PARS10.yml
 
-find . -name "*.gz" | xargs gunzip
+find . -name "*.gz" | xargs gzip -d
 ```
 
-Download S288c annotation data from ensembl by [rsync](http://www.ensembl.org/info/data/ftp/rsync.html?redirect=no).
+Download S288c annotation data from ensembl by
+[rsync](http://www.ensembl.org/info/data/ftp/rsync.html?redirect=no).
 
 S288c assembly version is not changed from 2011, R64-1-1 (GCA_000146045.2).
 
 ```bash
-mkdir -p ~/data/ensembl82/mysql
-cd ~/data/ensembl82/mysql
+mkdir -p ~/data/mrna-structure/ensembl82/mysql
+cd ~/data/mrna-structure/ensembl82/mysql
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/mysql/saccharomyces_cerevisiae_core_82_4 .
 
-mkdir -p ~/data/ensembl82/fasta
-cd ~/data/ensembl82/fasta
+mkdir -p ~/data/mrna-structure/ensembl82/fasta
+cd ~/data/mrna-structure/ensembl82/fasta
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/saccharomyces_cerevisiae .
 
-perl ~/Scripts/alignDB/util/build_ensembl.pl -e ~/data/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --checksum
-perl ~/Scripts/alignDB/util/build_ensembl.pl -e ~/data/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --initdb --db yeast_82
+perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --checksum
+perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --initdb --db yeast_82
 ```
 
 SGD.
