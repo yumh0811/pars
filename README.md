@@ -84,7 +84,6 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
     -f ~/Scripts/pars/scer_wgs.tsv \
     --fix -a \
     -o WGS
-    
 
 aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
 
@@ -170,7 +169,6 @@ sh plan_Scer_n7_Spar.sh
 sh 5_multi_cmd.sh
 sh 7_multi_db_only.sh
 
-find . -name "*.gz" | xargs gunzip
 ```
 
 ## Build alignDB for multiple genomes
@@ -208,7 +206,7 @@ rm Scer_n8_Spar.mvar.snp_codon_list.xlsx
 
 List all valid genes.
 
-```sql
+```mysql
 SELECT *
 FROM gene g, window w
 where g.window_id  = w.window_id
@@ -319,9 +317,12 @@ perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
 
 ## SNPs and indels
 
-Select columns `chr_name	snp_pos  snp_pos` and manually create snp bed file `~/data/mrna-structure/process/Scer_n8_Spar.snp.bed` from `~/data/mrna-structure/xlsx/Scer_n8_Spar.mvar.xlsx`
+Select columns `chr_name	snp_pos snp_pos` and manually create snp bed file
+`~/data/mrna-structure/process/Scer_n8_Spar.snp.bed` from
+`~/data/mrna-structure/xlsx/Scer_n8_Spar.mvar.xlsx`
 
-Select columns `chr_name	indel_start    indel_end` and manually create indel bed file `~/data/mrna-structure/process/Scer_n8_Spar.indel.bed`.
+Select columns `chr_name	indel_start indel_end` and manually create indel bed file
+`~/data/mrna-structure/process/Scer_n8_Spar.indel.bed`.
 
 ## Real Processing
 
@@ -418,3 +419,4 @@ Switch to RStudio, let R do its jobs.
 open -a RStudio ~/data/mrna-structure
 
 ```
+
