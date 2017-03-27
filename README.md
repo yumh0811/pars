@@ -63,7 +63,7 @@ find . -name "*.gz" | xargs gzip -d
 * `withncbi/db/`: taxonomy database
 * `withncbi/pop/`: scer_wgs alignments
 
-### Sanger (WGS)
+### Sanger (NCBI WGS)
 
 | Strain                       | Taxonomy ID | Sequencing Technology | Total length (bp) |
 |:-----------------------------|:------------|:----------------------|:------------------|
@@ -93,22 +93,6 @@ find WGS -name "*.gz" | xargs gzip -t
 ```bash
 mkdir -p ~/data/mrna-structure/GENOMES/ASSEMBLIES
 cd ~/data/mrna-structure/GENOMES/ASSEMBLIES
-
-# Download S288c, EC1118 separately
-perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-    -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_assembly_report.txt \
-    --nuclear -name S288c \
-    > S288c.seq.csv
-
-perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
-    -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/218/975/GCA_000218975.1_ASM21897v1/GCA_000218975.1_ASM21897v1_assembly_report.txt \
-    --nuclear --genbank --scaffold -name EC1118 \
-    > EC1118.seq.csv
-
-echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_wgs.seq.csv
-cat S288c.seq.csv EC1118.seq.csv \
-    | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
-    >> scer_wgs.seq.csv
 
 # Download, rename files and change fasta headers
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
