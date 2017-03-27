@@ -51,9 +51,124 @@ SGD.
 ```bash
 mkdir -p ~/data/mrna-structure/sgd
 cd ~/data/mrna-structure/sgd
-wget -N http://downloads.yeastgenome.org/sequence/S288C_reference/intergenic/NotFeature.fasta.gz
-wget -N http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_coding.fasta.gz
-wget -N http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_genomic_all.fasta.gz
+aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/intergenic/NotFeature.fasta.gz
+aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_coding.fasta.gz
+aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_genomic_all.fasta.gz
+
+find . -name "*.gz" | xargs gzip -d
+```
+
+## Other strains and outgroups
+
+* `withncbi/db/`: taxonomy database
+* `withncbi/pop/`: scer_wgs alignments
+
+### Sanger (WGS)
+
+| Strain                       | Taxonomy ID | Sequencing Technology | Total length (bp) |
+|:-----------------------------|:------------|:----------------------|:------------------|
+| *S. cerevisiae* S288c        | 559292      | Sanger                | 12,157,105        |
+| *S. cerevisiae* EC1118       | 643680      | 6x Sanger; 17.6x 454  | 11,659,512        |
+| *S. cerevisiae* Kyokai no. 7 | 721032      | 9.1x Sanger           | 12,370,866        |
+| *S. cerevisiae* RM11-1a      | 285006      | 10x Sanger            | 11,675,031        |
+| *S. cerevisiae* Sigma1278b   | 658763      | 45x Sanger/Illumina   | 11,906,055        |
+| *S. cerevisiae* T7           | 929585      | 25.4x Sanger/454      | 11,758,843        |
+| *S. cerevisiae* YJM789       | 307796      | 10x Sanger            | 11,990,995        |
+| *S. paradoxus* NRRL Y-17217  | 226125      | 7.7x Sanger           | 11,872,617        |
+
+```bash
+mkdir -p ~/data/mrna-structure/GENOMES
+cd ~/data/mrna-structure/GENOMES
+
+perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+    -f ~/Scripts/pars/scer_wgs.tsv \
+    --fix -a \
+    -o WGS
+    
+
+aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
+
+find WGS -name "*.gz" | xargs gzip -t
+```
+
+```bash
+mkdir -p ~/data/mrna-structure/GENOMES/ASSEMBLIES
+cd ~/data/mrna-structure/GENOMES/ASSEMBLIES
+
+# Download S288c, EC1118 separately
+perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+    -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64/GCF_000146045.2_R64_assembly_report.txt \
+    --nuclear -name S288c \
+    > S288c.seq.csv
+
+perl ~/Scripts/withncbi/taxon/assembly_csv.pl \
+    -f ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/218/975/GCA_000218975.1_ASM21897v1/GCA_000218975.1_ASM21897v1_assembly_report.txt \
+    --nuclear --genbank --scaffold -name EC1118 \
+    > EC1118.seq.csv
+
+echo "#strain_name,accession,strain_taxon_id,seq_name" > scer_wgs.seq.csv
+cat S288c.seq.csv EC1118.seq.csv \
+    | perl -nl -e '/^#/ and next; /^\s*$/ and next; print;' \
+    >> scer_wgs.seq.csv
+
+# Download, rename files and change fasta headers
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+    -p -f scer_wgs.seq.csv
+
+```
+
+```bash
+# create downloaded genome list
+cat ~/data/mrna-structure/GENOMES/ASSEMBLIES/scer_wgs.seq.csv \
+    | grep -v "^#" \
+    | cut -d',' -f1,3 \
+    | uniq \
+    | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'
+
+mkdir -p ~/data/mrna-structure/alignment/scer_wgs
+cd ~/data/mrna-structure/alignment/scer_wgs
+
+perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+    -i ~/data/mrna-structure/GENOMES/WGS/scer_wgs.data.yml \
+    -o scer_wgs.plan.yml \
+    -d ~/data/mrna-structure/GENOMES/WGS \
+    -m prefix \
+    -r '*.fsa_nt.gz' \
+    --opt group_name=scer_wgs \
+    --opt base_dir='~/data/mrna-structure/alignment' \
+    --opt data_dir="~/data/mrna-structure/alignment/scer_wgs" \
+    --opt rm_species=Fungi \
+    --dd ~/data/mrna-structure/GENOMES/ASSEMBLIES \
+    --download "name=S288c;taxon=559292" \
+    --download "name=EC1118;taxon=643680" \
+    --plan 'name=Scer_n7_pop;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789' \
+    --plan 'name=Scer_n7_Spar;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
+    -y
+
+# pop_prep.pl
+perl ~/Scripts/withncbi/pop/pop_prep.pl -p 8 -i scer_wgs.plan.yml
+
+sh 01_file.sh
+sh 02_rm.sh
+sh 03_strain_info.sh
+
+# plan_ALL.sh
+sh plan_ALL.sh
+
+sh 1_real_chr.sh
+sh 3_pair_cmd.sh
+sh 4_rawphylo.sh
+sh 5_multi_cmd.sh
+
+# other plans
+sh plan_Scer_n7_pop.sh
+sh 5_multi_cmd.sh
+sh 7_multi_db_only.sh
+
+# other plans
+sh plan_Scer_n7_Spar.sh
+sh 5_multi_cmd.sh
+sh 7_multi_db_only.sh
 
 find . -name "*.gz" | xargs gunzip
 ```
