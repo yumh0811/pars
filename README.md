@@ -267,13 +267,22 @@ bash 5_multi_cmd.sh
 mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
 
-perl ~/Scripts/alignDB/extra/multi_way_batch.pl \
-    -d Scer_n8_Spar \
-    -da ~/data/alignment/Fungi/scer_wgs/Scer_n8_Spar_refined \
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n7_pop \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n7_pop_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
     --ensembl yeast_82 \
-    --block \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run all
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n7_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n7_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl yeast_82 \
     --outgroup \
-    --chr ~/data/alignment/Fungi/scer_wgs/chr_length.csv \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
     -lt 1000 --parallel 8 --batch 5 \
     --run all
 ```
