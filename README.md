@@ -230,33 +230,34 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
 # pop_prep.pl
 perl ~/Scripts/withncbi/pop/pop_prep.pl -p 16 -i scer_wgs.plan.yml
 
-sh 01_file.sh
-sh 02_rm.sh
-sh 03_strain_info.sh
+bash 01_file.sh
+bash 02_rm.sh
+bash 03_strain_info.sh
 
 # plan_ALL.sh
-sh plan_ALL.sh
+bash plan_ALL.sh
 
-sh 1_real_chr.sh
-sh 3_pair_cmd.sh
-sh 4_rawphylo.sh
-sh 5_multi_cmd.sh
-
-# other plans
-sh plan_Scer_n7_pop.sh
-sh 5_multi_cmd.sh
+bash 1_real_chr.sh
+bash 3_pair_cmd.sh
+bash 4_rawphylo.sh
+bash 5_multi_cmd.sh
+bash 7_multi_db_only.sh
 
 # other plans
-sh plan_Scer_n7_Spar.sh
-sh 5_multi_cmd.sh
+bash plan_Scer_n7_pop.sh
+bash 5_multi_cmd.sh
 
 # other plans
-sh plan_Scer_n94_pop.sh
-sh 5_multi_cmd.sh
+bash plan_Scer_n7_Spar.sh
+bash 5_multi_cmd.sh
 
 # other plans
-sh plan_Scer_n94_Spar.sh
-sh 5_multi_cmd.sh
+bash plan_Scer_n94_pop.sh
+bash 5_multi_cmd.sh
+
+# other plans
+bash plan_Scer_n94_Spar.sh
+bash 5_multi_cmd.sh
 
 ```
 
