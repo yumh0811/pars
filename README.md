@@ -4,7 +4,9 @@
 
 - [Download reference data](#download-reference-data)
 - [Other strains and outgroups](#other-strains-and-outgroups)
-    - [Sanger (WGS)](#sanger-wgs)
+    - [Sanger (NCBI WGS)](#sanger-ncbi-wgs)
+    - [Illumina (NCBI ASSEMBLY)](#illumina-ncbi-assembly)
+- [Plans of alignments](#plans-of-alignments)
 - [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes)
 - [Build self alignDB for gene information](#build-self-aligndb-for-gene-information)
 - [Blast](#blast)
