@@ -15,8 +15,9 @@
     - [Illumina (NCBI ASSEMBLY)](#illumina-ncbi-assembly)
 - [Plans of alignments](#plans-of-alignments)
 - [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes)
+    - [Extract `gene_list` and `snp_codon_list`](#extract-gene-list-and-snp-codon-list)
+    - [SNPs and indels](#snps-and-indels)
 - [Blast](#blast)
-- [SNPs and indels](#snps-and-indels)
 - [Real Processing](#real-processing)
 - [Pack all things up](#pack-all-things-up)
 - [Stats](#stats)
@@ -433,19 +434,46 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-Extract `gene_list` and `snp_codon_list` from
-`Scer_n7_Spar.mvar.1-60.xlsx`.
+##  Extract `gene_list` and `snp_codon_list`
 
 ```bash
 cd ~/data/mrna-structure/xlsx
 
-perl ~/Scripts/fig_table/collect_xlsx.pl -f Scer_n7_Spar.mvar.1-60.xlsx -s gene_list -n gene_list -o Scer_n7_Spar.mvar.gene_list.xlsx
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.gene_list.xlsx > Scer_n7_Spar.mvar.gene_list.csv
-rm Scer_n7_Spar.mvar.gene_list.xlsx
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n7_Spar.mvar.gene_list.csv
 
-perl ~/Scripts/fig_table/collect_xlsx.pl -f Scer_n7_Spar.mvar.1-60.xlsx -s snp_codon_list -n snp_codon_list -o Scer_n7_Spar.mvar.snp_codon_list.xlsx
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.snp_codon_list.xlsx > Scer_n7_Spar.mvar.snp_codon_list.csv
-rm Scer_n7_Spar.mvar.snp_codon_list.xlsx
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n7_Spar.mvar.gene_list.csv
+```
+
+## SNPs and indels
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n7_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n7_Spar.indel.pos.txt
+
 ```
 
 List all valid genes.
@@ -482,36 +510,6 @@ perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
 # blast every transcripts against genome
 ~/share/blast/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 4 \
     -i ~/data/mrna-structure/PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
-```
-
-# SNPs and indels
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n7_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n7_Spar.indel.pos.txt
-
 ```
 
 # Real Processing
