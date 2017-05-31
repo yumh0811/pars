@@ -562,7 +562,6 @@ perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
 #----------------------------------------------------------#
 # intergenic
 #----------------------------------------------------------#
-# produce intergenic set
 cat ../sgd/NotFeature.fasta \
     | perl -n -e '
         />/ or next;
@@ -571,15 +570,39 @@ cat ../sgd/NotFeature.fasta \
     > sce_intergenic.pos.txt
 jrunlist cover sce_intergenic.pos.txt -o sce_intergenic.yml
 
-# SNPs within intergenic
+# SNPs within intergenic regions
 runlist position --op superset \
     sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
     -o ${NAME}.snp.intergenic.pos.txt
 
 #----------------------------------------------------------#
-# utr (5' and 3') and intron
+# intron
 #----------------------------------------------------------#
-# FIXME: seperate 5' and 3' utrs
+cat ../sgd/orf_coding_all.fasta \
+    | perl -n -MAlignDB::IntSpan -e '
+        />/ or next;
+        /Chr\s+(\w+)\s+from\s+([\d,-]+)/ or next;
+        
+        my $chr = $1;
+        my $range = $2;
+        my @ranges = sort { $a <=> $b } grep {/^\d+$/} split /,|\-/, $range;
+        my $intspan = AlignDB::IntSpan->new()->add_range(@ranges);
+        my $hole = $intspan->holes;
+        
+        printf qq{%s:%s\n}, $chr, $hole->as_string if $hole->is_not_empty;
+    ' \
+    > sce_intron.pos.txt
+jrunlist cover sce_intron.pos.txt -o sce_intron.yml
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+#----------------------------------------------------------#
+# utr (5' and 3')
+#----------------------------------------------------------#
+# FIXME: separate 5' and 3' utrs
 
 # produce orf set
 cat ../sgd/orf_genomic_all.fasta \
