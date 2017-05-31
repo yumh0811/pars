@@ -1,14 +1,20 @@
 # Processing Yeast PARS Data
 
-[TOC]: # " "
-
+[TOC level=1-3]: # " "
+- [Processing Yeast PARS Data](#processing-yeast-pars-data)
 - [Download reference data](#download-reference-data)
+    - [Download PARS10 full site.](#download-pars10-full-site)
+    - [Download S288c annotation data from ensembl by](#download-s288c-annotation-data-from-ensembl-by)
+    - [SGD.](#sgd)
+    - [mRNA levels](#mrna-levels)
+    - [ess, rich/minimal and chem](#ess-richminimal-and-chem)
+    - [Recombination rates](#recombination-rates)
+    - [Protein-protein interactions](#protein-protein-interactions)
 - [Other strains and outgroups](#other-strains-and-outgroups)
     - [Sanger (NCBI WGS)](#sanger-ncbi-wgs)
     - [Illumina (NCBI ASSEMBLY)](#illumina-ncbi-assembly)
 - [Plans of alignments](#plans-of-alignments)
 - [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes)
-- [Build self alignDB for gene information](#build-self-aligndb-for-gene-information)
 - [Blast](#blast)
 - [SNPs and indels](#snps-and-indels)
 - [Real Processing](#real-processing)
@@ -16,9 +22,9 @@
 - [Stats](#stats)
 
 
-## Download reference data
+# Download reference data
 
-Download PARS10 full site.
+## Download PARS10 full site.
 
 ```bash
 mkdir -p ~/data/mrna-structure/PARS10
@@ -30,10 +36,12 @@ perl ~/Scripts/download/download.pl -i pubs_PARS10.yml
 find . -name "*.gz" | xargs gzip -d
 ```
 
-Download S288c annotation data from ensembl by
+## Download S288c annotation data from ensembl by
+
 [rsync](http://www.ensembl.org/info/data/ftp/rsync.html?redirect=no).
 
-S288c assembly version is not changed from 2011, R64-1-1 (GCA_000146045.2).
+S288c assembly version is not changed from 2011, R64-1-1
+(GCA_000146045.2).
 
 ```bash
 mkdir -p ~/data/mrna-structure/ensembl82/mysql
@@ -45,10 +53,10 @@ cd ~/data/mrna-structure/ensembl82/fasta
 rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/saccharomyces_cerevisiae .
 
 perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --checksum
-perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --initdb --db yeast_82
+perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --initdb --db saccharomyces_cerevisiae_core_29_82_4
 ```
 
-SGD.
+## SGD.
 
 ```bash
 mkdir -p ~/data/mrna-structure/sgd
@@ -60,12 +68,141 @@ aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_
 find . -name "*.gz" | xargs gzip -d
 ```
 
-## Other strains and outgroups
+## mRNA levels
+
+* Data source: Quantification of the yeast transcriptome by
+  single-molecule sequencing. Lipson, D. et al. Nature Biotechnology 27,
+  652-658 (2009) doi:10.1038/nbt.1551
+
+```bash
+mkdir -p ~/data/mrna-structure/gene-traits
+cd ~/data/mrna-structure/gene-traits
+
+wget -N http://www.nature.com/nbt/journal/v27/n7/extref/nbt.1551-S2.xls
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f nbt.1551-S2.xls --sheet 'counts' \
+    | perl -nla -F/,/ -e '
+    if ( /^#/ ) {
+        print qq{#ORF\tGene\tAvg};
+    }
+    elsif ( /^\d/ ) {
+        print qq{$F[1]\t$F[2]\t$F[9]};
+    }
+    ' \
+    > mrna_levels.tsv
+```
+
+## ess, rich/minimal and chem
+
+* ess: Giaever, G., et al. Functional Profiling of theSaccharomyces
+  cerevisiae Genome. Nature 418, 387-391. (2002)
+* rich/minimal: Mechanisms of Haploinsufficiency Revealed by Genome-Wide
+  Profiling in Yeast Deutschbauer, AM. et al. GENETICS April 1, 2005
+  vol. 169 no. 4 1915-1925; 10.1534/genetics.104.036871
+* chem: The Chemical Genomic Portrait of Yeast: Uncovering a Phenotype
+  for All Genes. Hillenmeyer, M.E. et al. Science 18 Apr 2008: Vol. 320,
+  Issue 5874, pp. 362-365 DOI: 10.1126/science.1150021
+
+```bash
+mkdir -p ~/data/mrna-structure/gene-traits
+cd ~/data/mrna-structure/gene-traits
+
+wget -N http://www-sequence.stanford.edu/group/yeast_deletion_project/Essential_ORFs.txt
+
+cat Essential_ORFs.txt \
+    | perl -nl -e '
+        next unless /^\d/;
+        my $orf = ( split /\s+/ )[1];
+        print qq{$orf};
+    ' \
+    > ess_orf.tsv
+
+wget -N http://www-sequence.stanford.edu/group/research/HIP_HOP/supplements/01yfh/files/OrfGeneData.txt
+
+cat OrfGeneData.txt \
+    | perl -nla -F"\t" -e '
+        printf q{#} if /^orf/;
+        print qq{$F[0]\t$F[1]\t$F[5]\t$F[13]\t$F[17]};
+    ' \
+    > rich_orf.tsv
+
+# http://chemogenomics.stanford.edu/supplements/global/
+
+wget -N http://chemogenomics.stanford.edu/supplements/global/download/data/hom.z_tdist_pval_nm.counts.smallmol.cutoff.01.xls
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f hom.z_tdist_pval_nm.counts.smallmol.cutoff.01.xls --sheet 'hom.z_tdist_pval_nm.smallmol.co' \
+    | perl -nla -F"," -MText::CSV_XS -e '
+    BEGIN { 
+        our $csv = Text::CSV_XS->new(); 
+        print qq{#ORF\tGene\tCount};
+    }
+    
+    if ( /^Y/ ) {
+        if ($csv->parse($_)) {
+            my @fields = $csv->fields();
+            print qq{$fields[0]\t$fields[1]\t$fields[6]};
+        }
+    }
+    ' \
+    > chem_orf.tsv
+
+```
+
+## Recombination rates
+
+* Data source: Global mapping of meiotic recombination hotspots and
+  coldspots in the yeast Saccharomyces cerevisiae. vol. 97 no. 21 PNAS
+  Jennifer L. Gerton, 11383–11390
+
+```bash
+mkdir -p ~/data/mrna-structure/gene-traits
+cd ~/data/mrna-structure/gene-traits
+
+wget -N http://derisilab.ucsf.edu/data/hotspots/forWebORFs.txt
+
+cat forWebORFs.txt \
+    | perl -nla -F"\t" -MStatistics::Lite -e '
+        next unless /^Y/;    # ORF stable id start with a "Y"
+        next if @F < 2;
+        my $rec_rate  = Statistics::Lite::median(grep {defined} @F[1 .. 7]);
+        print qq{$F[0]\t$rec_rate};
+    ' \
+    > rec_rate.tsv
+```
+
+## Protein-protein interactions
+
+* Data source:
+
+```bash
+mkdir -p ~/data/mrna-structure/gene-traits
+cd ~/data/mrna-structure/gene-traits
+
+wget -N http://drygin.ccbr.utoronto.ca/%7Ecostanzo2009/sgadata_costanzo2009_stringentCutoff_101120.txt.gz
+
+gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
+    | perl -nla -F"\t" -e '
+        BEGIN { our %interact_of; }
+        
+        next unless /^Y/;    # ORF stable id start with a "Y"
+        next if @F != 7;
+        $interact_of{$F[0]}++;
+        
+        END {
+            for my $key ( sort keys %interact_of ) {
+                print qq{$key\t$interact_of{$key}};
+            }
+        }
+    ' \
+    > interact_count.tsv
+```
+
+# Other strains and outgroups
 
 * `withncbi/db/`: taxonomy database
 * `withncbi/pop/`: scer_wgs alignments
 
-### Sanger (NCBI WGS)
+## Sanger (NCBI WGS)
 
 | Strain                       | Taxonomy ID | Sequencing Technology | Total length (bp) |
 |:-----------------------------|:------------|:----------------------|:------------------|
@@ -92,7 +229,7 @@ aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
 find WGS -name "*.gz" | xargs gzip -t
 ```
 
-### Illumina (NCBI ASSEMBLY)
+## Illumina (NCBI ASSEMBLY)
 
 ```bash
 mkdir -p ~/data/mrna-structure/GENOMES/ASSEMBLIES
@@ -104,7 +241,7 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
 
 ```
 
-## Plans of alignments
+# Plans of alignments
 
 ```bash
 # create downloaded genome list
@@ -263,7 +400,7 @@ bash 5_multi_cmd.sh
 
 ```
 
-## Build alignDB for multiple genomes
+# Build alignDB for multiple genomes
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -273,36 +410,42 @@ perl ~/Scripts/alignDB/alignDB.pl \
     -d Scer_n7_pop \
     -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n7_pop_refined \
     -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl yeast_82 \
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
     --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
     -lt 1000 --parallel 8 --batch 5 \
-    --run all
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n7_pop -r 1-60
 
 perl ~/Scripts/alignDB/alignDB.pl \
     -d Scer_n7_Spar \
     -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n7_Spar_refined \
     -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl yeast_82 \
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
     --outgroup \
     --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
     -lt 1000 --parallel 8 --batch 5 \
-    --run all
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n7_Spar -r 1-60
+
 ```
 
-Extract `gene_list` from `Scer_n8_Spar.mvar.xlsx`.
-
-Extract `snp_codon_list` from `Scer_n8_Spar.mvar.xlsx`.
+Extract `gene_list` and `snp_codon_list` from
+`Scer_n7_Spar.mvar.1-60.xlsx`.
 
 ```bat
-cd /d d:\data\mrna-structure\xlsx\
+cd ~/data/mrna-structure/xlsx
 
-perl d:\Scripts\fig_table\collect_excel.pl -f Scer_n8_Spar.mvar.xlsx -s gene_list -n gene_list -o Scer_n8_Spar.mvar.gene_list.xlsx
-perl d:\Scripts\fig_table\xlsx2xls.pl -d Scer_n8_Spar.mvar.gene_list.xlsx --csv
-rm Scer_n8_Spar.mvar.gene_list.xlsx
+perl ~/Scripts/fig_table/collect_xlsx.pl -f Scer_n7_Spar.mvar.1-60.xlsx -s gene_list -n gene_list -o Scer_n7_Spar.mvar.gene_list.xlsx
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.gene_list.xlsx > Scer_n7_Spar.mvar.gene_list.csv
+rm Scer_n7_Spar.mvar.gene_list.xlsx
 
-perl d:\Scripts\fig_table\collect_excel.pl -f Scer_n8_Spar.mvar.xlsx -s snp_codon_list -n snp_codon_list -o Scer_n8_Spar.mvar.snp_codon_list.xlsx
-perl d:\Scripts\fig_table\xlsx2xls.pl -d Scer_n8_Spar.mvar.snp_codon_list.xlsx --csv
-rm Scer_n8_Spar.mvar.snp_codon_list.xlsx
+perl ~/Scripts/fig_table/collect_xlsx.pl -f Scer_n7_Spar.mvar.1-60.xlsx -s snp_codon_list -n snp_codon_list -o Scer_n7_Spar.mvar.snp_codon_list.xlsx
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.snp_codon_list.xlsx > Scer_n7_Spar.mvar.snp_codon_list.csv
+rm Scer_n7_Spar.mvar.snp_codon_list.xlsx
 ```
 
 List all valid genes.
@@ -320,59 +463,7 @@ and g.gene_description not like "Identified%"
 order by w.window_length
 ```
 
-## Build self alignDB for gene information
-
-```bash
-perl ~/Scripts/alignDB/init/init_alignDB.pl \
-    -d S288Cvsself_gene \
-    -taxon ~/data/alignment/Fungi/scer_wgs/taxon.csv \
-    -chr ~/data/alignment/Fungi/scer_wgs/chr_length.csv
-
-perl ~/Scripts/alignDB/init/gen_alignDB_genome.pl \
-    -d S288Cvsself_gene \
-    -t "559292,S288c" \
-    -dir ~/data/alignment/Fungi/scer_wgs/Genomes/S288c \
-    --length 1_000_000 \
-    --parallel 8
-
-perl ~/Scripts/alignDB/gene/insert_gene.pl -d S288Cvsself_gene -e yeast_82 --batch 1 --parallel 8
-
-perl ~/Scripts/alignDB/init/update_sw_cv.pl -d S288Cvsself_gene --batch 1 --parallel 8
-perl ~/Scripts/alignDB/init/update_feature.pl -d S288Cvsself_gene -e yeast_82 --batch 1 --parallel 8
-
-perl ~/Scripts/alignDB/gene/update_gene_yeast_ess.pl -d S288Cvsself_gene
-perl ~/Scripts/alignDB/gene/update_gene_yeast_quan.pl -d S288Cvsself_gene
-
-cat <<EOF > query.tmp
-SELECT
-    g.gene_stable_id gene,
-    g.gene_feature10 quan,
-    g.gene_feature4 ess,
-    g.gene_feature7 interact,
-    g.gene_feature6 rec,
-    AVG(sw.codingsw_cv) avg_cv,
-    AVG(sw.codingsw_intra_cv) avg_intra_cv
-FROM
-    gene g,
-    exon e,
-    codingsw sw,
-    window w
-WHERE
-    1 = 1
-        AND g.gene_id = e.gene_id
-        AND e.exon_id = sw.exon_id
-        AND sw.window_id = w.window_id
-        AND sw.codingsw_distance < 0
-        AND g.gene_feature10 IS NOT NULL
-GROUP BY g.gene_id
-EOF
-
-perl ~/Scripts/alignDB/util/query_sql.pl -d S288Cvsself_gene -f query.tmp -o ~/data/mrna-structure/xlsx/S288Cvsself_gene.csv
-rm query.tmp
-
-```
-
-## Blast
+# Blast
 
 Prepare a combined fasta file of yeast genome.
 
@@ -416,16 +507,16 @@ perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
 ~/share/blast/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 4 -i ~/data/mrna-structure/PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
 ```
 
-## SNPs and indels
+# SNPs and indels
 
-Select columns `chr_name	snp_pos snp_pos` and manually create snp bed file
-`~/data/mrna-structure/process/Scer_n8_Spar.snp.bed` from
+Select columns `chr_name	snp_pos snp_pos` and manually create snp bed
+file `~/data/mrna-structure/process/Scer_n8_Spar.snp.bed` from
 `~/data/mrna-structure/xlsx/Scer_n8_Spar.mvar.xlsx`
 
-Select columns `chr_name	indel_start indel_end` and manually create indel bed file
-`~/data/mrna-structure/process/Scer_n8_Spar.indel.bed`.
+Select columns `chr_name	indel_start indel_end` and manually create
+indel bed file `~/data/mrna-structure/process/Scer_n8_Spar.indel.bed`.
 
-## Real Processing
+# Real Processing
 
 ```bash
 mkdir -p ~/data/mrna-structure/process
@@ -504,7 +595,7 @@ perl -an -e '
 unset NAME
 ```
 
-## Pack all things up
+# Pack all things up
 
 ```bash
 cd  ~/data
@@ -512,7 +603,7 @@ tar -cf - mrna-structure/ | xz -9 -c - > mrna-structure.tar.xz
 
 ```
 
-## Stats
+# Stats
 
 Switch to RStudio, let R do its jobs.
 
