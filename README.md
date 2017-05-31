@@ -64,10 +64,15 @@ mkdir -p ~/data/mrna-structure/sgd
 cd ~/data/mrna-structure/sgd
 
 aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/intergenic/NotFeature.fasta.gz
-aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_coding.fasta.gz
+aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_coding_all.fasta.gz
 aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_genomic_all.fasta.gz
+aria2c -c http://downloads.yeastgenome.org/curation/chromosomal_feature/saccharomyces_cerevisiae.gff
 
-find . -name "*.gz" | xargs gzip -d
+find . -name "*.gz" \
+    | parallel -j 1 "
+        echo {};
+        gzip -d -c {} > {.};
+    "
 ```
 
 ## mRNA levels
