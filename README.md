@@ -4,8 +4,8 @@
 - [Processing Yeast PARS Data](#processing-yeast-pars-data)
 - [Download reference data](#download-reference-data)
     - [Download PARS10 full site.](#download-pars10-full-site)
-    - [Download S288c annotation data from ensembl by](#download-s288c-annotation-data-from-ensembl-by)
-    - [SGD.](#sgd)
+    - [Download S288c annotation data from ensembl by rsync](#download-s288c-annotation-data-from-ensembl-by-rsync)
+    - [SGD](#sgd)
     - [mRNA levels](#mrna-levels)
     - [ess, rich/minimal and chem](#ess-richminimal-and-chem)
     - [Recombination rates](#recombination-rates)
@@ -19,8 +19,8 @@
     - [SNPs and indels](#snps-and-indels)
 - [Blast](#blast)
 - [Real Processing](#real-processing)
-- [Pack all things up](#pack-all-things-up)
 - [Stats](#stats)
+- [Pack all things up](#pack-all-things-up)
 
 
 # Download reference data
@@ -37,11 +37,11 @@ perl ~/Scripts/download/download.pl -i pubs_PARS10.yml
 find . -name "*.gz" | xargs gzip -d
 ```
 
-## Download S288c annotation data from ensembl by
+## Download S288c annotation data from ensembl by rsync
 
-[rsync](http://www.ensembl.org/info/data/ftp/rsync.html?redirect=no).
+http://www.ensembl.org/info/data/ftp/rsync.html?redirect=no
 
-S288c assembly version is not changed from 2011, R64-1-1
+S288c assembly version is not changed since 2011, R64-1-1
 (GCA_000146045.2).
 
 ```bash
@@ -57,11 +57,12 @@ perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensemb
 perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --initdb --db saccharomyces_cerevisiae_core_29_82_4
 ```
 
-## SGD.
+## SGD
 
 ```bash
 mkdir -p ~/data/mrna-structure/sgd
 cd ~/data/mrna-structure/sgd
+
 aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/intergenic/NotFeature.fasta.gz
 aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_coding.fasta.gz
 aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_genomic_all.fasta.gz
@@ -493,7 +494,8 @@ order by w.window_length
 
 # Blast
 
-Prepare a combined fasta file of yeast genome and blast genes against the genome.
+Prepare a combined fasta file of yeast genome and blast genes against
+the genome.
 
 ```bash
 mkdir -p ~/data/mrna-structure/blast
@@ -516,87 +518,88 @@ perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
 
 ```bash
 mkdir -p ~/data/mrna-structure/process
+cd ~/data/mrna-structure/process
+
 export NAME=Scer_n7_Spar
 
 #----------------------------------------------------------#
 # gene
 #----------------------------------------------------------#
-cd ~/data/mrna-structure/process
-
 # parse blastn output
-perl ~/Scripts/pars/blastn_transcript.pl -f ~/data/mrna-structure/blast/sce_genes.blast -m 0
+perl ~/Scripts/pars/blastn_transcript.pl -f ../blast/sce_genes.blast -m 0
 
 # produce transcript set
 # YLR167W	568	chrXII	498888	499455	+
-perl -an -e 'print qq{$F[2]\t$F[3]\t$F[4]\n}' \
-    ~/data/mrna-structure/process/sce_genes.blast.tsv \
+cat sce_genes.blast.tsv \
+    | perl -nla -e 'print qq{$F[2]:$F[3]-$F[4]}' \
     | sort \
-    > ~/data/mrna-structure/process/sce_genes.bed
+    > sce_genes.pos.txt
+jrunlist cover sce_genes.pos.txt -o sce_genes.yml
 
-# snps within transcripts
-perl ~/Scripts/alignDB/ofg/bed_op.pl --op bed_intersect --file ~/data/mrna-structure/process/$NAME.snp.bed --name ~/data/mrna-structure/process/sce_genes.bed
-mv $NAME.snp.bed.bed_intersect $NAME.snp.gene.bed
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
 
 # read gene and snp info file
 # produce $NAME.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl --pars ~/data/mrna-structure/PARS10/pubs/PARS10/data --gene ~/data/mrna-structure/process/sce_genes.blast.tsv --pos $NAME.snp.gene.bed  > fail_pos.txt
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos ${NAME}.snp.gene.bed \
+    > fail_pos.txt
 
-# check fail_pos.txt to find snps located in overlap genes
-# produce fail_pos.xlsx
+# check fail_pos.txt to find snps located in overlapped genes
 
-# process $NAME.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.yml
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
 
 #----------------------------------------------------------#
 # intergenic
 #----------------------------------------------------------#
-cd ~/data/mrna-structure/process
-
 # produce intergenic set
-perl -n -e '/>/ or next; /Chr\s+(\w+)\s+from\s+(\d+)\-(\d+)/ and print qq{$1\t$2\t$3\n}' ~/data/mrna-structure/sgd/NotFeature.fasta > ~/data/mrna-structure/process/intergenic.bed
-
-# snps within intergenic
-perl ~/Scripts/alignDB/ofg/bed_op.pl --op bed_intersect --file ~/data/mrna-structure/process/$NAME.snp.bed --name ~/data/mrna-structure/process/intergenic.bed
-mv $NAME.snp.bed.bed_intersect $NAME.snp.intergenic.bed
-
-# convert to unique snp name
-perl -an -e '
-    BEGIN{print qq{name\n}};
-    print qq{$F[0]:$F[1]\n}
+cat ../sgd/NotFeature.fasta \
+    | perl -n -e '
+        />/ or next;
+        /Chr\s+(\w+)\s+from\s+(\d+)\-(\d+)/ and print qq{$1:$2-$3\n};
     ' \
-    ~/data/mrna-structure/process/$NAME.snp.intergenic.bed \
-    > ~/data/mrna-structure/process/$NAME.intergenic.snp.tsv
+    > sce_intergenic.pos.txt
+jrunlist cover sce_intergenic.pos.txt -o sce_intergenic.yml
+
+# SNPs within intergenic
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
 
 #----------------------------------------------------------#
 # utr (5' and 3')
 #----------------------------------------------------------#
 # FIXME: seperate 5' and 3' utrs
-cd ~/data/mrna-structure/process
 
-# produce orf_genomic set
-perl -n -e '/>/ or next; /Chr\s+(\w+)\s+from\s+(\d+)\-(\d+)/ and print qq{$1\t$2\t$3\n}' ~/data/mrna-structure/sgd/orf_genomic_all.fasta > ~/data/mrna-structure/process/orf_genomic.bed
-
-# remove in orf_genomic set from snp.gene, so the left is snps.utr
-perl ~/Scripts/alignDB/ofg/bed_op.pl --op bed_diff --file ~/data/mrna-structure/process/$NAME.snp.gene.bed --name  ~/data/mrna-structure/process/orf_genomic.bed
-mv $NAME.snp.gene.bed.bed_diff $NAME.snp.utr.bed
-
-# convert to unique snp name
-perl -an -e '
-    BEGIN{print qq{name\n}};
-    print qq{$F[0]:$F[1]\n};
+# produce orf set
+cat ../sgd/orf_genomic_all.fasta \
+    | perl -n -e '
+        />/ or next;
+        /Chr\s+(\w+)\s+from\s+(\d+)\-(\d+)/ or next;
+        if ($2 == $3) {
+            print qq{$1:$2\n};
+        }
+        elsif ($2 < $3) {
+            print qq{$1:$2-$3\n};
+        }
+        else {
+            print qq{$1:$3-$2\n};
+        }
     ' \
-    ~/data/mrna-structure/process/$NAME.snp.utr.bed \
-    > ~/data/mrna-structure/process/$NAME.utr.snp.tsv
+    > sce_orf.pos.txt
+jrunlist cover sce_orf.pos.txt -o sce_orf.yml
+
+# remove in orf set from snp.gene, so the left is snps.utr
+runlist position --op non-overlap \
+    sce_orf.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
 
 unset NAME
-```
-
-# Pack all things up
-
-```bash
-cd  ~/data
-tar -cf - mrna-structure/ | xz -9 -c - > mrna-structure.tar.xz
-
 ```
 
 # Stats
@@ -605,6 +608,14 @@ Switch to RStudio, let R do its jobs.
 
 ```bash
 open -a RStudio ~/data/mrna-structure
+
+```
+
+# Pack all things up
+
+```bash
+cd  ~/data
+tar -cf - mrna-structure/ | xz -9 -c - > mrna-structure.tar.xz
 
 ```
 
