@@ -436,7 +436,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 Extract `gene_list` and `snp_codon_list` from
 `Scer_n7_Spar.mvar.1-60.xlsx`.
 
-```bat
+```bash
 cd ~/data/mrna-structure/xlsx
 
 perl ~/Scripts/fig_table/collect_xlsx.pl -f Scer_n7_Spar.mvar.1-60.xlsx -s gene_list -n gene_list -o Scer_n7_Spar.mvar.gene_list.xlsx
@@ -465,38 +465,14 @@ order by w.window_length
 
 # Blast
 
-Prepare a combined fasta file of yeast genome.
-
-```bash
-cd ~/data/alignment/Fungi/scer_wgs/Genomes/S288c
-
-cat \
-I.fa     \
-II.fa    \
-III.fa   \
-IV.fa    \
-V.fa     \
-VI.fa    \
-VII.fa   \
-VIII.fa  \
-IX.fa    \
-X.fa     \
-XI.fa    \
-XII.fa   \
-XIII.fa  \
-XIV.fa   \
-XV.fa    \
-XVI.fa   \
-> S288c.fa
-```
-
-Move `S288c.fa` to the blast folder and blast genes against the genome.
+Prepare a combined fasta file of yeast genome and blast genes against the genome.
 
 ```bash
 mkdir -p ~/data/mrna-structure/blast
 cd ~/data/mrna-structure/blast
 
-mv ~/data/alignment/Fungi/scer_wgs/Genomes/S288c/S288c.fa .
+cat ~/data/alignment/Fungi/scer_wgs/Genomes/S288c/{I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI}.fa \
+    > S288c.fa
 
 perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
 
@@ -504,23 +480,45 @@ perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
 ~/share/blast/bin/formatdb -p F -o T -i S288c.fa
 
 # blast every transcripts against genome
-~/share/blast/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 4 -i ~/data/mrna-structure/PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
+~/share/blast/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 4 \
+    -i ~/data/mrna-structure/PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
 ```
 
 # SNPs and indels
 
-Select columns `chr_name	snp_pos snp_pos` and manually create snp bed
-file `~/data/mrna-structure/process/Scer_n8_Spar.snp.bed` from
-`~/data/mrna-structure/xlsx/Scer_n8_Spar.mvar.xlsx`
+Select columns `chr_name,snp_pos` for SNPs.
 
-Select columns `chr_name	indel_start indel_end` and manually create
-indel bed file `~/data/mrna-structure/process/Scer_n8_Spar.indel.bed`.
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n7_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n7_Spar.indel.pos.txt
+
+```
 
 # Real Processing
 
 ```bash
 mkdir -p ~/data/mrna-structure/process
-export NAME=Scer_n8_Spar
+export NAME=Scer_n7_Spar
 
 #----------------------------------------------------------#
 # gene
