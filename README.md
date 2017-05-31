@@ -511,7 +511,7 @@ perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
 
 # blast every transcripts against genome
 ~/share/blast/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 4 \
-    -i ~/data/mrna-structure/PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
+    -i ../PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
 ```
 
 # Real Processing
@@ -542,14 +542,14 @@ runlist position --op superset \
     -o ${NAME}.snp.gene.pos.txt
 
 # read gene and snp info file
-# produce $NAME.gene_variation.yml
+# produce ${NAME}.gene_variation.yml
 perl ~/Scripts/pars/read_fold.pl \
     --pars ../PARS10/pubs/PARS10/data \
     --gene sce_genes.blast.tsv \
-    --pos ${NAME}.snp.gene.bed \
+    --pos  ${NAME}.snp.gene.bed \
     > fail_pos.txt
 
-# check fail_pos.txt to find snps located in overlapped genes
+# review fail_pos.txt to find SNPs located in overlapped genes
 
 # process ${NAME}.gene_variation.yml
 perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
@@ -572,7 +572,7 @@ runlist position --op superset \
     -o ${NAME}.snp.intergenic.pos.txt
 
 #----------------------------------------------------------#
-# utr (5' and 3')
+# utr (5' and 3') and intron
 #----------------------------------------------------------#
 # FIXME: seperate 5' and 3' utrs
 
