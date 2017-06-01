@@ -5,7 +5,7 @@ use autodie;
 
 use Getopt::Long qw();
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck qw();
 
 use Path::Tiny;
 
@@ -211,7 +211,7 @@ if ($file_pos2) {
     print "\n";
 }
 
-DumpFile( "$output.yml", $gene_info_of );
+YAML::Syck::DumpFile( "$output.yml", $gene_info_of );
 
 $stopwatch->end_message;
 

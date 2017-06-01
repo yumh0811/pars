@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long qw();
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck qw();
 
 use Path::Tiny;
 use Bio::SearchIO;
@@ -36,13 +36,13 @@ blastn_transcript.pl - get transcripts' genome location
 
 =cut
 
-GetOptions(
-    'help|?'   => sub { HelpMessage(0) },
+Getopt::Long::GetOptions(
+    'help|?'   => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s' => \my $file,
     'view|m=s'     => \( my $alignment_view = 0 ),
     'identity|i=i' => \( my $identity       = 99 ),
     'coverage|c=i' => \( my $coverage       = 1 ),
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 $|++;
 my $output;

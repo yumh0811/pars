@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long qw();
 use FindBin;
-use YAML qw(Dump Load DumpFile LoadFile);
+use YAML::Syck qw();
 
 use Path::Tiny;
 
@@ -22,11 +22,11 @@ use AlignDB::Stopwatch;
 
 =cut
 
-GetOptions(
-    'help|?'     => sub { HelpMessage(0) },
+Getopt::Long::GetOptions(
+    'help|?'     => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s'   => \my $file,
     'output|o=s' => \my $output,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -44,7 +44,7 @@ if ( !$output ) {
 # start update
 #----------------------------------------------------------#
 print "Load $file\n";
-my $gene_info_of = LoadFile($file);
+my $gene_info_of = YAML::Syck::LoadFile($file);
 
 my $fold_class = {
     fold_dot   => '.',
@@ -189,7 +189,7 @@ for my $gene ( sort keys %{$gene_info_of} ) {
     close $out_fh;
 }
 
-DumpFile( "$output.process.yml", $gene_info_of );
+YAML::Syck::DumpFile( "$output.process.yml", $gene_info_of );
 
 $stopwatch->end_message;
 
