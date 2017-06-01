@@ -506,10 +506,11 @@ the genome.
 mkdir -p ~/data/mrna-structure/blast
 cd ~/data/mrna-structure/blast
 
-cat ~/data/alignment/Fungi/scer_wgs/Genomes/S288c/{I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI}.fa \
+cat ~/data/mrna-structure/alignment/scer_wgs/Genomes/S288c/{I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI,Mito}.fa \
     > S288c.fa
 
 perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
+faops size S288c.fa > S288c.sizes
 
 # formatdb
 ~/share/blast/bin/formatdb -p F -o T -i S288c.fa
@@ -519,13 +520,11 @@ perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
     -i ../PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
 ```
 
-# Real Processing
+# Features
 
 ```bash
 mkdir -p ~/data/mrna-structure/process
 cd ~/data/mrna-structure/process
-
-export NAME=Scer_n7_Spar
 
 #----------------------------------------------------------#
 # gene
@@ -541,39 +540,18 @@ cat sce_genes.blast.tsv \
     > sce_genes.pos.txt
 jrunlist cover sce_genes.pos.txt -o sce_genes.yml
 
-# SNPs within transcripts
-runlist position --op superset \
-    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.gene.pos.txt
-
-# read gene and snp info file
-# produce ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl \
-    --pars ../PARS10/pubs/PARS10/data \
-    --gene sce_genes.blast.tsv \
-    --pos  ${NAME}.snp.gene.bed \
-    > fail_pos.txt
-
-# review fail_pos.txt to find SNPs located in overlapped genes
-
-# process ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
-
 #----------------------------------------------------------#
 # intergenic
 #----------------------------------------------------------#
 cat ../sgd/NotFeature.fasta \
     | perl -n -e '
         />/ or next;
-        /Chr\s+(\w+)\s+from\s+(\d+)\-(\d+)/ and print qq{$1:$2-$3\n};
+        /Chr\s+(\w+)\s+from\s+(\d+)\-(\d+)/ or next;
+        $1 eq "Mito" and next;
+        print qq{$1:$2-$3\n};
     ' \
     > sce_intergenic.pos.txt
 jrunlist cover sce_intergenic.pos.txt -o sce_intergenic.yml
-
-# SNPs within intergenic regions
-runlist position --op superset \
-    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intergenic.pos.txt
 
 #----------------------------------------------------------#
 # intron
@@ -582,7 +560,8 @@ cat ../sgd/orf_coding_all.fasta \
     | perl -n -MAlignDB::IntSpan -e '
         />/ or next;
         /Chr\s+(\w+)\s+from\s+([\d,-]+)/ or next;
-        
+        $1 eq "Mito" and next;
+
         my $chr = $1;
         my $range = $2;
         my @ranges = sort { $a <=> $b } grep {/^\d+$/} split /,|\-/, $range;
@@ -594,21 +573,16 @@ cat ../sgd/orf_coding_all.fasta \
     > sce_intron.pos.txt
 jrunlist cover sce_intron.pos.txt -o sce_intron.yml
 
-# SNPs within introns
-runlist position --op superset \
-    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intron.pos.txt
-
 #----------------------------------------------------------#
 # utr (5' and 3')
 #----------------------------------------------------------#
-# FIXME: separate 5' and 3' utrs
-
-# produce orf set
+# produce orf_genomic set
 cat ../sgd/orf_genomic_all.fasta \
     | perl -n -e '
         />/ or next;
         /Chr\s+(\w+)\s+from\s+(\d+)\-(\d+)/ or next;
+        $1 eq "Mito" and next;
+
         if ($2 == $3) {
             print qq{$1:$2\n};
         }
@@ -619,13 +593,114 @@ cat ../sgd/orf_genomic_all.fasta \
             print qq{$1:$3-$2\n};
         }
     ' \
-    > sce_orf.pos.txt
-jrunlist cover sce_orf.pos.txt -o sce_orf.yml
+    > sce_orf_genomic.pos.txt
+jrunlist cover sce_orf_genomic.pos.txt -o sce_orf_genomic.yml
 
-# remove in orf set from snp.gene, so the left is snps.utr
+# utr 5' and 3'
+jrunlist compare --op diff sce_genes.yml sce_orf_genomic.yml -o sce_utr.yml
+runlist convert sce_utr.yml -o sce_utr.pos.txt
+
+# 5' of orf_genomic
+cat ../sgd/orf_genomic_all.fasta \
+    | perl -n -e '
+        />/ or next;
+        /Chr\s+(\w+)\s+from\s+(\d+)\-(\d+)/ or next;
+        $1 eq "Mito" and next;
+
+        if ($2 < $3) {
+            print qq{$1:$2\n};
+        }
+        else {
+            print qq{$1:$3\n};
+        }
+    ' \
+    > sce_5prime.pos.txt
+jrunlist cover sce_5prime.pos.txt -o sce_5prime.yml
+jrunlist span --op pad -n 5 sce_5prime.yml -o sce_5prime_pad5.yml
+
+# split 5' and 3' utr
+runlist position --op overlap \
+    sce_5prime_pad5.yml sce_utr.pos.txt \
+    -o sce_utr5.pos.txt
+jrunlist cover sce_utr5.pos.txt -o sce_utr5.yml
+
 runlist position --op non-overlap \
-    sce_orf.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
+    sce_5prime_pad5.yml sce_utr.pos.txt \
+    -o sce_utr3.pos.txt
+jrunlist cover sce_utr3.pos.txt -o sce_utr3.yml
+
+# Stats
+printf "| %s | %s | %s | %s |\n" \
+    "Name" "chrLength" "size" "coverage" \
+    > coverage.stat.md
+printf "|:--|--:|--:|--:|\n" >> coverage.stat.md
+
+for f in genes intergenic intron orf_genomic utr utr5 utr3; do
+    printf "| %s | %s | %s | %s |\n" \
+        ${f} \
+        $( 
+            jrunlist stat ../blast/S288c.sizes sce_${f}.yml --all -o stdout \
+            | grep -v coverage \
+            | sed "s/,/ /g"
+        )
+done >> coverage.stat.md
+
+cat coverage.stat.md
+```
+
+| Name        | chrLength |    size | coverage |
+|:------------|----------:|--------:|---------:|
+| genes       |  12071326 | 4235405 |   0.3509 |
+| intergenic  |  12071326 | 2864170 |   0.2373 |
+| intron      |  12071326 |   65144 |   0.0054 |
+| orf_genomic |  12071326 | 8895737 |   0.7369 |
+| utr         |  12071326 |  516569 |   0.0428 |
+| utr5        |  12071326 |  275817 |   0.0228 |
+| utr3        |  12071326 |  240752 |   0.0199 |
+
+# Real Processing
+
+```bash
+export NAME=Scer_n7_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
 
 unset NAME
 ```
