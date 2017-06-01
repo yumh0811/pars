@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use autodie;
 
-use Getopt::Long qw(HelpMessage);
+use Getopt::Long qw();
 use FindBin;
 use YAML qw(Dump Load DumpFile LoadFile);
 
@@ -11,7 +11,8 @@ use Path::Tiny;
 
 use AlignDB::IntSpan;
 use AlignDB::Stopwatch;
-use AlignDB::Util qw(mean);
+use App::RL::Common;
+use App::Fasops::Common;
 
 #----------------------------------------------------------#
 # GetOpt section
@@ -22,19 +23,19 @@ use AlignDB::Util qw(mean);
     perl ~/Scripts/pars/read_fold.pl \
         --pars ~/data/mrna-structure/PARS10/pubs/PARS10/data \
         --gene ~/data/mrna-structure/process/sce_genes.blast.tsv \
-        --pos $NAME.snp.gene.bed  \
+        --pos $NAME.snp.gene.pos.txt  \
         > fail_pos.txt
 
 =cut
 
-GetOptions(
-    'help|?' => sub { HelpMessage(0) },
+Getopt::Long::GetOptions(
+    'help|?' => sub { Getopt::Long::HelpMessage(0) },
     'pars=s' => \my $dir_pars,
     'gene=s' => \( my $file_gene = "sce_genes.blast.tsv" ),
-    'pos=s'  => \( my $file_pos  = "S288CvsVII_WGS_pop.snp.gene.bed" ),
-    'pos2=s' => \my $file_pos2,
+    'pos=s'  => \( my $file_pos  = ".snp.gene.pos.txt" ),
+    'pos2=s'     => \my $file_pos2,    # for indel
     'output|o=s' => \my $output,
-) or HelpMessage(1);
+) or Getopt::Long::HelpMessage(1);
 
 #----------------------------------------------------------#
 # init
@@ -128,7 +129,7 @@ my $gene_info_of = {};
 
         if ( exists $gene_info_of->{$gene} ) {
             my @scores = split /\;/, $score;
-            $gene_info_of->{$gene}{mF_score}    = mean(@scores);
+            $gene_info_of->{$gene}{mF_score}    = App::Fasops::Common::mean(@scores);
             $gene_info_of->{$gene}{pars_scores} = [@scores];
         }
         else {
@@ -151,12 +152,17 @@ my $gene_info_of = {};
 
     open my $fh_pos, '<', $file_pos;
     while ( my $line = <$fh_pos> ) {
+        next if substr( $line, 0, 1 ) eq "#";
         chomp $line;
-        my ( $chr, $start, $end ) = split /\t/, $line;
 
-        my @genes
-            = grep { $gene_info_of->{$_}{start} <= $start and $end <= $gene_info_of->{$_}{end} }
-            grep { $gene_info_of->{$_}{chr} eq $chr } keys %{$gene_info_of};
+        my $info = App::RL::Common::decode_header($line);
+        next unless App::RL::Common::info_is_valid($info);
+
+        my @genes = grep {
+                    $gene_info_of->{$_}{start} <= $info->{start}
+                and $info->{end} <= $gene_info_of->{$_}{end}
+            }
+            grep { $gene_info_of->{$_}{chr} eq $info->{chr} } keys %{$gene_info_of};
 
         my $count = scalar @genes;
         if ( $count != 1 ) {
@@ -164,8 +170,8 @@ my $gene_info_of = {};
         }
         else {
             my $gene = $genes[0];
-            my $name = $gene_info_of->{$gene}{chr} . ":" . $start;
-            push @{ $gene_info_of->{$gene}{vars} }, { chr_pos => $start, name => $name, };
+            my $name = $gene_info_of->{$gene}{chr} . ":" . $info->{start};
+            push @{ $gene_info_of->{$gene}{vars} }, { chr_pos => $info->{start}, name => $name, };
         }
     }
     close $fh_pos;
@@ -178,12 +184,17 @@ if ($file_pos2) {
 
     open my $fh_pos, '<', $file_pos2;
     while ( my $line = <$fh_pos> ) {
+        next if substr( $line, 0, 1 ) eq "#";
         chomp $line;
-        my ( $chr, $start, $end ) = split /\t/, $line;
 
-        my @genes
-            = grep { $gene_info_of->{$_}{start} <= $start and $end <= $gene_info_of->{$_}{end} }
-            grep { $gene_info_of->{$_}{chr} eq $chr } keys %{$gene_info_of};
+        my $info = App::RL::Common::decode_header($line);
+        next unless App::RL::Common::info_is_valid($info);
+
+        my @genes = grep {
+                    $gene_info_of->{$_}{start} <= $info->{start}
+                and $info->{end} <= $gene_info_of->{$_}{end}
+            }
+            grep { $gene_info_of->{$_}{chr} eq $info->{chr} } keys %{$gene_info_of};
 
         my $count = scalar @genes;
         if ( $count != 1 ) {
@@ -191,9 +202,9 @@ if ($file_pos2) {
         }
         else {
             my $gene = $genes[0];
-            my $name = $gene_info_of->{$gene}{chr} . ":" . $start;
+            my $name = $gene_info_of->{$gene}{chr} . ":" . $info->{start};
             push @{ $gene_info_of->{$gene}{vars2} },
-                { chr_start => $start, chr_end => $end, name => $name, };
+                { chr_start => $info->{start}, chr_end => $info->{end}, name => $name, };
         }
     }
     close $fh_pos;
