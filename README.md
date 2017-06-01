@@ -18,6 +18,7 @@
     - [Extract `gene_list` and `snp_codon_list`](#extract-gene-list-and-snp-codon-list)
     - [SNPs and indels](#snps-and-indels)
 - [Blast](#blast)
+- [Features](#features)
 - [Real Processing](#real-processing)
 - [Stats](#stats)
 - [Pack all things up](#pack-all-things-up)
