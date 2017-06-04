@@ -408,7 +408,7 @@ bash 5_multi_cmd.sh
 
 ```
 
-# Build alignDB for multiple genomes
+# Build alignDB for multiple genomes n7
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -441,7 +441,41 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-##  Extract `gene_list` and `snp_codon_list`
+# Build alignDB for multiple genomes n94
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n94_pop \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n94_pop_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n94_pop -r 1-60
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n94_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n94_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n94_Spar -r 1-60
+
+```
+
+
+##  Extract `gene_list` and `snp_codon_list` n7
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -453,7 +487,20 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp
     > Scer_n7_Spar.mvar.gene_list.csv
 ```
 
-## SNPs and indels
+##  Extract `gene_list` and `snp_codon_list` n94
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n94_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n94_Spar.mvar.gene_list.csv
+```
+
+
+## SNPs and indels n7
 
 Select columns `chr_name,snp_pos` for SNPs.
 
@@ -482,6 +529,38 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'ind
     > Scer_n7_Spar.indel.pos.txt
 
 ```
+
+## SNPs and indels n94
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n94_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n94_Spar.indel.pos.txt
+
+```
+
+
 
 List all valid genes.
 
