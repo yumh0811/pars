@@ -788,7 +788,7 @@ unset NAME
 # Real Processing n94
 
 ```bash
-export NAME=Scer_n7_Spar
+export NAME=Scer_n94_Spar
 
 cd ~/data/mrna-structure/process
 
