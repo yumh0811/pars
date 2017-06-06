@@ -475,7 +475,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 ```
 
 
-##  Extract `gene_list` and `snp_codon_list` n7
+##  Extract `gene_list` and `snp_codon_list` n7_Spar
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -487,7 +487,21 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp
     > Scer_n7_Spar.mvar.gene_list.csv
 ```
 
-##  Extract `gene_list` and `snp_codon_list` n94
+
+##  Extract `gene_list` and `snp_codon_list` n7_pop
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_pop.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n7_pop.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_pop.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n7_pop.mvar.gene_list.csv
+```
+
+
+##  Extract `gene_list` and `snp_codon_list` n94_Spar
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -499,8 +513,20 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_Spar.mvar.1-60.xlsx --sheet 'sn
     > Scer_n94_Spar.mvar.gene_list.csv
 ```
 
+##  Extract `gene_list` and `snp_codon_list` n94_pop
 
-## SNPs and indels n7
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_pop.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n94_pop.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_pop.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n94_pop.mvar.gene_list.csv
+```
+
+
+## SNPs and indels n7_Spar
 
 Select columns `chr_name,snp_pos` for SNPs.
 
@@ -530,7 +556,39 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'ind
 
 ```
 
-## SNPs and indels n94
+
+## SNPs and indels n7_pop
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_pop.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n7_pop.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_pop.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n7_pop.indel.pos.txt
+
+```
+
+
+## SNPs and indels n94_Spar
 
 Select columns `chr_name,snp_pos` for SNPs.
 
@@ -560,6 +618,36 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_Spar.mvar.1-60.xlsx --sheet 'in
 
 ```
 
+
+## SNPs and indels n94_pop
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_pop.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n94_pop.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n94_pop.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n94_pop.indel.pos.txt
+
+```
 
 
 List all valid genes.
@@ -738,7 +826,7 @@ cat coverage.stat.md
 | utr5        |  12071326 |  275817 |   0.0228 |
 | utr3        |  12071326 |  240752 |   0.0199 |
 
-# Real Processing n7
+# Real Processing n7_Spar
 
 ```bash
 export NAME=Scer_n7_Spar
@@ -785,10 +873,57 @@ runlist position --op superset \
 unset NAME
 ```
 
-# Real Processing n94
+# Real Processing n94_Spar
 
 ```bash
 export NAME=Scer_n94_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
+
+unset NAME
+```
+
+# Real Processing n94_pop
+
+```bash
+export NAME=Scer_n94_pop
 
 cd ~/data/mrna-structure/process
 
