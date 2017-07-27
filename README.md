@@ -1088,6 +1088,11 @@ runlist position --op superset \
     sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.orf_genomic.pos.txt
 
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
 unset NAME
 ```
 
