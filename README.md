@@ -268,6 +268,8 @@ find WGS -name "*.gz" | xargs gzip -t
 
 # Plans of alignments
 
+## Illumina (NCBI ASSEMBLY)
+
 ```bash
 # create downloaded genome list
 cat ~/Scripts/pars/scer_100.seq.csv \
@@ -389,6 +391,64 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --plan 'name=Scer_n7_Spar;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
     --plan 'name=Scer_n94_pop;t=S288c;qs=YJM993,YJM1078,YJM195,YJM270,YJM470,YJM683,YJM689,YJM693,YJM1248,YJM1252,YJM1273,YJM1342,YJM1385,YJM1387,YJM1388,YJM1389,YJM1399,YJM1402,YJM1418,YJM1439,YJM1443,YJM1444,YJM1447,YJM1460,YJM1549,YJM1573,YJM1592,YJM244,YJM1083,YJM1129,YJM189,YJM193,YJM248,YJM271,YJM320,YJM326,YJM428,YJM450,YJM451,YJM453,YJM456,YJM541,YJM554,YJM555,YJM627,YJM681,YJM682,YJM969,YJM972,YJM975,YJM978,YJM981,YJM984,YJM987,YJM990,YJM996,YJM1133,YJM1190,YJM1199,YJM1202,YJM1208,YJM1242,YJM1244,YJM1250,YJM1307,YJM1311,YJM1326,YJM1332,YJM1336,YJM1338,YJM1341,YJM1355,YJM1356,YJM1381,YJM1383,YJM1386,YJM1400,YJM1401,YJM1415,YJM1417,YJM1419,YJM1433,YJM1450,YJM1463,YJM1477,YJM1478,YJM1479,YJM1526,YJM1527,YJM1574,YJM1615' \
     --plan 'name=Scer_n94_Spar;t=S288c;qs=YJM993,YJM1078,YJM195,YJM270,YJM470,YJM683,YJM689,YJM693,YJM1248,YJM1252,YJM1273,YJM1342,YJM1385,YJM1387,YJM1388,YJM1389,YJM1399,YJM1402,YJM1418,YJM1439,YJM1443,YJM1444,YJM1447,YJM1460,YJM1549,YJM1573,YJM1592,YJM244,YJM1083,YJM1129,YJM189,YJM193,YJM248,YJM271,YJM320,YJM326,YJM428,YJM450,YJM451,YJM453,YJM456,YJM541,YJM554,YJM555,YJM627,YJM681,YJM682,YJM969,YJM972,YJM975,YJM978,YJM981,YJM984,YJM987,YJM990,YJM996,YJM1133,YJM1190,YJM1199,YJM1202,YJM1208,YJM1242,YJM1244,YJM1250,YJM1307,YJM1311,YJM1326,YJM1332,YJM1336,YJM1338,YJM1341,YJM1355,YJM1356,YJM1381,YJM1383,YJM1386,YJM1400,YJM1401,YJM1415,YJM1417,YJM1419,YJM1433,YJM1450,YJM1463,YJM1477,YJM1478,YJM1479,YJM1526,YJM1527,YJM1574,YJM1615,Spar;o=Spar' \
+    -y
+
+# pop_prep.pl
+perl ~/Scripts/withncbi/pop/pop_prep.pl -p 16 -i scer_wgs.plan.yml
+
+bash 01_file.sh
+bash 02_rm.sh
+bash 03_strain_info.sh
+
+# plan_ALL.sh
+bash plan_ALL.sh
+
+bash 1_real_chr.sh
+bash 3_pair_cmd.sh
+bash 4_rawphylo.sh
+bash 5_multi_cmd.sh
+bash 7_multi_db_only.sh
+
+# other plans
+bash plan_Scer_n7_pop.sh
+bash 5_multi_cmd.sh
+
+# other plans
+bash plan_Scer_n7_Spar.sh
+bash 5_multi_cmd.sh
+
+# other plans
+bash plan_Scer_n94_pop.sh
+bash 5_multi_cmd.sh
+
+# other plans
+bash plan_Scer_n94_Spar.sh
+bash 5_multi_cmd.sh
+
+```
+
+## Illumina (NCBI WGS_157)
+
+```bash
+
+mkdir -p ~/data/mrna-structure/alignment/scer_wgs_157
+cd ~/data/mrna-structure/alignment/scer_wgs_157
+
+perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+    -i ~/data/mrna-structure/GENOMES/WGS/scer_wgs_157.data.yml \
+    -o scer_wgs_157.plan.yml \
+    -d ~/data/mrna-structure/GENOMES/WGS \
+    -m prefix \
+    -r '*.fsa_nt.gz' \
+    --opt group_name=scer_wgs \
+    --opt base_dir='~/data/mrna-structure/alignment' \
+    --opt data_dir="~/data/mrna-structure/alignment/scer_wgs" \
+    --opt rm_species=Fungi \
+    --dd ~/data/mrna-structure/GENOMES/ASSEMBLIES \
+    --download "name=S288c;taxon=559292" \
+    --plan 'name=Scer_n157_pop;t=S288c' \
+    --plan 'name=Scer_n157_Spar;t=S288c;qs=Spar;o=Spar' \
+    
     -y
 
 # pop_prep.pl
