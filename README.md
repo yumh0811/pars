@@ -249,6 +249,23 @@ perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
 
 ```
 
+## Illumina (NCBI WGS_157)
+
+```bash
+mkdir -p ~/data/mrna-structure/GENOMES
+cd ~/data/mrna-structure/GENOMES
+
+perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+    -f ~/Scripts/pars/scer_wgs_157.tsv \
+    --fix -a \
+    -o WGS
+
+aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
+
+find WGS -name "*.gz" | xargs gzip -t
+```
+
+
 # Plans of alignments
 
 ```bash
