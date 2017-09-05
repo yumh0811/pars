@@ -260,7 +260,7 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
     --fix -a \
     -o WGS
 
-aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
+aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs_157.url.txt
 
 find WGS -name "*.gz" | xargs gzip -t
 ```
