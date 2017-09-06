@@ -431,12 +431,12 @@ bash 5_multi_cmd.sh
 
 ```bash
 
-mkdir -p ~/data/mrna-structure/alignment/scer_wgs_157
-cd ~/data/mrna-structure/alignment/scer_wgs_157
+mkdir -p ~/data/mrna-structure/alignment/scer_wgs
+cd ~/data/mrna-structure/alignment/scer_wgs
 
 perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     -i ~/data/mrna-structure/GENOMES/WGS/scer_wgs_157.data.yml \
-    -o scer_wgs_157.plan.yml \
+    -o scer_wgs.plan.yml \
     -d ~/data/mrna-structure/GENOMES/WGS \
     -m prefix \
     -r '*.fsa_nt.gz' \
@@ -448,7 +448,6 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --download "name=S288c;taxon=559292" \
     --plan 'name=Scer_n157_pop;t=S288c' \
     --plan 'name=Scer_n157_Spar;t=S288c;qs=Spar;o=Spar' \
-    
     -y
 
 # pop_prep.pl
@@ -468,19 +467,11 @@ bash 5_multi_cmd.sh
 bash 7_multi_db_only.sh
 
 # other plans
-bash plan_Scer_n7_pop.sh
+bash plan_Scer_n157_pop.sh
 bash 5_multi_cmd.sh
 
 # other plans
-bash plan_Scer_n7_Spar.sh
-bash 5_multi_cmd.sh
-
-# other plans
-bash plan_Scer_n94_pop.sh
-bash 5_multi_cmd.sh
-
-# other plans
-bash plan_Scer_n94_Spar.sh
+bash plan_Scer_n157_Spar.sh
 bash 5_multi_cmd.sh
 
 ```
