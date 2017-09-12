@@ -479,6 +479,18 @@ bash 5_multi_cmd.sh
 bash plan_Scer_n157_Spar.sh
 bash 5_multi_cmd.sh
 
+# other plans
+bash plan_Scer_n157_Beer1_Spar.sh
+bash 5_multi_cmd.sh
+bash plan_Scer_n157_Beer2_Spar.sh
+bash 5_multi_cmd.sh
+bash plan_Scer_n157_Mixed_Spar.sh
+bash 5_multi_cmd.sh
+bash plan_Scer_n157_Wine_Spar.sh
+bash 5_multi_cmd.sh
+bash plan_Scer_n157_Wild_Spar.sh
+bash 5_multi_cmd.sh
+
 ```
 
 # Build alignDB for multiple genomes n7
