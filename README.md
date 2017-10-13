@@ -1486,6 +1486,16 @@ perl ~/Scripts/pars/read_fold.pl \
 # process ${NAME}.gene_variation.yml
 perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
 
+# SNPs within orf_genomic regions
+runlist position --op superset \
+    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr regions
+runlist position --op superset \
+    sce_utr.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
 # SNPs within intergenic regions
 runlist position --op superset \
     sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
