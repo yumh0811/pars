@@ -453,6 +453,7 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --plan 'name=Scer_n157_Mixed_Spar;t=S288c;qs=spirits009,beer005,wine008,beer029,beer028,beer006,spirits001,beer023,bread004,beer038,spirits003,beer061,bread002,bread001,beer025,bread003,wild006,wild007,wild005,Spar;o=Spar' \
     --plan 'name=Scer_n157_Wine_Spar;t=S288c;qs=beer014,beer030,wine014,wine007,wine018,wine010,wine003,wine017,wine011,wine015,sake002,wine006,beer020,spirits011,wine004,wine005,beer024,beer088,wine009,wine001,beer033,wine013,spirits002,Spar;o=Spar' \
     --plan 'name=Scer_n157_Wild_Spar;t=S288c;qs=wine002,wild004,bioethanol004,bioethanol003,bioethanol001,sake006,sake001,sake004,sake007,sake005,sake003,wild002,wild003,wild001,Spar;o=Spar' \
+    --plan 'name=Scer_n157_Beer1_S288c;t=S288c;qs=beer072,beer093,beer074,beer017,beer046,beer008,beer041,beer073,beer012,beer087,beer015,beer043,beer081,beer016,spirits005,beer022,beer026,beer076,beer077,beer075,beer031,beer078,beer060,beer035,beer051,beer065,beer071,beer067,beer007,beer102,beer098,beer082,beer044,beer068,beer058,beer042,beer052,beer097,beer095,beer096,beer019,beer057,beer066,beer094,beer045,beer050,beer090,beer099,beer001,beer069,beer055,beer056,beer100,beer064,beer053,beer070,beer047,wine012,beer009,beer089,beer079,beer010,beer036,beer048,beer037,beer101,beer049,beer054,S288c;o=S288c' \
     -y
 
 # pop_prep.pl
@@ -490,7 +491,8 @@ bash plan_Scer_n157_Wine_Spar.sh
 bash 5_multi_cmd.sh
 bash plan_Scer_n157_Wild_Spar.sh
 bash 5_multi_cmd.sh
-
+bash plan_Scer_n157_Beer1_S288c.sh
+bash 5_multi_cmd.sh
 ```
 
 # Build alignDB for multiple genomes n7
