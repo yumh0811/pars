@@ -1574,6 +1574,16 @@ runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
 
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
 unset NAME
 ```
 
@@ -1678,6 +1688,16 @@ runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
 
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
 unset NAME
 ```
 
@@ -1725,6 +1745,16 @@ runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
 
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
 unset NAME
 ```
 
@@ -1771,6 +1801,16 @@ runlist position --op superset \
 runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
 
 unset NAME
 ```
@@ -1829,6 +1869,16 @@ runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
 
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
 unset NAME
 ```
 
@@ -1875,6 +1925,16 @@ runlist position --op superset \
 runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
 
 unset NAME
 ```
@@ -1933,6 +1993,16 @@ runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
 
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
 unset NAME
 ```
 
@@ -1979,6 +2049,16 @@ runlist position --op superset \
 runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
 
 unset NAME
 ```
@@ -2027,6 +2107,16 @@ runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
 
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
 unset NAME
 ```
 
@@ -2073,6 +2163,16 @@ runlist position --op superset \
 runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
 
 unset NAME
 ```
@@ -2130,6 +2230,16 @@ runlist position --op superset \
 runlist position --op superset \
     sce_utr3.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
 
 unset NAME
 ```
