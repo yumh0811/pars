@@ -814,6 +814,144 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
+# Build alignDB for multiple genomes n152
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n152_pop \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_pop_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n152_pop -r 1-60
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n152_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n152_Spar -r 1-60
+
+```
+
+# Build alignDB for multiple genomes n152_Beer1
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n152_Beer1_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Beer1_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n152_Beer1_Spar -r 1-60
+
+```
+
+# Build alignDB for multiple genomes n152_Beer2
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n152_Beer2_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Beer2_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n152_Beer2_Spar -r 1-60
+
+```
+
+# Build alignDB for multiple genomes n152_Mixed
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n152_Mixed_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Mixed_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n152_Mixed_Spar -r 1-60
+
+```
+
+# Build alignDB for multiple genomes n152_Wine
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n152_Wine_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Wine_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n152_Wine_Spar -r 1-60
+
+```
+
+# Build alignDB for multiple genomes n152_Wild
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n152_Wild_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Wild_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n152_Wild_Spar -r 1-60
+
+```
+
 ##  Extract `gene_list` and `snp_codon_list` n7_Spar
 
 ```bash
