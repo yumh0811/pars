@@ -1095,6 +1095,78 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Wild_Spar.mvar.1-60.xlsx --she
     > Scer_n157_Wild_Spar.mvar.gene_list.csv
 ```
 
+##  Extract `gene_list` and `snp_codon_list` n152_Spar
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n152_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n152_Spar.mvar.gene_list.csv
+```
+
+##  Extract `gene_list` and `snp_codon_list` n152_Beer1_Spar
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer1_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n152_Beer1_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer1_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n152_Beer1_Spar.mvar.gene_list.csv
+```
+
+##  Extract `gene_list` and `snp_codon_list` n152_Beer2_Spar
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer2_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n152_Beer2_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer2_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n152_Beer2_Spar.mvar.gene_list.csv
+```
+
+##  Extract `gene_list` and `snp_codon_list` n152_Mixed_Spar
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Mixed_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n152_Mixed_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Mixed_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n152_Mixed_Spar.mvar.gene_list.csv
+```
+
+##  Extract `gene_list` and `snp_codon_list` n152_Wine_Spar
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wine_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n152_Wine_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wine_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n152_Wine_Spar.mvar.gene_list.csv
+```
+
+##  Extract `gene_list` and `snp_codon_list` n152_Wild_Spar
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wild_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n152_Wild_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wild_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n152_Wild_Spar.mvar.gene_list.csv
+```
+
 ## SNPs and indels n7_Spar
 
 Select columns `chr_name,snp_pos` for SNPs.
@@ -1487,6 +1559,186 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Wild_Spar.mvar.1-60.xlsx --she
         }
     ' \
     > Scer_n157_Wild_Spar.indel.pos.txt
+
+```
+
+## SNPs and indels n152_Spar
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n152_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n152_Spar.indel.pos.txt
+
+```
+
+## SNPs and indels n152_Beer1_Spar
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer1_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n152_Beer1_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer1_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n152_Beer1_Spar.indel.pos.txt
+
+```
+
+## SNPs and indels n152_Beer2_Spar
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer2_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n152_Beer2_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer2_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n152_Beer2_Spar.indel.pos.txt
+
+```
+
+## SNPs and indels n152_Mixed_Spar
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Mixed_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n152_Mixed_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Mixed_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n152_Mixed_Spar.indel.pos.txt
+
+```
+
+## SNPs and indels n152_Wine_Spar
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wine_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n152_Wine_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wine_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n152_Wine_Spar.indel.pos.txt
+
+```
+
+## SNPs and indels n152_Wild_Spar
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wild_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n152_Wild_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wild_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n152_Wild_Spar.indel.pos.txt
 
 ```
 
@@ -2384,6 +2636,378 @@ unset NAME
 
 ```bash
 export NAME=Scer_n157_Wild_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within orf_genomic regions
+runlist position --op superset \
+    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr regions
+runlist position --op superset \
+    sce_utr.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+unset NAME
+```
+
+# Real Processing n152_Spar
+
+```bash
+export NAME=Scer_n152_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within orf_genomic regions
+runlist position --op superset \
+    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr regions
+runlist position --op superset \
+    sce_utr.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+unset NAME
+```
+
+# Real Processing n152_Beer1_Spar
+
+```bash
+export NAME=Scer_n152_Beer1_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within orf_genomic regions
+runlist position --op superset \
+    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr regions
+runlist position --op superset \
+    sce_utr.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+unset NAME
+```
+
+# Real Processing n152_Beer2_Spar
+
+```bash
+export NAME=Scer_n152_Beer2_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+unset NAME
+```
+
+# Real Processing n152_Mixed_Spar
+
+```bash
+export NAME=Scer_n152_Mixed_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+unset NAME
+```
+
+# Real Processing n152_Wine_Spar
+
+```bash
+export NAME=Scer_n152_Wine_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+unset NAME
+```
+
+# Real Processing n152_Wild_Spar
+
+```bash
+export NAME=Scer_n152_Wild_Spar
 
 cd ~/data/mrna-structure/process
 
