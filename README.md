@@ -529,7 +529,6 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --opt rm_species=Fungi \
     --dd ~/data/mrna-structure/GENOMES/ASSEMBLIES \
     --download "name=S288c;taxon=559292" \
-    --plan 'name=Scer_n152_pop;t=S288c;qs=wild007,wild006,wild005,wild004,wild003,wild002,wild001,wine019,wine018,wine017,wine016,wine015,wine014,wine013,wine012,wine010,wine009,wine008,wine006,wine005,wine004,wine003,wine002,wine001,spirits011,spirits010,spirits009,spirits008,spirits007,spirits006,spirits005,spirits004,spirits003,spirits002,spirits001,sake006,sake005,sake004,sake003,sake001,laboratory002,laboratory001,bread004,bread003,bread002,bread001,bioethanol005,bioethanol004,bioethanol003,bioethanol002,bioethanol001,beer102,beer101,beer100,beer099,beer098,beer097,beer096,beer095,beer094,beer093,beer092,beer091,beer090,beer089,beer088,beer087,beer086,beer085,beer084,beer083,beer082,beer081,beer080,beer079,beer078,beer077,beer076,beer075,beer074,beer073,beer072,beer071,beer069,beer068,beer067,beer066,beer065,beer064,beer063,beer062,beer061,beer060,beer059,beer058,beer057,beer056,beer055,beer054,beer053,beer052,beer051,beer050,beer049,beer048,beer047,beer046,beer045,beer044,beer043,beer042,beer041,beer040,beer039,beer038,beer037,beer036,beer035,beer034,beer033,beer032,beer031,beer030,beer029,beer028,beer027,beer026,beer025,beer024,beer023,beer022,beer021,beer020,beer019,beer018,beer017,beer016,beer015,beer014,beer013,beer012,beer011,beer010,beer009,beer008,beer007,beer006,beer005,beer004,beer003,beer002,beer001' \
     --plan 'name=Scer_n152_Spar;t=S288c;qs=wild007,wild006,wild005,wild004,wild003,wild002,wild001,wine019,wine018,wine017,wine016,wine015,wine014,wine013,wine012,wine010,wine009,wine008,wine006,wine005,wine004,wine003,wine002,wine001,spirits011,spirits010,spirits009,spirits008,spirits007,spirits006,spirits005,spirits004,spirits003,spirits002,spirits001,sake006,sake005,sake004,sake003,sake001,laboratory002,laboratory001,bread004,bread003,bread002,bread001,bioethanol005,bioethanol004,bioethanol003,bioethanol002,bioethanol001,beer102,beer101,beer100,beer099,beer098,beer097,beer096,beer095,beer094,beer093,beer092,beer091,beer090,beer089,beer088,beer087,beer086,beer085,beer084,beer083,beer082,beer081,beer080,beer079,beer078,beer077,beer076,beer075,beer074,beer073,beer072,beer071,beer069,beer068,beer067,beer066,beer065,beer064,beer063,beer062,beer061,beer060,beer059,beer058,beer057,beer056,beer055,beer054,beer053,beer052,beer051,beer050,beer049,beer048,beer047,beer046,beer045,beer044,beer043,beer042,beer041,beer040,beer039,beer038,beer037,beer036,beer035,beer034,beer033,beer032,beer031,beer030,beer029,beer028,beer027,beer026,beer025,beer024,beer023,beer022,beer021,beer020,beer019,beer018,beer017,beer016,beer015,beer014,beer013,beer012,beer011,beer010,beer009,beer008,beer007,beer006,beer005,beer004,beer003,beer002,beer001,Spar;o=Spar' \
     --plan 'name=Scer_n152_Beer1_Spar;t=S288c;qs=beer072,beer093,beer074,beer017,beer046,beer008,beer041,beer073,beer012,beer087,beer015,beer043,beer081,beer016,spirits005,beer022,beer026,beer076,beer077,beer075,beer031,beer078,beer060,beer035,beer051,beer065,beer071,beer067,beer007,beer102,beer098,beer082,beer044,beer068,beer058,beer042,beer052,beer097,beer095,beer096,beer019,beer057,beer066,beer094,beer045,beer050,beer090,beer099,beer001,beer069,beer055,beer056,beer100,beer064,beer053,beer047,wine012,beer009,beer089,beer079,beer010,beer036,beer048,beer037,beer101,beer049,beer054,Spar;o=Spar' \
     --plan 'name=Scer_n152_Beer2_Spar;t=S288c;qs=beer002,wine019,beer003,beer063,beer086,beer092,beer021,beer080,beer059,beer032,beer062,beer091,beer013,beer084,beer083,beer034,beer004,beer027,beer085,beer040,beer011,beer039,Spar;o=Spar' \
@@ -553,10 +552,6 @@ bash 3_pair_cmd.sh
 bash 4_rawphylo.sh
 bash 5_multi_cmd.sh
 bash 7_multi_db_only.sh
-
-# other plans
-bash plan_Scer_n152_pop.sh
-bash 5_multi_cmd.sh
 
 # other plans
 bash plan_Scer_n152_Spar.sh
@@ -819,18 +814,6 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n152_pop \
-    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_pop_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n152_pop -r 1-60
 
 perl ~/Scripts/alignDB/alignDB.pl \
     -d Scer_n152_Spar \
