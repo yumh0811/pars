@@ -506,8 +506,6 @@ bash plan_Scer_n157_Wine_Spar.sh
 bash 5_multi_cmd.sh
 bash plan_Scer_n157_Wild_Spar.sh
 bash 5_multi_cmd.sh
-bash plan_Scer_n157_Beer1_S288c.sh
-bash 5_multi_cmd.sh
 ```
 
 ## Illumina (NCBI WGS_152)
@@ -567,8 +565,6 @@ bash 5_multi_cmd.sh
 bash plan_Scer_n152_Wine_Spar.sh
 bash 5_multi_cmd.sh
 bash plan_Scer_n152_Wild_Spar.sh
-bash 5_multi_cmd.sh
-bash plan_Scer_n152_Beer1_S288c.sh
 bash 5_multi_cmd.sh
 ```
 
