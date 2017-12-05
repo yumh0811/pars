@@ -144,7 +144,7 @@ mkdir -p ~/data/mrna-structure/GENOMES
 cd ~/data/mrna-structure/GENOMES
 
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/withncbi/pop/saccharomyces.tsv \
+    -f ~/Scripts/pars/saccharomyces.tsv \
     --fix -a \
     -o WGS
 
