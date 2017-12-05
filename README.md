@@ -281,6 +281,22 @@ aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs_152.url.txt
 find WGS -name "*.gz" | xargs gzip -t
 ```
 
+## Illumina (NCBI WGS_outgroup)
+
+```bash
+mkdir -p ~/data/mrna-structure/GENOMES
+cd ~/data/mrna-structure/GENOMES
+
+perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+    -f ~/Scripts/withncbi/pop/saccharomyces.tsv \
+    --fix -a \
+    -o WGS
+
+aria2c -UWget -x 6 -s 3 -c -i WGS/saccharomyces.url.txt
+
+find WGS -name "*.gz" | xargs gzip -t
+```
+
 
 # Plans of alignments
 
