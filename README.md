@@ -76,134 +76,6 @@ find . -name "*.gz" \
     "
 ```
 
-## mRNA levels
-
-* Data source: Quantification of the yeast transcriptome by
-  single-molecule sequencing. Lipson, D. et al. Nature Biotechnology 27,
-  652-658 (2009) doi:10.1038/nbt.1551
-
-```bash
-mkdir -p ~/data/mrna-structure/gene-traits
-cd ~/data/mrna-structure/gene-traits
-
-wget -N http://www.nature.com/nbt/journal/v27/n7/extref/nbt.1551-S2.xls
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f nbt.1551-S2.xls --sheet 'counts' \
-    | perl -nla -F/,/ -e '
-    if ( /^#/ ) {
-        print qq{#ORF\tGene\tAvg};
-    }
-    elsif ( /^\d/ ) {
-        print qq{$F[1]\t$F[2]\t$F[9]};
-    }
-    ' \
-    > mrna_levels.tsv
-```
-
-## ess, rich/minimal and chem
-
-* ess: Giaever, G., et al. Functional Profiling of theSaccharomyces
-  cerevisiae Genome. Nature 418, 387-391. (2002)
-* rich/minimal: Mechanisms of Haploinsufficiency Revealed by Genome-Wide
-  Profiling in Yeast Deutschbauer, AM. et al. GENETICS April 1, 2005
-  vol. 169 no. 4 1915-1925; 10.1534/genetics.104.036871
-* chem: The Chemical Genomic Portrait of Yeast: Uncovering a Phenotype
-  for All Genes. Hillenmeyer, M.E. et al. Science 18 Apr 2008: Vol. 320,
-  Issue 5874, pp. 362-365 DOI: 10.1126/science.1150021
-
-```bash
-mkdir -p ~/data/mrna-structure/gene-traits
-cd ~/data/mrna-structure/gene-traits
-
-wget -N http://www-sequence.stanford.edu/group/yeast_deletion_project/Essential_ORFs.txt
-
-cat Essential_ORFs.txt \
-    | perl -nl -e '
-        next unless /^\d/;
-        my $orf = ( split /\s+/ )[1];
-        print qq{$orf};
-    ' \
-    > ess_orf.tsv
-
-wget -N http://www-sequence.stanford.edu/group/research/HIP_HOP/supplements/01yfh/files/OrfGeneData.txt
-
-cat OrfGeneData.txt \
-    | perl -nla -F"\t" -e '
-        printf q{#} if /^orf/;
-        print qq{$F[0]\t$F[1]\t$F[5]\t$F[13]\t$F[17]};
-    ' \
-    > rich_orf.tsv
-
-# http://chemogenomics.stanford.edu/supplements/global/
-
-wget -N http://chemogenomics.stanford.edu/supplements/global/download/data/hom.z_tdist_pval_nm.counts.smallmol.cutoff.01.xls
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f hom.z_tdist_pval_nm.counts.smallmol.cutoff.01.xls --sheet 'hom.z_tdist_pval_nm.smallmol.co' \
-    | perl -nla -F"," -MText::CSV_XS -e '
-    BEGIN { 
-        our $csv = Text::CSV_XS->new(); 
-        print qq{#ORF\tGene\tCount};
-    }
-    
-    if ( /^Y/ ) {
-        if ($csv->parse($_)) {
-            my @fields = $csv->fields();
-            print qq{$fields[0]\t$fields[1]\t$fields[6]};
-        }
-    }
-    ' \
-    > chem_orf.tsv
-
-```
-
-## Recombination rates
-
-* Data source: Global mapping of meiotic recombination hotspots and
-  coldspots in the yeast Saccharomyces cerevisiae. vol. 97 no. 21 PNAS
-  Jennifer L. Gerton, 11383–11390
-
-```bash
-mkdir -p ~/data/mrna-structure/gene-traits
-cd ~/data/mrna-structure/gene-traits
-
-wget -N http://derisilab.ucsf.edu/data/hotspots/forWebORFs.txt
-
-cat forWebORFs.txt \
-    | perl -nla -F"\t" -MStatistics::Lite -e '
-        next unless /^Y/;    # ORF stable id start with a "Y"
-        next if @F < 2;
-        my $rec_rate  = Statistics::Lite::median(grep {defined} @F[1 .. 7]);
-        print qq{$F[0]\t$rec_rate};
-    ' \
-    > rec_rate.tsv
-```
-
-## Protein-protein interactions
-
-* Data source:
-
-```bash
-mkdir -p ~/data/mrna-structure/gene-traits
-cd ~/data/mrna-structure/gene-traits
-
-wget -N http://drygin.ccbr.utoronto.ca/%7Ecostanzo2009/sgadata_costanzo2009_stringentCutoff_101120.txt.gz
-
-gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
-    | perl -nla -F"\t" -e '
-        BEGIN { our %interact_of; }
-        
-        next unless /^Y/;    # ORF stable id start with a "Y"
-        next if @F != 7;
-        $interact_of{$F[0]}++;
-        
-        END {
-            for my $key ( sort keys %interact_of ) {
-                print qq{$key\t$interact_of{$key}};
-            }
-        }
-    ' \
-    > interact_count.tsv
-```
 
 # Other strains and outgroups
 
@@ -261,22 +133,6 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
     -o WGS
 
 aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs_157.url.txt
-
-find WGS -name "*.gz" | xargs gzip -t
-```
-
-## Illumina (NCBI WGS_152)
-
-```bash
-mkdir -p ~/data/mrna-structure/GENOMES
-cd ~/data/mrna-structure/GENOMES
-
-perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/pars/scer_wgs_152.tsv \
-    --fix -a \
-    -o WGS
-
-aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs_152.url.txt
 
 find WGS -name "*.gz" | xargs gzip -t
 ```
@@ -524,66 +380,6 @@ bash plan_Scer_n157_Wild_Spar.sh
 bash 5_multi_cmd.sh
 ```
 
-## Illumina (NCBI WGS_152)
-
-```bash
-
-mkdir -p ~/data/mrna-structure/alignment/scer_wgs
-cd ~/data/mrna-structure/alignment/scer_wgs
-
-perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-    -i ~/data/mrna-structure/GENOMES/WGS/scer_wgs_152.data.yml \
-    -o scer_wgs.plan.yml \
-    -d ~/data/mrna-structure/GENOMES/WGS \
-    -m prefix \
-    -r '*.fsa_nt.gz' \
-    --opt group_name=scer_wgs \
-    --opt base_dir='~/data/mrna-structure/alignment' \
-    --opt data_dir="~/data/mrna-structure/alignment/scer_wgs" \
-    --opt rm_species=Fungi \
-    --dd ~/data/mrna-structure/GENOMES/ASSEMBLIES \
-    --download "name=S288c;taxon=559292" \
-    --plan 'name=Scer_n152_Spar;t=S288c;qs=wild007,wild006,wild005,wild004,wild003,wild002,wild001,wine019,wine018,wine017,wine016,wine015,wine014,wine013,wine012,wine010,wine009,wine008,wine006,wine005,wine004,wine003,wine002,wine001,spirits011,spirits010,spirits009,spirits008,spirits007,spirits006,spirits005,spirits004,spirits003,spirits002,spirits001,sake006,sake005,sake004,sake003,sake001,laboratory002,laboratory001,bread004,bread003,bread002,bread001,bioethanol005,bioethanol004,bioethanol003,bioethanol002,bioethanol001,beer102,beer101,beer100,beer099,beer098,beer097,beer096,beer095,beer094,beer093,beer092,beer091,beer090,beer089,beer088,beer087,beer086,beer085,beer084,beer083,beer082,beer081,beer080,beer079,beer078,beer077,beer076,beer075,beer074,beer073,beer072,beer071,beer069,beer068,beer067,beer066,beer065,beer064,beer063,beer062,beer061,beer060,beer059,beer058,beer057,beer056,beer055,beer054,beer053,beer052,beer051,beer050,beer049,beer048,beer047,beer046,beer045,beer044,beer043,beer042,beer041,beer040,beer039,beer038,beer037,beer036,beer035,beer034,beer033,beer032,beer031,beer030,beer029,beer028,beer027,beer026,beer025,beer024,beer023,beer022,beer021,beer020,beer019,beer018,beer017,beer016,beer015,beer014,beer013,beer012,beer011,beer010,beer009,beer008,beer007,beer006,beer005,beer004,beer003,beer002,beer001,Spar;o=Spar' \
-    --plan 'name=Scer_n152_Beer1_Spar;t=S288c;qs=beer072,beer093,beer074,beer017,beer046,beer008,beer041,beer073,beer012,beer087,beer015,beer043,beer081,beer016,spirits005,beer022,beer026,beer076,beer077,beer075,beer031,beer078,beer060,beer035,beer051,beer065,beer071,beer067,beer007,beer102,beer098,beer082,beer044,beer068,beer058,beer042,beer052,beer097,beer095,beer096,beer019,beer057,beer066,beer094,beer045,beer050,beer090,beer099,beer001,beer069,beer055,beer056,beer100,beer064,beer053,beer047,wine012,beer009,beer089,beer079,beer010,beer036,beer048,beer037,beer101,beer049,beer054,Spar;o=Spar' \
-    --plan 'name=Scer_n152_Beer2_Spar;t=S288c;qs=beer002,wine019,beer003,beer063,beer086,beer092,beer021,beer080,beer059,beer032,beer062,beer091,beer013,beer084,beer083,beer034,beer004,beer027,beer085,beer040,beer011,beer039,Spar;o=Spar' \
-    --plan 'name=Scer_n152_Mixed_Spar;t=S288c;qs=spirits009,beer005,wine008,beer029,beer028,beer006,spirits001,beer023,bread004,beer038,spirits003,beer061,bread002,bread001,beer025,bread003,wild006,wild007,wild005,Spar;o=Spar' \
-    --plan 'name=Scer_n152_Wine_Spar;t=S288c;qs=beer014,beer030,wine014,wine018,wine010,wine003,wine017,wine015,wine006,beer020,spirits011,wine004,wine005,beer024,beer088,wine009,wine001,beer033,wine013,spirits002,Spar;o=Spar' \
-    --plan 'name=Scer_n152_Wild_Spar;t=S288c;qs=wine002,wild004,bioethanol004,bioethanol003,bioethanol001,sake006,sake001,sake004,sake005,sake003,wild002,wild003,wild001,Spar;o=Spar' \
-    -y
-
-# pop_prep.pl
-perl ~/Scripts/withncbi/pop/pop_prep.pl -p 16 -i scer_wgs.plan.yml
-
-bash 01_file.sh
-bash 02_rm.sh
-bash 03_strain_info.sh
-
-# plan_ALL.sh
-bash plan_ALL.sh
-
-bash 1_real_chr.sh
-bash 3_pair_cmd.sh
-bash 4_rawphylo.sh
-bash 5_multi_cmd.sh
-bash 7_multi_db_only.sh
-
-# other plans
-bash plan_Scer_n152_Spar.sh
-bash 5_multi_cmd.sh
-
-# other plans
-bash plan_Scer_n152_Beer1_Spar.sh
-bash 5_multi_cmd.sh
-bash plan_Scer_n152_Beer2_Spar.sh
-bash 5_multi_cmd.sh
-bash plan_Scer_n152_Mixed_Spar.sh
-bash 5_multi_cmd.sh
-bash plan_Scer_n152_Wine_Spar.sh
-bash 5_multi_cmd.sh
-bash plan_Scer_n152_Wild_Spar.sh
-bash 5_multi_cmd.sh
-```
-
 # Build alignDB for multiple genomes n7
 
 ```bash
@@ -821,132 +617,6 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-# Build alignDB for multiple genomes n152
-
-```bash
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n152_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n152_Spar -r 1-60
-
-```
-
-# Build alignDB for multiple genomes n152_Beer1
-
-```bash
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n152_Beer1_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Beer1_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n152_Beer1_Spar -r 1-60
-
-```
-
-# Build alignDB for multiple genomes n152_Beer2
-
-```bash
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n152_Beer2_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Beer2_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n152_Beer2_Spar -r 1-60
-
-```
-
-# Build alignDB for multiple genomes n152_Mixed
-
-```bash
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n152_Mixed_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Mixed_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n152_Mixed_Spar -r 1-60
-
-```
-
-# Build alignDB for multiple genomes n152_Wine
-
-```bash
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n152_Wine_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Wine_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n152_Wine_Spar -r 1-60
-
-```
-
-# Build alignDB for multiple genomes n152_Wild
-
-```bash
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n152_Wild_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n152_Wild_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n152_Wild_Spar -r 1-60
-
-```
-
 ##  Extract `gene_list` and `snp_codon_list` n7_Spar
 
 ```bash
@@ -1107,77 +777,6 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Wild_Spar.mvar.1-60.xlsx --she
     > Scer_n157_Wild_Spar.mvar.gene_list.csv
 ```
 
-##  Extract `gene_list` and `snp_codon_list` n152_Spar
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n152_Spar.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n152_Spar.mvar.gene_list.csv
-```
-
-##  Extract `gene_list` and `snp_codon_list` n152_Beer1_Spar
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer1_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n152_Beer1_Spar.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer1_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n152_Beer1_Spar.mvar.gene_list.csv
-```
-
-##  Extract `gene_list` and `snp_codon_list` n152_Beer2_Spar
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer2_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n152_Beer2_Spar.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer2_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n152_Beer2_Spar.mvar.gene_list.csv
-```
-
-##  Extract `gene_list` and `snp_codon_list` n152_Mixed_Spar
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Mixed_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n152_Mixed_Spar.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Mixed_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n152_Mixed_Spar.mvar.gene_list.csv
-```
-
-##  Extract `gene_list` and `snp_codon_list` n152_Wine_Spar
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wine_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n152_Wine_Spar.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wine_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n152_Wine_Spar.mvar.gene_list.csv
-```
-
-##  Extract `gene_list` and `snp_codon_list` n152_Wild_Spar
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wild_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n152_Wild_Spar.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wild_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n152_Wild_Spar.mvar.gene_list.csv
-```
 
 ## SNPs and indels n7_Spar
 
@@ -1574,185 +1173,6 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Wild_Spar.mvar.1-60.xlsx --she
 
 ```
 
-## SNPs and indels n152_Spar
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n152_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n152_Spar.indel.pos.txt
-
-```
-
-## SNPs and indels n152_Beer1_Spar
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer1_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n152_Beer1_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer1_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n152_Beer1_Spar.indel.pos.txt
-
-```
-
-## SNPs and indels n152_Beer2_Spar
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer2_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n152_Beer2_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Beer2_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n152_Beer2_Spar.indel.pos.txt
-
-```
-
-## SNPs and indels n152_Mixed_Spar
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Mixed_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n152_Mixed_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Mixed_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n152_Mixed_Spar.indel.pos.txt
-
-```
-
-## SNPs and indels n152_Wine_Spar
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wine_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n152_Wine_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wine_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n152_Wine_Spar.indel.pos.txt
-
-```
-
-## SNPs and indels n152_Wild_Spar
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wild_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n152_Wild_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n152_Wild_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n152_Wild_Spar.indel.pos.txt
-
-```
 
 List all valid genes.
 
@@ -2711,377 +2131,138 @@ runlist position --op superset \
 unset NAME
 ```
 
-# Real Processing n152_Spar
+
+# Download other reference data
+
+## mRNA levels
+
+* Data source: Quantification of the yeast transcriptome by
+  single-molecule sequencing. Lipson, D. et al. Nature Biotechnology 27,
+  652-658 (2009) doi:10.1038/nbt.1551
 
 ```bash
-export NAME=Scer_n152_Spar
+mkdir -p ~/data/mrna-structure/gene-traits
+cd ~/data/mrna-structure/gene-traits
 
-cd ~/data/mrna-structure/process
+wget -N http://www.nature.com/nbt/journal/v27/n7/extref/nbt.1551-S2.xls
 
-# SNPs within transcripts
-runlist position --op superset \
-    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.gene.pos.txt
-
-# read gene and snp info file
-# produce ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl \
-    --pars ../PARS10/pubs/PARS10/data \
-    --gene sce_genes.blast.tsv \
-    --pos  ${NAME}.snp.gene.pos.txt \
-    > fail_pos.txt
-
-# review fail_pos.txt to find SNPs located in overlapped genes
-
-# process ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
-
-# SNPs within orf_genomic regions
-runlist position --op superset \
-    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within utr regions
-runlist position --op superset \
-    sce_utr.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-# SNPs within intergenic regions
-runlist position --op superset \
-    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intergenic.pos.txt
-
-# SNPs within introns
-runlist position --op superset \
-    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within 5' and 3' utr
-runlist position --op superset \
-    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr5.pos.txt
-
-runlist position --op superset \
-    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr3.pos.txt
-
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within utr
-runlist position --op superset \
-    sce_utr.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-unset NAME
+perl ~/Scripts/fig_table/xlsx2csv.pl -f nbt.1551-S2.xls --sheet 'counts' \
+    | perl -nla -F/,/ -e '
+    if ( /^#/ ) {
+        print qq{#ORF\tGene\tAvg};
+    }
+    elsif ( /^\d/ ) {
+        print qq{$F[1]\t$F[2]\t$F[9]};
+    }
+    ' \
+    > mrna_levels.tsv
 ```
 
-# Real Processing n152_Beer1_Spar
+## ess, rich/minimal and chem
+
+* ess: Giaever, G., et al. Functional Profiling of theSaccharomyces
+  cerevisiae Genome. Nature 418, 387-391. (2002)
+* rich/minimal: Mechanisms of Haploinsufficiency Revealed by Genome-Wide
+  Profiling in Yeast Deutschbauer, AM. et al. GENETICS April 1, 2005
+  vol. 169 no. 4 1915-1925; 10.1534/genetics.104.036871
+* chem: The Chemical Genomic Portrait of Yeast: Uncovering a Phenotype
+  for All Genes. Hillenmeyer, M.E. et al. Science 18 Apr 2008: Vol. 320,
+  Issue 5874, pp. 362-365 DOI: 10.1126/science.1150021
 
 ```bash
-export NAME=Scer_n152_Beer1_Spar
+mkdir -p ~/data/mrna-structure/gene-traits
+cd ~/data/mrna-structure/gene-traits
 
-cd ~/data/mrna-structure/process
+wget -N http://www-sequence.stanford.edu/group/yeast_deletion_project/Essential_ORFs.txt
 
-# SNPs within transcripts
-runlist position --op superset \
-    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.gene.pos.txt
+cat Essential_ORFs.txt \
+    | perl -nl -e '
+        next unless /^\d/;
+        my $orf = ( split /\s+/ )[1];
+        print qq{$orf};
+    ' \
+    > ess_orf.tsv
 
-# read gene and snp info file
-# produce ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl \
-    --pars ../PARS10/pubs/PARS10/data \
-    --gene sce_genes.blast.tsv \
-    --pos  ${NAME}.snp.gene.pos.txt \
-    > fail_pos.txt
+wget -N http://www-sequence.stanford.edu/group/research/HIP_HOP/supplements/01yfh/files/OrfGeneData.txt
 
-# review fail_pos.txt to find SNPs located in overlapped genes
+cat OrfGeneData.txt \
+    | perl -nla -F"\t" -e '
+        printf q{#} if /^orf/;
+        print qq{$F[0]\t$F[1]\t$F[5]\t$F[13]\t$F[17]};
+    ' \
+    > rich_orf.tsv
 
-# process ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+# http://chemogenomics.stanford.edu/supplements/global/
 
-# SNPs within orf_genomic regions
-runlist position --op superset \
-    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
+wget -N http://chemogenomics.stanford.edu/supplements/global/download/data/hom.z_tdist_pval_nm.counts.smallmol.cutoff.01.xls
 
-# SNPs within utr regions
-runlist position --op superset \
-    sce_utr.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
+perl ~/Scripts/fig_table/xlsx2csv.pl -f hom.z_tdist_pval_nm.counts.smallmol.cutoff.01.xls --sheet 'hom.z_tdist_pval_nm.smallmol.co' \
+    | perl -nla -F"," -MText::CSV_XS -e '
+    BEGIN { 
+        our $csv = Text::CSV_XS->new(); 
+        print qq{#ORF\tGene\tCount};
+    }
+    
+    if ( /^Y/ ) {
+        if ($csv->parse($_)) {
+            my @fields = $csv->fields();
+            print qq{$fields[0]\t$fields[1]\t$fields[6]};
+        }
+    }
+    ' \
+    > chem_orf.tsv
 
-# SNPs within intergenic regions
-runlist position --op superset \
-    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intergenic.pos.txt
-
-# SNPs within introns
-runlist position --op superset \
-    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within 5' and 3' utr
-runlist position --op superset \
-    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr5.pos.txt
-
-runlist position --op superset \
-    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr3.pos.txt
-
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within utr
-runlist position --op superset \
-    sce_utr.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-unset NAME
 ```
 
-# Real Processing n152_Beer2_Spar
+## Recombination rates
+
+* Data source: Global mapping of meiotic recombination hotspots and
+  coldspots in the yeast Saccharomyces cerevisiae. vol. 97 no. 21 PNAS
+  Jennifer L. Gerton, 11383–11390
 
 ```bash
-export NAME=Scer_n152_Beer2_Spar
+mkdir -p ~/data/mrna-structure/gene-traits
+cd ~/data/mrna-structure/gene-traits
 
-cd ~/data/mrna-structure/process
+wget -N http://derisilab.ucsf.edu/data/hotspots/forWebORFs.txt
 
-# SNPs within transcripts
-runlist position --op superset \
-    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.gene.pos.txt
-
-# read gene and snp info file
-# produce ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl \
-    --pars ../PARS10/pubs/PARS10/data \
-    --gene sce_genes.blast.tsv \
-    --pos  ${NAME}.snp.gene.pos.txt \
-    > fail_pos.txt
-
-# review fail_pos.txt to find SNPs located in overlapped genes
-
-# process ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
-
-# SNPs within intergenic regions
-runlist position --op superset \
-    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intergenic.pos.txt
-
-# SNPs within introns
-runlist position --op superset \
-    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within 5' and 3' utr
-runlist position --op superset \
-    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr5.pos.txt
-
-runlist position --op superset \
-    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr3.pos.txt
-
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within utr
-runlist position --op superset \
-    sce_utr.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-unset NAME
+cat forWebORFs.txt \
+    | perl -nla -F"\t" -MStatistics::Lite -e '
+        next unless /^Y/;    # ORF stable id start with a "Y"
+        next if @F < 2;
+        my $rec_rate  = Statistics::Lite::median(grep {defined} @F[1 .. 7]);
+        print qq{$F[0]\t$rec_rate};
+    ' \
+    > rec_rate.tsv
 ```
 
-# Real Processing n152_Mixed_Spar
+## Protein-protein interactions
+
+* Data source:
 
 ```bash
-export NAME=Scer_n152_Mixed_Spar
+mkdir -p ~/data/mrna-structure/gene-traits
+cd ~/data/mrna-structure/gene-traits
 
-cd ~/data/mrna-structure/process
+wget -N http://drygin.ccbr.utoronto.ca/%7Ecostanzo2009/sgadata_costanzo2009_stringentCutoff_101120.txt.gz
 
-# SNPs within transcripts
-runlist position --op superset \
-    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.gene.pos.txt
-
-# read gene and snp info file
-# produce ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl \
-    --pars ../PARS10/pubs/PARS10/data \
-    --gene sce_genes.blast.tsv \
-    --pos  ${NAME}.snp.gene.pos.txt \
-    > fail_pos.txt
-
-# review fail_pos.txt to find SNPs located in overlapped genes
-
-# process ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
-
-# SNPs within intergenic regions
-runlist position --op superset \
-    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intergenic.pos.txt
-
-# SNPs within introns
-runlist position --op superset \
-    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within 5' and 3' utr
-runlist position --op superset \
-    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr5.pos.txt
-
-runlist position --op superset \
-    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr3.pos.txt
-
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within utr
-runlist position --op superset \
-    sce_utr.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-unset NAME
+gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
+    | perl -nla -F"\t" -e '
+        BEGIN { our %interact_of; }
+        
+        next unless /^Y/;    # ORF stable id start with a "Y"
+        next if @F != 7;
+        $interact_of{$F[0]}++;
+        
+        END {
+            for my $key ( sort keys %interact_of ) {
+                print qq{$key\t$interact_of{$key}};
+            }
+        }
+    ' \
+    > interact_count.tsv
 ```
 
-# Real Processing n152_Wine_Spar
-
-```bash
-export NAME=Scer_n152_Wine_Spar
-
-cd ~/data/mrna-structure/process
-
-# SNPs within transcripts
-runlist position --op superset \
-    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.gene.pos.txt
-
-# read gene and snp info file
-# produce ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl \
-    --pars ../PARS10/pubs/PARS10/data \
-    --gene sce_genes.blast.tsv \
-    --pos  ${NAME}.snp.gene.pos.txt \
-    > fail_pos.txt
-
-# review fail_pos.txt to find SNPs located in overlapped genes
-
-# process ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
-
-# SNPs within intergenic regions
-runlist position --op superset \
-    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intergenic.pos.txt
-
-# SNPs within introns
-runlist position --op superset \
-    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within 5' and 3' utr
-runlist position --op superset \
-    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr5.pos.txt
-
-runlist position --op superset \
-    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr3.pos.txt
-
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within utr
-runlist position --op superset \
-    sce_utr.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-unset NAME
-```
-
-# Real Processing n152_Wild_Spar
-
-```bash
-export NAME=Scer_n152_Wild_Spar
-
-cd ~/data/mrna-structure/process
-
-# SNPs within transcripts
-runlist position --op superset \
-    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.gene.pos.txt
-
-# read gene and snp info file
-# produce ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl \
-    --pars ../PARS10/pubs/PARS10/data \
-    --gene sce_genes.blast.tsv \
-    --pos  ${NAME}.snp.gene.pos.txt \
-    > fail_pos.txt
-
-# review fail_pos.txt to find SNPs located in overlapped genes
-
-# process ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
-
-# SNPs within orf_genomic regions
-runlist position --op superset \
-    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within utr regions
-runlist position --op superset \
-    sce_utr.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-# SNPs within intergenic regions
-runlist position --op superset \
-    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intergenic.pos.txt
-
-# SNPs within introns
-runlist position --op superset \
-    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within 5' and 3' utr
-runlist position --op superset \
-    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr5.pos.txt
-
-runlist position --op superset \
-    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr3.pos.txt
-
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within utr
-runlist position --op superset \
-    sce_utr.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-unset NAME
-```
 
 # Stats
 
