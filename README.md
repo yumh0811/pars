@@ -387,8 +387,10 @@ bash 5_multi_cmd.sh
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
 
+# scer_wgs_157.data.yml + saccharomyces.data.yml → total.data.yml
+
 perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
-    -i ~/data/mrna-structure/GENOMES/WGS/scer_wgs_157.data.yml \
+    -i ~/data/mrna-structure/GENOMES/WGS/total.data.yml \
     -o scer_wgs.plan.yml \
     -d ~/data/mrna-structure/GENOMES/WGS \
     -m prefix \
