@@ -438,6 +438,7 @@ bash 7_multi_db_only.sh
 # other plans
 bash plan_Scer_n157_pop.sh
 bash 5_multi_cmd.sh
+bash 7_multi_db_only.sh
 
 # other plans
 bash plan_Scer_n157_Spar.sh
