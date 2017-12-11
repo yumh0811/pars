@@ -341,6 +341,7 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --plan 'name=Scer_n157_Mixed_Spar;t=S288c;qs=spirits009,beer005,wine008,beer029,beer028,beer006,spirits001,beer023,bread004,beer038,spirits003,beer061,bread002,bread001,beer025,bread003,wild006,wild007,wild005,Spar;o=Spar' \
     --plan 'name=Scer_n157_Wine_Spar;t=S288c;qs=beer014,beer030,wine014,wine007,wine018,wine010,wine003,wine017,wine011,wine015,sake002,wine006,beer020,spirits011,wine004,wine005,beer024,beer088,wine009,wine001,beer033,wine013,spirits002,Spar;o=Spar' \
     --plan 'name=Scer_n157_Wild_Spar;t=S288c;qs=wine002,wild004,bioethanol004,bioethanol003,bioethanol001,sake006,sake001,sake004,sake007,sake005,sake003,wild002,wild003,wild001,Spar;o=Spar' \
+    --plan 'name=Scer_n157_nonMosaic_Spar;t=S288c;qs=wild007,wild006,wild005,wild004,wine018,wine017,wine015,wine014,wine013,wine012,wine011,wine010,wine009,wine007,wine006,wine005,wine004,wine003,wine001,spirits011,spirits005,spirits004,spirits003,spirits002,spirits001,sake007,sake006,sake005,sake004,sake003,sake002,sake001,laboratory001,bread004,bread003,bread002,bread001,bioethanol004,bioethanol003,bioethanol001,beer102,beer101,beer100,beer099,beer098,beer097,beer096,beer095,beer094,beer092,beer091,beer090,beer089,beer088,beer087,beer086,beer085,beer084,beer083,beer082,beer081,beer080,beer079,beer078,beer077,beer076,beer075,beer073,beer071,beer070,beer069,beer068,beer067,beer066,beer065,beer064,beer063,beer062,beer061,beer059,beer056,beer055,beer054,beer053,beer052,beer051,beer050,beer049,beer048,beer047,beer046,beer045,beer044,beer043,beer041,beer040,beer039,beer038,beer037,beer036,beer034,beer033,beer032,beer031,beer030,beer029,beer028,beer027,beer026,beer025,beer024,beer023,beer022,beer021,beer020,beer016,beer015,beer014,beer013,beer012,beer011,beer010,beer009,beer008,beer007,beer006,beer005,beer004,beer003,beer002,beer001,Spar;o=Spar' \
     -y
 
 # pop_prep.pl
@@ -377,6 +378,8 @@ bash 5_multi_cmd.sh
 bash plan_Scer_n157_Wine_Spar.sh
 bash 5_multi_cmd.sh
 bash plan_Scer_n157_Wild_Spar.sh
+bash 5_multi_cmd.sh
+bash plan_Scer_n157_nonMosaic_Spar.sh
 bash 5_multi_cmd.sh
 ```
 
