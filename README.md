@@ -756,6 +756,27 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
+# Build alignDB for multiple genomes n157_nonMosaic
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n157_nonMosaic_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n157_nonMosaic_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n157_nonMosaic_Spar -r 1-60
+
+```
+
 ##  Extract `gene_list` and `snp_codon_list` n7_Spar
 
 ```bash
@@ -914,6 +935,18 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Wild_Spar.mvar.1-60.xlsx --she
 
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Wild_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
     > Scer_n157_Wild_Spar.mvar.gene_list.csv
+```
+
+##  Extract `gene_list` and `snp_codon_list` n157_nonMosaic_Spar
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n157_nonMosaic_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n157_nonMosaic_Spar.mvar.gene_list.csv
 ```
 
 
@@ -1312,6 +1345,36 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Wild_Spar.mvar.1-60.xlsx --she
 
 ```
 
+
+## SNPs and indels n157_nonMosaic_Spar
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n157_nonMosaic_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n157_nonMosaic_Spar.indel.pos.txt
+
+```
 
 List all valid genes.
 
@@ -2207,6 +2270,74 @@ unset NAME
 
 ```bash
 export NAME=Scer_n157_Wild_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within orf_genomic regions
+runlist position --op superset \
+    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr regions
+runlist position --op superset \
+    sce_utr.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within 5' and 3' utr
+runlist position --op superset \
+    sce_utr5.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr5.pos.txt
+
+runlist position --op superset \
+    sce_utr3.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr3.pos.txt
+
+# SNPs within orf_genomic
+runlist position --op superset \
+    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+unset NAME
+```
+
+
+# Real Processing n157_nonMosaic_Spar
+
+```bash
+export NAME=Scer_n157_nonMosaic_Spar
 
 cd ~/data/mrna-structure/process
 
