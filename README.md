@@ -1726,6 +1726,10 @@ runlist position --op non-overlap \
     -o sce_utr3.pos.txt
 jrunlist cover sce_utr3.pos.txt -o sce_utr3.yml
 
+jrunlist compare --op diff sce_genes.yml sce_intron.yml -o sce_mRNA.yml
+runlist convert sce_mRNA.yml -o sce_mRNA.pos.txt
+
+
 # Stats
 printf "| %s | %s | %s | %s |\n" \
     "Name" "chrLength" "size" "coverage" \
