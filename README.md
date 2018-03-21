@@ -1729,6 +1729,8 @@ jrunlist cover sce_utr3.pos.txt -o sce_utr3.yml
 jrunlist compare --op diff sce_genes.yml sce_intron.yml -o sce_mRNA.yml
 runlist convert sce_mRNA.yml -o sce_mRNA.pos.txt
 
+jrunlist compare --op diff sce_mRNA.yml sce_utr.yml -o sce_cds.yml
+runlist convert sce_cds.yml -o sce_cds.pos.txt
 
 # Stats
 printf "| %s | %s | %s | %s |\n" \
@@ -2605,7 +2607,12 @@ runlist position --op superset \
     sce_utr.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.utr.pos.txt
 
+# SNPs within cds
+runlist position --op superset \
+    sce_cds.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.cds.pos.txt
 unset NAME
+
 ```
 
 # Real Processing n157_Spas_CBS_1513
