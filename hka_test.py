@@ -22,7 +22,7 @@ parser.add_argument(
     nargs=4,
     help='four integers of comparable: CS1A CS2A CD1 CD2')
 parser.add_argument('--name', default='locus', help='the name of test locus')
-parser.add_argument('--size', type=int, default=81, help='population size')
+parser.add_argument('--size', type=int, default=81, help='sample size for within species population')
 
 args = parser.parse_args()
 
