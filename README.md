@@ -140,11 +140,11 @@ wget -N http://chemogenomics.stanford.edu/supplements/global/download/data/hom.z
 
 perl ~/Scripts/fig_table/xlsx2csv.pl -f hom.z_tdist_pval_nm.counts.smallmol.cutoff.01.xls --sheet 'hom.z_tdist_pval_nm.smallmol.co' \
     | perl -nla -F"," -MText::CSV_XS -e '
-    BEGIN { 
-        our $csv = Text::CSV_XS->new(); 
+    BEGIN {
+        our $csv = Text::CSV_XS->new();
         print qq{#ORF\tGene\tCount};
     }
-    
+
     if ( /^Y/ ) {
         if ($csv->parse($_)) {
             my @fields = $csv->fields();
@@ -191,11 +191,11 @@ wget -N http://drygin.ccbr.utoronto.ca/%7Ecostanzo2009/sgadata_costanzo2009_stri
 gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
     | perl -nla -F"\t" -e '
         BEGIN { our %interact_of; }
-        
+
         next unless /^Y/;    # ORF stable id start with a "Y"
         next if @F != 7;
         $interact_of{$F[0]}++;
-        
+
         END {
             for my $key ( sort keys %interact_of ) {
                 print qq{$key\t$interact_of{$key}};
@@ -568,7 +568,7 @@ cat ../sgd/orf_coding_all.fasta \
         my @ranges = sort { $a <=> $b } grep {/^\d+$/} split /,|\-/, $range;
         my $intspan = AlignDB::IntSpan->new()->add_range(@ranges);
         my $hole = $intspan->holes;
-        
+
         printf qq{%s:%s\n}, $chr, $hole->as_string if $hole->is_not_empty;
     ' \
     > sce_intron.pos.txt
@@ -639,7 +639,7 @@ printf "|:--|--:|--:|--:|\n" >> coverage.stat.md
 for f in genes intergenic intron orf_genomic utr utr5 utr3; do
     printf "| %s | %s | %s | %s |\n" \
         ${f} \
-        $( 
+        $(
             jrunlist stat ../blast/S288c.sizes sce_${f}.yml --all -o stdout \
             | grep -v coverage \
             | sed "s/,/ /g"
@@ -723,3 +723,21 @@ tar -cf - mrna-structure/ | xz -9 -c - > mrna-structure.tar.xz
 
 ```
 
+# HKA test
+
+```bash
+cd ~/Scripts/pars/
+cat HKA_prepare_chisq.txt |
+    grep -v '^#' |
+    parallel --line-buffer -j 16 '
+        echo >&2 {}
+        HKA_NAME=$(echo {} | cut -f 1)
+        HKA_SIZE=$(echo {} | cut -f 2)
+        HKA_NUMBERS=$(echo {} | cut -f3-10)
+        # echo $HKA_NUMBERS
+
+        python hka_test.py --name ${HKA_NAME} --size ${HKA_SIZE} $HKA_NUMBERS
+    ' \
+    > HKA_chisq.txt
+
+```
