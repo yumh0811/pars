@@ -10,7 +10,7 @@ from sympy import *
 from sympy.core.cache import *
 import itertools
 
-parser = argparse.ArgumentParser(description='Original HKA test')
+parser = argparse.ArgumentParser(description='Original HKA test, locus 1 as neutral locus and locus 2 as test locus')
 parser.add_argument(
     'diff',
     type=int,
