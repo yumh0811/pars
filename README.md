@@ -135,13 +135,12 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --opt rm_species=Fungi \
     --dd ~/data/mrna-structure/GENOMES/ASSEMBLIES \
     --download "name=S288c;taxon=559292" \
-    --download "name=S288c;taxon=559292" \
-    --download "name=DBVPG6044;taxon=" \
-    --download "name=UWOPS03_461_4;taxon=" \
-    --download "name=Y12;taxon=" \
-    --download "name=SK1;taxon=" \
-    --download "name=YPS128;taxon=" \
-    --download "name=DBVPG6765;taxon=" \
+    --download "name=DBVPG6044;taxon=100000000001" \
+    --download "name=UWOPS03_461_4;taxon=100000000002" \
+    --download "name=Y12;taxon=100000000003" \
+    --download "name=SK1;taxon=100000000004" \
+    --download "name=YPS128;taxon=100000000005" \
+    --download "name=DBVPG6765;taxon=100000000006" \
     --download "name=EC1118;taxon=643680" \
     --plan 'name=Scer_n7_Spar;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
     --plan 'name=Scer_n7p_Spar;t=S288c;qs=DBVPG6044,UWOPS03_461_4,Y12,SK1,YPS128,DBVPG6765,Spar;o=Spar' \
