@@ -11,7 +11,7 @@
     - [Illumina (NCBI ASSEMBLY)](#illumina-ncbi-assembly)
 - [Plans of alignments](#plans-of-alignments)
 - [AlignDB](#aligndb)
-    - [Build alignDB for multiple genomes n7](#build-aligndb-for-multiple-genomes-n7)
+    - [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes-n7)
     - [Extract `gene_list` and `snp_codon_list`](#extract-gene-list-and-snp-codon-list-n7)
     - [SNPs and indels](#snps-and-indels-n7)
 - [Blast](#blast)
