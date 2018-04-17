@@ -947,22 +947,3 @@ gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
     ' \
     > interact_count.tsv
 ```
-
-
-# Stats
-
-Switch to RStudio, let R do its jobs.
-
-```bash
-open -a RStudio ~/data/mrna-structure
-
-```
-
-# Pack all things up
-
-```bash
-cd  ~/data
-tar -cf - mrna-structure/ | xz -9 -c - > mrna-structure.tar.xz
-
-```
-
