@@ -11,18 +11,18 @@
     - [Illumina (NCBI ASSEMBLY)](#illumina-ncbi-assembly)
 - [Plans of alignments](#plans-of-alignments)
 - [AlignDB](#aligndb)
-    - [Build alignDB for multiple genomes n7_Spar](#build-aligndb-for-multiple-genomes-n7-spar)
-    - [Build alignDB for multiple genomes n7p_Spar](#build-aligndb-for-multiple-genomes-n7p-spar)
-    - [Build alignDB for multiple genomes n157_Spar](#build-aligndb-for-multiple-genomes-n157-spar)
-    - [Build alignDB for multiple genomes n157_nonMosaic_Spar](#build-aligndb-for-multiple-genomes-n157-nonmosaic-spar)
-    - [Extract `gene_list` and `snp_codon_list` n7_Spar](#extract-gene-list-and-snp-codon-list-n7-spar)
-    - [Extract `gene_list` and `snp_codon_list` n7p_Spar](#extract-gene-list-and-snp-codon-list-n7p-spar)
-    - [Extract `gene_list` and `snp_codon_list` n157_Spar](#extract-gene-list-and-snp-codon-list-n157-spar)
-    - [Extract `gene_list` and `snp_codon_list` n157_nonMosaic_Spar](#extract-gene-list-and-snp-codon-list-n157-nonmosaic-spar)
-    - [SNPs and indels n7_Spar](#snps-and-indels-n7-spar)
-    - [SNPs and indels n7p_Spar](#snps-and-indels-n7p-spar)
-    - [SNPs and indels n157_Spar](#snps-and-indels-n157-spar)
-    - [SNPs and indels n157_nonMosaic_Spar](#snps-and-indels-n157-nonmosaic-spar)
+    - [Build alignDB for multiple genomes n7](#build-aligndb-for-multiple-genomes-n7)
+    - [Build alignDB for multiple genomes n7p](#build-aligndb-for-multiple-genomes-n7p)
+    - [Build alignDB for multiple genomes n157](#build-aligndb-for-multiple-genomes-n157)
+    - [Build alignDB for multiple genomes n157_nonMosaic](#build-aligndb-for-multiple-genomes-n157-nonmosaic)
+    - [Extract `gene_list` and `snp_codon_list` n7](#extract-gene-list-and-snp-codon-list-n7)
+    - [Extract `gene_list` and `snp_codon_list` n7p](#extract-gene-list-and-snp-codon-list-n7p)
+    - [Extract `gene_list` and `snp_codon_list` n157](#extract-gene-list-and-snp-codon-list-n157)
+    - [Extract `gene_list` and `snp_codon_list` n157_nonMosaic](#extract-gene-list-and-snp-codon-list-n157-nonmosaic)
+    - [SNPs and indels n7](#snps-and-indels-n7)
+    - [SNPs and indels n7p](#snps-and-indels-n7p)
+    - [SNPs and indels n157](#snps-and-indels-n157)
+    - [SNPs and indels n157_nonMosaic](#snps-and-indels-n157-nonmosaic)
 - [Blast](#blast)
 - [Features](#features)
 - [Real Processing](#real-processing)
@@ -195,7 +195,7 @@ bash 7_multi_db_only.sh
 
 # AlignDB
 
-## Build alignDB for multiple genomes n7_Spar
+## Build alignDB for multiple genomes n7
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -216,7 +216,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-## Build alignDB for multiple genomes n7p_Spar
+## Build alignDB for multiple genomes n7p
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -237,7 +237,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-## Build alignDB for multiple genomes n157_Spar
+## Build alignDB for multiple genomes n157
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -258,7 +258,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-## Build alignDB for multiple genomes n157_nonMosaic_Spar
+## Build alignDB for multiple genomes n157_nonMosaic
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -279,7 +279,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-##  Extract `gene_list` and `snp_codon_list` n7_Spar
+##  Extract `gene_list` and `snp_codon_list` n7
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -291,7 +291,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp
     > Scer_n7_Spar.mvar.gene_list.csv
 ```
 
-##  Extract `gene_list` and `snp_codon_list` n7p_Spar
+##  Extract `gene_list` and `snp_codon_list` n7p
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -303,7 +303,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'sn
     > Scer_n7p_Spar.mvar.gene_list.csv
 ```
 
-##  Extract `gene_list` and `snp_codon_list` n157_Spar
+##  Extract `gene_list` and `snp_codon_list` n157
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -315,7 +315,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Spar.mvar.1-60.xlsx --sheet 's
     > Scer_n157_Spar.mvar.gene_list.csv
 ```
 
-##  Extract `gene_list` and `snp_codon_list` n157_nonMosaic_Spar
+##  Extract `gene_list` and `snp_codon_list` n157_nonMosaic
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -327,7 +327,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_Spar.mvar.1-60.xlsx 
     > Scer_n157_nonMosaic_Spar.mvar.gene_list.csv
 ```
 
-## SNPs and indels n7_Spar
+## SNPs and indels n7
 
 Select columns `chr_name,snp_pos` for SNPs.
 
@@ -357,7 +357,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'ind
 
 ```
 
-## SNPs and indels n7p_Spar
+## SNPs and indels n7p
 
 Select columns `chr_name,snp_pos` for SNPs.
 
@@ -387,7 +387,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'in
 
 ```
 
-## SNPs and indels n157_Spar
+## SNPs and indels n157
 
 Select columns `chr_name,snp_pos` for SNPs.
 
@@ -417,7 +417,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Spar.mvar.1-60.xlsx --sheet 'i
 
 ```
 
-## SNPs and indels n157_nonMosaic_Spar
+## SNPs and indels n157_nonMosaic
 
 Select columns `chr_name,snp_pos` for SNPs.
 
@@ -574,7 +574,7 @@ done >> coverage.stat.md
 cat coverage.stat.md
 ```
 
-# Real Processing n7_Spar
+# Real Processing n7
 
 ```bash
 export NAME=Scer_n7_Spar
@@ -637,7 +637,7 @@ unset NAME
 
 ```
 
-# Real Processing n7p_Spar
+# Real Processing n7p
 
 ```bash
 export NAME=Scer_n7p_Spar
@@ -700,7 +700,7 @@ unset NAME
 
 ```
 
-# Real Processing n157_Spar
+# Real Processing n157
 
 ```bash
 export NAME=Scer_n157_Spar
@@ -763,7 +763,7 @@ unset NAME
 
 ```
 
-# Real Processing n157_nonMosaic_Spar
+# Real Processing n157_nonMosaic
 
 ```bash
 export NAME=Scer_n157_nonMosaic_Spar
