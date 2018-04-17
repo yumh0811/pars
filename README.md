@@ -12,7 +12,7 @@
 - [Plans of alignments](#plans-of-alignments)
 - [AlignDB](#aligndb)
     - [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes-n7)
-    - [Extract *gene_list* and *snp_codon_list*](#extract-gene-list-and-snp-codon-list-n7)
+    - [Extract gene_list and snp_codon_list](#extract-gene-list-and-snp-codon-list-n7)
     - [SNPs and indels](#snps-and-indels-n7)
 - [Blast](#blast)
 - [Features](#features)
@@ -270,7 +270,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-## Extract *gene_list* and *snp_codon_list* n7
+## Extract gene_list and snp_codon_list n7
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -282,7 +282,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp
     > Scer_n7_Spar.mvar.gene_list.csv
 ```
 
-## Extract *gene_list* and *snp_codon_list* n7p
+## Extract gene_list and snp_codon_list n7p
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -294,7 +294,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'sn
     > Scer_n7p_Spar.mvar.gene_list.csv
 ```
 
-## Extract *gene_list* and *snp_codon_list* n157
+## Extract gene_list and snp_codon_list n157
 
 ```bash
 cd ~/data/mrna-structure/xlsx
@@ -306,7 +306,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Spar.mvar.1-60.xlsx --sheet 's
     > Scer_n157_Spar.mvar.gene_list.csv
 ```
 
-## Extract *gene_list* and *8snp_codon_list* n157_nonMosaic
+## Extract gene_list and snp_codon_list n157_nonMosaic
 
 ```bash
 cd ~/data/mrna-structure/xlsx
