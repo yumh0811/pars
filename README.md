@@ -6,13 +6,9 @@
     - [Download PARS10 full site.](#download-pars10-full-site)
     - [Download S288c annotation data from ensembl by rsync](#download-s288c-annotation-data-from-ensembl-by-rsync)
     - [SGD](#sgd)
-    - [mRNA levels](#mrna-levels)
-    - [ess, rich/minimal and chem](#ess-richminimal-and-chem)
-    - [Recombination rates](#recombination-rates)
-    - [Protein-protein interactions](#protein-protein-interactions)
-- [Other strains and outgroups](#other-strains-and-outgroups)
-    - [Sanger (NCBI WGS)](#sanger-ncbi-wgs)
-    - [Illumina (NCBI ASSEMBLY)](#illumina-ncbi-assembly)
+- [Download strains and outgroups](#Download-strains-and-outgroups)
+    - [Sanger (NCBI WGS)](#Sanger-(NCBI-WGS))
+    - [Illumina (NCBI ASSEMBLY)](#Illumina-(NCBI-ASSEMBLY))
 - [Plans of alignments](#plans-of-alignments)
 - [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes)
     - [Extract `gene_list` and `snp_codon_list`](#extract-gene-list-and-snp-codon-list)
@@ -20,6 +16,11 @@
 - [Blast](#blast)
 - [Features](#features)
 - [Real Processing](#real-processing)
+- [Download other reference data](#Download other reference data)
+    - [mRNA levels](#mrna-levels)
+    - [ess, rich/minimal and chem](#ess-richminimal-and-chem)
+    - [Recombination rates](#recombination-rates)
+    - [Protein-protein interactions](#protein-protein-interactions)
 - [Stats](#stats)
 - [Pack all things up](#pack-all-things-up)
 
@@ -77,10 +78,7 @@ find . -name "*.gz" \
 ```
 
 
-# Other strains and outgroups
-
-* `withncbi/db/`: taxonomy database
-* `withncbi/pop/`: scer_wgs alignments
+# Download strains and outgroups
 
 ## Sanger (NCBI WGS)
 
