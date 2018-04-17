@@ -10,9 +10,19 @@
     - [Sanger (NCBI WGS)](#sanger-ncbi-wgs)
     - [Illumina (NCBI ASSEMBLY)](#illumina-ncbi-assembly)
 - [Plans of alignments](#plans-of-alignments)
-- [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes)
-    - [Extract `gene_list` and `snp_codon_list`](#extract-gene-list-and-snp-codon-list)
-    - [SNPs and indels](#snps-and-indels)
+- [AlignDB](#aligndb)
+    - [Build alignDB for multiple genomes n7_Spar](#build-aligndb-for-multiple-genomes-n7-spar)
+    - [Build alignDB for multiple genomes n7p_Spar](#build-aligndb-for-multiple-genomes-n7p-spar)
+    - [Build alignDB for multiple genomes n157_Spar](#build-aligndb-for-multiple-genomes-n157-spar)
+    - [Build alignDB for multiple genomes n157_nonMosaic_Spar](#build-aligndb-for-multiple-genomes-n157-nonmosaic-spar)
+    - [Extract `gene_list` and `snp_codon_list` n7_Spar](#extract-gene-list-and-snp-codon-list-n7-spar)
+    - [Extract `gene_list` and `snp_codon_list` n7p_Spar](#extract-gene-list-and-snp-codon-list-n7p-spar)
+    - [Extract `gene_list` and `snp_codon_list` n157_Spar](#extract-gene-list-and-snp-codon-list-n157-spar)
+    - [Extract `gene_list` and `snp_codon_list` n157_nonMosaic_Spar](#extract-gene-list-and-snp-codon-list-n157-nonmosaic-spar)
+    - [SNPs and indels n7_Spar](#snps-and-indels-n7-spar)
+    - [SNPs and indels n7p_Spar](#snps-and-indels-n7p-spar)
+    - [SNPs and indels n157_Spar](#snps-and-indels-n157-spar)
+    - [SNPs and indels n157_nonMosaic_Spar](#snps-and-indels-n157-nonmosaic-spar)
 - [Blast](#blast)
 - [Features](#features)
 - [Real Processing](#real-processing)
@@ -183,7 +193,9 @@ bash 5_multi_cmd.sh
 bash 7_multi_db_only.sh
 ```
 
-# Build alignDB for multiple genomes n7
+# AlignDB
+
+## Build alignDB for multiple genomes n7_Spar
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -204,7 +216,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-# Build alignDB for multiple genomes n7p
+## Build alignDB for multiple genomes n7p_Spar
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -225,7 +237,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-# Build alignDB for multiple genomes n157
+## Build alignDB for multiple genomes n157_Spar
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
@@ -246,7 +258,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
-# Build alignDB for multiple genomes n157_nonMosaic
+## Build alignDB for multiple genomes n157_nonMosaic_Spar
 
 ```bash
 mkdir -p ~/data/mrna-structure/xlsx
