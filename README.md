@@ -563,6 +563,16 @@ for f in genes intergenic intron orf_genomic utr mRNA cds; do
 done >> coverage.stat.md
 
 cat coverage.stat.md
+
+| Name | chrLength | size | coverage |
+|:--|--:|--:|--:|
+| genes | 12071326 | 4235405 | 0.3509 |
+| intergenic | 12071326 | 2864170 | 0.2373 |
+| intron | 12071326 | 65144 | 0.0054 |
+| orf_genomic | 12071326 | 8895737 | 0.7369 |
+| utr | 12071326 | 516569 | 0.0428 |
+| mRNA | 12071326 | 4233361 | 0.3507 |
+| cds | 12071326 | 3716792 | 0.3079 |
 ```
 
 # Real Processing n7
