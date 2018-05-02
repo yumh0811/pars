@@ -23,7 +23,7 @@
     - [Recombination rates](#recombination-rates)
     - [Protein-protein interactions](#protein-protein-interactions)
 - [Phylogeny](#phylogeny)
-    - [sgd/saccharomyces_cerevisiae.gff → protein coding gene list](#sgdsaccharomyces-cerevisiae-gff-protein-coding-gene-list)
+    - [sgd/saccharomyces_cerevisiae.gff → protein coding gene list](#sgdsaccharomyces-cerevisiae-gff-→-protein-coding-gene-list)
     - [cut cds alignment](#cut-cds-alignment)
         - [create cds_yml](#create-cds-yml)
         - [cut cds_alignment by cds_yml (n157_nonMosaic)](#cut-cds-alignment-by-cds-yml-n157-nonmosaic)
