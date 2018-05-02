@@ -1080,5 +1080,8 @@ Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
 
 unset NAME
 
-
 ```
+
+# SNP
+
+[stat SNPs](https://github.com/yumh0811/pars/blob/master/stat_SNPs.rmd)
