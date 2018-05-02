@@ -978,10 +978,26 @@ perl ~/Scripts/pars/program/protein_coding_list_range_chr.pl --file ~/data/mrna-
 
 ```bash
 cd ~/data/mrna-structure/phylogeny
-mkdir -p ~/data/mrna-structure/phylogeny/gene_cds_all_yml
+mkdir -p ~/data/mrna-structure/phylogeny/gene_cds_yml
 
-perl ~/Scripts/pars/program/cut_cds_yml.pl --file protein_coding_list_range_chr.csv --output gene_cds_all_yml
+perl ~/Scripts/pars/program/cut_cds_yml.pl --file protein_coding_list_range_chr.csv --output gene_cds_yml
 
+```
+
+## cut cds_alignment by cds_yml (n157_nonMosaic)
+
+```bash
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/Scer_n157_nonMosaic_Spar_refined ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_refined
+cd ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+
+cd ~/data/mrna-structure/phylogeny
+mkdir -p ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_gene_alignment_cds
+cd ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_gene_alignment_cds
+cat ../protein_coding_list.csv |
+   parallel --line-buffer -j 8 '
+   	   fasops slice ../Scer_n157_nonMosaic_Spar_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   '
 ```
 
 
