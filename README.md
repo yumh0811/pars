@@ -23,7 +23,7 @@
     - [Recombination rates](#recombination-rates)
     - [Protein-protein interactions](#protein-protein-interactions)
 - [Phylogeny](#phylogeny)
-    - [sgd/saccharomyces_cerevisiae.gff → protein coding gene list](#sgdsaccharomyces-cerevisiae-gff-protein-coding-gene-list)
+    - [create protein coding gene list](#create-protein-coding-gene-list)
     - [cut cds alignment](#cut-cds-alignment)
         - [create cds_yml](#create-cds_yml)
         - [cut cds_alignment by cds_yml (n157_nonMosaic)](#cut-cds_alignment-by-cds_yml-n157_nonmosaic)
@@ -979,11 +979,13 @@ gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
 
 # Phylogeny
 
-## sgd/saccharomyces_cerevisiae.gff → protein coding gene list
+## create protein coding gene list
 
 ```bash
 mkdir -p ~/data/mrna-structure/phylogeny
 cd ~/data/mrna-structure/phylogeny
+
+# sgd/saccharomyces_cerevisiae.gff → protein coding gene list
 
 perl ~/Scripts/pars/program/protein_coding_list.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list.csv
 
