@@ -1052,6 +1052,17 @@ cat protein_coding_list.csv |
        perl ~/Scripts/pars/program/count_distance.pl --file ~/data/mrna-structure/phylogeny/${NAME}_newick/{}.nwk --list ~/data/mrna-structure/phylogeny/${NAME}_strain_name.list --output ${NAME}_distance/{}.csv
     fi
     '
+cd ~/data/mrna-structure/phylogeny
+echo 'gene,asian,wine,beer1,beer2,mixed,beer1_beer2,beer1_beer2_mixed,wine_beer1_beer2_mixed' > ${NAME}_mean_distance.csv
+cat protein_coding_list.csv |
+    parallel --line-buffer -j 8 '
+        if [ -e "${NAME}_distance/{}.csv" ]; then
+            perl ~/Scripts/pars/program/count_distance_mean.pl --file ${NAME}_distance/{}.csv
+        fi
+    ' \
+>> ${NAME}_mean_distance.csv
+
+
 
 unset NAME
 ```
