@@ -53,14 +53,14 @@ while (<$tsv_fh>) {
                 $content_new[1] = $content[3];
                 $content_new[2] = $content[4];
                 my $content_new = join ",", @content_new;
-                open OUT1, '>>', $output;
-                print OUT1 $content_new, "\n";
+                open OUT, '>>', $output;
+                print OUT $content_new, "\n";
             }
         }
     }
 }
 
 close $tsv_fh;
-close OUT1;
+close OUT;
 
 __END__
