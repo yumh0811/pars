@@ -1048,7 +1048,7 @@ cat ../protein_coding_list.csv |
 unset NAME
 ```
 
-## count distance
+## count distance (n157_nonMosaic)
 
 ```bash
 export NAME=Scer_n157_nonMosaic_Spar
