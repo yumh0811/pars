@@ -25,11 +25,11 @@
 - [Phylogeny](#phylogeny)
     - [sgd/saccharomyces_cerevisiae.gff → protein coding gene list](#sgdsaccharomyces-cerevisiae-gff-protein-coding-gene-list)
     - [cut cds alignment](#cut-cds-alignment)
-        - [create cds_yml](#create-cdsyml)
-        - [cut cds_alignment by cds_yml (n157_nonMosaic)](#cut-cdsalignment-by-cdsyml-n157-nonmosaic)
-        - [count cds_alignment proporation in sgd (n157_nonMosaic)](#count-cdsalignment-proporation-in-sgd-n157nonmosaic)
-    - [create gene_phylogeny (n157_nonMosaic)](#create-gene-phylogeny-n157nonmosaic)
-    - [count distance (n157_nonMosaic)](#count-distance-n157nonmosaic)
+        - [create cds_yml](#create-cds_yml)
+        - [cut cds_alignment by cds_yml (n157_nonMosaic)](#cut-cds_alignment-by-cds_yml-n157_nonmosaic)
+        - [count cds_alignment proporation in sgd (n157_nonMosaic)](#count-cds_alignment-proporation-in-sgd-n157_nonmosaic)
+    - [create gene_phylogeny (n157_nonMosaic)](#create-gene-phylogeny-n157_nonmosaic)
+    - [count distance (n157_nonMosaic)](#count-distance-n157_nonmosaic)
 - [SNP](#snp)
 
 
