@@ -1075,6 +1075,7 @@ cat protein_coding_list.csv |
     ' \
 >> ${NAME}_mean_distance.csv
 
+# generate domestication gene （asian → nodom_gene, wine → limdom_gene, beer1+beer2 → strdom_gene)
 Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
 
 unset NAME
