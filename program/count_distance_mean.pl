@@ -19,7 +19,7 @@ use List::Util qw/min/;
 
 =head1 SYNOPSIS
 
-    perl count_distance_mean.pl --file $NAME.csv
+    perl ~/Scripts/pars/program/count_distance_mean.pl --file ${NAME}_distance/{}.csv
 
 =cut
 
