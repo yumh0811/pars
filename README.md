@@ -22,6 +22,15 @@
     - [ess, rich/minimal and chem](#ess-richminimal-and-chem)
     - [Recombination rates](#recombination-rates)
     - [Protein-protein interactions](#protein-protein-interactions)
+- [Phylogeny](#Phylogeny)
+    - [sgd/saccharomyces_cerevisiae.gff → protein coding gene list](#sgd-saccharomyces-cerevisiae-gff-protein-coding-gene-list)
+    - [cut cds alignment](#cut-cds-alignment)
+        - [create cds_yml](#create-cds-yml)
+        - [cut cds_alignment by cds_yml (n157_nonMosaic)](#cut-cds-alignment-by-cds-yml-n157-nonMosaic)
+        - [count cds_alignment proporation in sgd (n157_nonMosaic)](#count-cds-alignment-proporation-in-sgd-(-n157_nonMosaic)
+    - [create gene_phylogeny (n157_nonMosaic)](#create-gene-phylogeny-n157-nonMosaic)
+    - [count distance (n157_nonMosaic)](#count-distance-n157-nonMosaic)
+- [SNP](#SNP)
 
 
 # Download reference data
