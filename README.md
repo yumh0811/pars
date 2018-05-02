@@ -36,6 +36,7 @@ perl ~/Scripts/download/list.pl -u http://genie.weizmann.ac.il/pubs/PARS10/
 perl ~/Scripts/download/download.pl -i pubs_PARS10.yml
 
 find . -name "*.gz" | xargs gzip -d
+
 ```
 
 ## Download S288c annotation data from ensembl by rsync
@@ -56,6 +57,7 @@ rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/saccharomyces_ce
 
 perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --checksum
 perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --initdb --db saccharomyces_cerevisiae_core_29_82_4
+
 ```
 
 ## SGD
@@ -74,6 +76,7 @@ find . -name "*.gz" \
         echo {};
         gzip -d -c {} > {.};
     "
+    
 ```
 
 
@@ -93,6 +96,7 @@ perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
 aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
 
 find WGS -name "*.gz" | xargs gzip -t
+
 ```
 
 ## Illumina (NCBI ASSEMBLY)
@@ -180,6 +184,7 @@ bash 7_multi_db_only.sh
 bash plan_Scer_n157_nonMosaic_Spar.sh
 bash 5_multi_cmd.sh
 bash 7_multi_db_only.sh
+
 ```
 
 # AlignDB
@@ -278,6 +283,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'gen
 
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
     > Scer_n7_Spar.mvar.gene_list.csv
+    
 ```
 
 ## Extract gene-list and snp-codon-list n7p
@@ -290,6 +296,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'ge
 
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
     > Scer_n7p_Spar.mvar.gene_list.csv
+    
 ```
 
 ## Extract gene-list and snp-codon-list n157
@@ -302,6 +309,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Spar.mvar.1-60.xlsx --sheet 'g
 
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
     > Scer_n157_Spar.mvar.gene_list.csv
+    
 ```
 
 ## Extract gene-list and snp-codon-list n157_nonMosaic
@@ -314,6 +322,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_Spar.mvar.1-60.xlsx 
 
 perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
     > Scer_n157_nonMosaic_Spar.mvar.gene_list.csv
+    
 ```
 
 ## SNPs and indels n7
@@ -849,6 +858,7 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f nbt.1551-S2.xls --sheet 'counts' \
     }
     ' \
     > mrna_levels.tsv
+    
 ```
 
 ## ess, rich/minimal and chem
@@ -927,6 +937,7 @@ cat forWebORFs.txt \
         print qq{$F[0]\t$rec_rate};
     ' \
     > rec_rate.tsv
+    
 ```
 
 ## Protein-protein interactions
@@ -954,6 +965,7 @@ gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
         }
     ' \
     > interact_count.tsv
+    
 ```
 
 # Phylogeny
@@ -1014,6 +1026,7 @@ cd ~/data/mrna-structure/phylogeny
 perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
 
 unset NAME
+
 ```
 
 ## create gene_phylogeny (n157_nonMosaic)
@@ -1062,7 +1075,6 @@ cat protein_coding_list.csv |
     ' \
 >> ${NAME}_mean_distance.csv
 
-
-
 unset NAME
+
 ```
