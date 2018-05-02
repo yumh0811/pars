@@ -51,14 +51,14 @@ while (<$tsv_fh>) {
                 $process =~ /ID=(.*)_mRNA;Name=/;
                 $content_new[0] = $1;
                 my $content_new = join ",", @content_new;
-                open OUT1, '>>', $output;
-                print OUT1 $content_new, "\n";
+                open OUT, '>>', $output;
+                print OUT $content_new, "\n";
             }
         }
     }
 }
 
 close $tsv_fh;
-close OUT1;
+close OUT;
 
 __END__
