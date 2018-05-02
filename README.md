@@ -1075,8 +1075,9 @@ cat protein_coding_list.csv |
     ' \
 >> ${NAME}_mean_distance.csv
 
+Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+
 unset NAME
 
-Rscript ~/Scripts/pars/program/Scer_n157_nonMosaic_Spar_distance_processed.R
 
 ```
