@@ -1,0 +1,481 @@
+---
+title: "n157_nonMosaic"
+author: "yuminghao"
+date: "2018/3/13"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/yumh/data_processing/n157_nonMosaic/result/profile/")
+```
+
+```{r setup}
+library(ggplot2)
+library(scales)
+library(reshape)
+library(pander)
+library(gridExtra)
+library(plyr)
+library(dplyr)
+library(proto)
+library(gsubfn)
+library(RSQLite)
+library(sqldf)
+
+```
+
+# bash count_ACGT_percent.sh
+# perl protein_coding_list.pl
+
+```{r Read total SNPs}
+name <- "Scer_n157_nonMosaic_Spar" 
+
+# 统计所有snp的数量
+file_SNPs_all <- paste0("/Users/yumh/data_processing/n157_nonMosaic/xlsx/", name, ".mvar.gene_list.csv", collapse = NULL)
+data_SNPs_all <- read.csv(file_SNPs_all,  header = TRUE, sep = ",")
+dd_SNPs <- data.frame(name = c("all"),count=c(nrow(data_SNPs_all)))
+rownames(data_SNPs_all) <- NULL # suppress rownames
+
+# 统计intergenic snp的数量
+file_SNPs_intergenic <- paste0("/Users/yumh/data_processing/n157_nonMosaic/process/", name, ".snp.intergenic.pos.txt", collapse = NULL)
+data_intergenic <- read.csv(file_SNPs_intergenic,  header = FALSE, sep = "\t")
+names(data_intergenic) =c("name")
+data_intergenic <- merge(data_SNPs_all, data_intergenic, by="name")
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="intergenic", count=nrow(data_intergenic) ))
+rownames(data_intergenic) <- NULL # suppress rownames
+
+# 统计有PARS数据的转录本中的SNPs
+file_SNPs_PARS_transcripts <- paste0("/Users/yumh/data_processing/n157_nonMosaic/process/", name, ".gene_variation.var_pars.tsv", collapse = NULL)
+data_SNPs_PARS_transcripts <- read.csv(file_SNPs_PARS_transcripts,  header = TRUE, sep = "\t")
+
+# 合并data_SNPs_all和data_SNPs_PARS_transcripts
+data_SNPs_PARS_transcripts <- merge(data_SNPs_PARS_transcripts, data_SNPs_all, by="name")
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="PARS_transcripts", count=nrow(data_SNPs_PARS_transcripts) ))
+
+# 得到每一个有PARS信息的转录本的茎环长度、GC含量等信息
+file_fold_class <- paste0("/Users/yumh/data_processing/n157_nonMosaic/result/profile/", name, ".gene_variation.fold_class.csv", collapse = NULL)
+data_fold_class <- read.csv(file_fold_class,  header = TRUE, sep = ",")
+
+# 得到protein coding gene的list
+file_protein_coding_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/protein_coding_list.csv"
+data_protein_coding_list <- read.csv(file_protein_coding_list,  header = FALSE, sep = ",")
+colnames(data_protein_coding_list) <- c("gene")
+
+# 取出cds alignment proportation = 1 的基因
+file_proporation_1_gene <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/proporation_1_gene.txt"
+data_proporation_1_gene <- read.csv(file_proporation_1_gene,  header = TRUE, sep = ",")
+data_protein_coding_list <- merge(data_protein_coding_list,data_proporation_1_gene,by="gene")
+
+# 得到asian_1_gene的protein coding list
+file_asian_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/asian_1_gene.txt"
+data_asian_1_gene_list <- read.csv(file_asian_1_gene_list,  header = TRUE, sep = ",")
+data_asian_1_gene_list_non <- sqldf('SELECT * FROM [data_asian_1_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_asian_1_gene_list] EXCEPT SELECT * FROM [data_asian_1_gene_list_non]')
+
+# 得到wine_1_gene的protein coding list
+file_wine_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/wine_1_gene.txt"
+data_wine_1_gene_list <- read.csv(file_wine_1_gene_list,  header = TRUE, sep = ",")
+data_wine_1_gene_list_non <- sqldf('SELECT * FROM [data_wine_1_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_wine_1_gene_list] EXCEPT SELECT * FROM [data_wine_1_gene_list_non]')
+
+# 得到beer1_1_gene的protein coding list
+file_beer1_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/beer1_1_gene.txt"
+data_beer1_1_gene_list <- read.csv(file_beer1_1_gene_list,  header = TRUE, sep = ",")
+data_beer1_1_gene_list_non <- sqldf('SELECT * FROM [data_beer1_1_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_beer1_1_gene_list] EXCEPT SELECT * FROM [data_beer1_1_gene_list_non]')
+
+# 得到beer2_1_gene的protein coding list
+file_beer2_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/beer2_1_gene.txt"
+data_beer2_1_gene_list <- read.csv(file_beer2_1_gene_list,  header = TRUE, sep = ",")
+data_beer2_1_gene_list_non <- sqldf('SELECT * FROM [data_beer2_1_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_beer2_1_gene_list] EXCEPT SELECT * FROM [data_beer2_1_gene_list_non]')
+
+# 得到mixed_1_gene的protein coding list
+file_mixed_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/mixed_1_gene.txt"
+data_mixed_1_gene_list <- read.csv(file_mixed_1_gene_list,  header = TRUE, sep = ",")
+data_mixed_1_gene_list_non <- sqldf('SELECT * FROM [data_mixed_1_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_mixed_1_gene_list] EXCEPT SELECT * FROM [data_mixed_1_gene_list_non]')
+
+# 得到beer2/beer1_1_gene的protein coding list
+file_beer2_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/beer2_1_gene.txt"
+data_beer2_1_gene_list <- read.csv(file_beer2_1_gene_list,  header = TRUE, sep = ",")
+file_beer1_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/beer1_1_gene.txt"
+data_beer1_1_gene_list <- read.csv(file_beer1_1_gene_list,  header = TRUE, sep = ",")
+
+data_beer2_beer1_1_gene_list <- merge(data_beer2_1_gene_list,data_beer1_1_gene_list,by="gene",all=T)
+data_beer2_beer1_1_gene_list_non <- sqldf('SELECT * FROM [data_beer2_beer1_1_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_beer2_beer1_1_gene_list] EXCEPT SELECT * FROM [data_beer2_beer1_1_gene_list_non]')
+
+# 得到beer2/mixed/beer1_1_gene的protein coding list
+file_beer2_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/beer2_1_gene.txt"
+data_beer2_1_gene_list <- read.csv(file_beer2_1_gene_list,  header = TRUE, sep = ",")
+file_mixed_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/mixed_1_gene.txt"
+data_mixed_1_gene_list <- read.csv(file_mixed_1_gene_list,  header = TRUE, sep = ",")
+file_beer1_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/beer1_1_gene.txt"
+data_beer1_1_gene_list <- read.csv(file_beer1_1_gene_list,  header = TRUE, sep = ",")
+
+data_beer2_mixed_beer1_1_gene_list <- merge(data_beer2_1_gene_list,data_mixed_1_gene_list,by="gene",all=T)
+data_beer2_mixed_beer1_1_gene_list <- merge(data_beer2_mixed_beer1_1_gene_list,data_beer1_1_gene_list,by="gene",all=T)
+  
+data_beer2_mixed_beer1_1_gene_list_non <- sqldf('SELECT * FROM [data_beer2_mixed_beer1_1_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_beer2_mixed_beer1_1_gene_list] EXCEPT SELECT * FROM [data_beer2_mixed_beer1_1_gene_list_non]')
+
+
+# 得到wine_beer1_beer2_mixed_1_gene的protein coding list
+file_wine_beer1_beer2_mixed_1_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/wine_beer1_beer2_mixed_1_gene.txt"
+data_wine_beer1_beer2_mixed_1_gene_list <- read.csv(file_wine_beer1_beer2_mixed_1_gene_list,  header = TRUE, sep = ",")
+data_wine_beer1_beer2_mixed_1_gene_list_non <- sqldf('SELECT * FROM [data_wine_beer1_beer2_mixed_1_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_wine_beer1_beer2_mixed_1_gene_list] EXCEPT SELECT * FROM [data_wine_beer1_beer2_mixed_1_gene_list_non]')
+
+# 得到Metabolic_pathways_gene的protein coding list
+file_Metabolic_pathways_gene_list <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/Metabolic_pathways_gene.txt"
+data_Metabolic_pathways_gene_list <- read.csv(file_Metabolic_pathways_gene_list,  header = TRUE, sep = ",")
+data_Metabolic_pathways_gene_list_non <- sqldf('SELECT * FROM [data_Metabolic_pathways_gene_list] EXCEPT SELECT * FROM [data_protein_coding_list]')
+data_protein_coding_list <- sqldf('SELECT * FROM [data_Metabolic_pathways_gene_list] EXCEPT SELECT * FROM [data_Metabolic_pathways_gene_list_non]')
+
+
+# 得到pos_sel_gene的protein coding list
+#file_pos_sel_gene <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/pos_sel_gene.txt"
+#data_pos_sel_gene <- read.csv(file_pos_sel_gene,  header = TRUE, sep = ",")
+#data_protein_coding_list <- data_pos_sel_gene
+
+# 得到neg_sel_gene的protein coding list
+#file_neg_sel_gene <- "/Users/yumh/data_processing/n157_nonMosaic/result/profile/neg_sel_gene.txt"
+#data_neg_sel_gene <- read.csv(file_neg_sel_gene,  header = TRUE, sep = ",")
+#data_protein_coding_list <- data_neg_sel_gene
+
+
+# 将有PARS信息的转录本分为mRNA和非mRNA
+data_fold_class_mRNA <- merge(data_fold_class, data_protein_coding_list , by="gene")
+data_fold_class_non_mRNA <- sqldf('SELECT * FROM [data_fold_class] EXCEPT SELECT * FROM [data_fold_class_mRNA]') # 备用
+
+# 得到有PARS信息的mRNA和非mRNA的SNPs
+data_SNPs_PARS_mRNA <- merge(data_SNPs_PARS_transcripts , data_fold_class_mRNA , by="gene")
+data_SNPs_PARS_non_mRNA <- merge(data_SNPs_PARS_transcripts , data_fold_class_non_mRNA , by="gene") # 备用
+
+# 利用perl计算每一个位点所在的茎/环的长度，以及距离茎环交接处的相对位置
+write.csv(data_SNPs_PARS_mRNA, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/interim.csv", row.names = FALSE)
+# bash count_position_gene.sh
+data_SNPs_PARS_mRNA <- read.csv("/Users/yumh/data_processing/n157_nonMosaic/result/profile/data_SNPs_PARS_mRNA.csv",header = TRUE, sep = ",")
+
+# 统计有PARS信息的mRNA中SNPs的数量
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="PARS_mRNA", count=nrow(data_SNPs_PARS_mRNA) ))
+
+# 统计有PARS信息的mRNA的数量
+data_gene_process <- data_SNPs_PARS_mRNA["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+dd_gene <- data.frame(name = c("PARS_mRNA"),count=c(nrow(data_gene_process)))
+
+# 去除有PARS信息的mRNA的SNPs中complex，求出SNPs数量和mRNA数量
+data_SNPs_PARS_mRNA <- subset(data_SNPs_PARS_mRNA, data_SNPs_PARS_mRNA$mutant_to != "Complex")
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="PARS_mRNA_non_complex", count=nrow(data_SNPs_PARS_mRNA) ))
+data_gene_process <- data_SNPs_PARS_mRNA["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+write.csv(data_gene_process, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/gene_name_non_complex.csv", row.names = FALSE)
+dd_gene <- rbind(dd_gene, data.frame(name="PARS_mRNA_non_complex", count=nrow(data_gene_process) ))
+
+# 去除有PARS信息的mRNA的SNPs中target=0，求出SNPs数量和mRNA数量
+data_SNPs_PARS_mRNA <- subset(data_SNPs_PARS_mRNA, data_SNPs_PARS_mRNA$target == 1)
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="PARS_mRNA_target_1", count=nrow(data_SNPs_PARS_mRNA) ))
+data_gene_process <- data_SNPs_PARS_mRNA["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+write.csv(data_gene_process, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/gene_name_target_1.csv", row.names = FALSE)
+dd_gene <- rbind(dd_gene, data.frame(name="PARS_mRNA_target_1", count=nrow(data_gene_process) ))
+
+
+# 取出mRNA中CDS和UTR，求出SNPs数量和mRNA数量
+file_SNPs_utr <- paste0("/Users/yumh/data_processing/n157_nonMosaic/process/", name, ".snp.utr.pos.txt", collapse = NULL)
+data_utr <- read.csv(file_SNPs_utr,  header = FALSE, sep = "\t")
+names(data_utr) =c("name")
+data_utr <- merge(data_SNPs_PARS_mRNA, data_utr, by="name")
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="utr", count=nrow(data_utr) ))
+rownames(data_utr) <- NULL # suppress rownames
+
+file_SNPs_cds <- paste0("/Users/yumh/data_processing/n157_nonMosaic/process/", name, ".snp.cds.pos.txt", collapse = NULL)
+data_cds <- read.csv(file_SNPs_cds,  header = FALSE, sep = "\t")
+names(data_cds) =c("name")
+data_cds <- merge(data_SNPs_PARS_mRNA, data_cds, by="name")
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="cds", count=nrow(data_cds) ))
+rownames(data_cds) <- NULL # suppress rownames
+
+
+file_SNPs_intron <- paste0("/Users/yumh/data_processing/n157_nonMosaic/process/", name, ".snp.intron.pos.txt", collapse = NULL)
+data_intron <- read.csv(file_SNPs_intron,  header = FALSE, sep = "\t")
+names(data_intron) =c("name")
+data_intron <- merge(data_SNPs_PARS_mRNA, data_intron, by="name")
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="intron", count=nrow(data_intron) ))
+rownames(data_intron) <- NULL # suppress rownames
+
+# 取出syn，求出SNPs数量和mRNA数量
+data_SNPs_PARS_mRNA_syn <- sqldf('SELECT * FROM [data_SNPs_PARS_mRNA] where syn > 0 AND nsy == 0' )
+dd_SNPs <- rbind(dd_SNPs, data.frame(name="PARS_mRNA_syn", count=nrow(data_SNPs_PARS_mRNA_syn) ))
+data_gene_process <- data_SNPs_PARS_mRNA_syn["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+dd_gene <- rbind(dd_gene, data.frame(name="PARS_mRNA_syn", count=nrow(data_gene_process) ))
+data_SNPs_PARS_mRNA <- data_SNPs_PARS_mRNA_syn
+
+
+
+
+
+```
+
+data_SNPs_PARS_mRNA <- data_cds
+data_SNPs_PARS_mRNA <- data_utr
+
+
+
+
+```{r 根据freq分组}
+# 把freq分组（先判断freq是否>=10)
+if(max(data_SNPs_PARS_mRNA$freq)>=10){
+  for(i in 1:10){
+    # 统计每个freq的总SNPs和总gene的情况
+    n <- assign(paste0('data_SNPs_PARS_mRNA_',i,collapse = NULL),subset(data_SNPs_PARS_mRNA,freq <= max(freq)*(i/10) & freq > max(freq)*((i-1)/10)))
+    if(i==1){
+      dd_SNPs_freq <- data.frame(name = paste0("0-",i,"0%",collapse = NULL), SNPs = c(nrow(n)))
+    }else{
+      dd_SNPs_freq <- rbind(dd_SNPs_freq, data.frame(name = paste0(i-1,"0","-",i,"0%",collapse = NULL), SNPs = nrow(n)))
+    }
+    data_gene_process <- n["gene"]
+    data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+    if(i==1){
+      dd_gene_freq <- data.frame(name = paste0("0-",i,"0%",collapse = NULL), gene = c(nrow(data_gene_process)))
+    }else{
+      dd_gene_freq <- rbind(dd_gene_freq, data.frame(name = paste0(i-1,"0","-",i,"0%",collapse = NULL), gene = nrow(data_gene_process) ))
+    }  
+    # 统计每个freq的stem-loop的SNPs和gene的情况 
+    'stem'
+    
+    data_stem <- subset(n,(structure == "stem"))
+    if(i==1){
+      dd_SNPs_freq_stem <- data.frame(name = paste0("0-",i,"0%",collapse = NULL), SNPs = c(nrow(data_stem)))
+    }else{
+      dd_SNPs_freq_stem <- rbind(dd_SNPs_freq_stem, data.frame(name = paste0(i-1,"0","-",i,"0%",collapse = NULL), SNPs = nrow(data_stem)))
+    }
+    
+    data_stem_AT_GC <- sqldf('SELECT * FROM [data_stem] where mutant_to == "A->G" OR mutant_to == "A->C" OR mutant_to == "T->G" OR mutant_to == "T->C"' )
+    if(i==1){
+      dd_SNPs_freq_stem_AT_GC <- data.frame(name = paste0("0-",i,"0%",collapse = NULL), SNPs = c(nrow(data_stem_AT_GC)))
+    }else{
+      dd_SNPs_freq_stem_AT_GC <- rbind(dd_SNPs_freq_stem_AT_GC, data.frame(name = paste0(i-1,"0","-",i,"0%",collapse = NULL), SNPs = nrow(data_stem_AT_GC)))
+    }
+    
+    data_stem_GC_AT <- sqldf('SELECT * FROM [data_stem] where mutant_to == "G->A" OR mutant_to == "C->A" OR mutant_to == "G->T" OR mutant_to == "C->T"')  
+    if(i==1){
+      dd_SNPs_freq_stem_GC_AT <- data.frame(name = paste0("0-",i,"0%",collapse = NULL), SNPs = c(nrow(data_stem_GC_AT)))
+    }else{
+      dd_SNPs_freq_stem_GC_AT <- rbind(dd_SNPs_freq_stem_GC_AT, data.frame(name = paste0(i-1,"0","-",i,"0%",collapse = NULL), SNPs = nrow(data_stem_GC_AT)))
+    }
+    
+    'loop'
+    
+    data_loop <- subset(n,(structure == "loop"))
+    if(i==1){
+      dd_SNPs_freq_loop <- data.frame(name = paste0("0-",i,"0%",collapse = NULL), SNPs = c(nrow(data_loop)))
+    }else{
+      dd_SNPs_freq_loop <- rbind(dd_SNPs_freq_loop, data.frame(name = paste0(i-1,"0","-",i,"0%",collapse = NULL), SNPs = nrow(data_loop)))
+    }
+    
+    data_loop_AT_GC <- sqldf('SELECT * FROM [data_loop] where mutant_to == "A->G" OR mutant_to == "A->C" OR mutant_to == "T->G" OR mutant_to == "T->C"' )
+    if(i==1){
+      dd_SNPs_freq_loop_AT_GC <- data.frame(name = paste0("0-",i,"0%",collapse = NULL), SNPs = c(nrow(data_loop_AT_GC)))
+    }else{
+      dd_SNPs_freq_loop_AT_GC <- rbind(dd_SNPs_freq_loop_AT_GC, data.frame(name = paste0(i-1,"0","-",i,"0%",collapse = NULL), SNPs = nrow(data_loop_AT_GC)))
+    }
+    
+    data_loop_GC_AT <- sqldf('SELECT * FROM [data_loop] where mutant_to == "G->A" OR mutant_to == "C->A" OR mutant_to == "G->T" OR mutant_to == "C->T"')  
+    if(i==1){
+      dd_SNPs_freq_loop_GC_AT <- data.frame(name = paste0("0-",i,"0%",collapse = NULL), SNPs = c(nrow(data_loop_GC_AT)))
+    }else{
+      dd_SNPs_freq_loop_GC_AT <- rbind(dd_SNPs_freq_loop_GC_AT, data.frame(name = paste0(i-1,"0","-",i,"0%",collapse = NULL), SNPs = nrow(data_loop_GC_AT)))
+    }
+    
+    assign(paste0('data_stat_',i),data.frame(structure=c("stem","loop"),AT_GC=c(nrow(data_stem_AT_GC),nrow(data_loop_AT_GC)),GC_AT=c(nrow(data_stem_GC_AT),nrow(data_loop_GC_AT))))
+
+  }
+    # 合并多个数据框
+    data <- lapply(paste0('data_stat_',1:10), function(data_stat_) eval(as.name(data_stat_)))
+    data_stat <- do.call("rbind", data)
+  
+    
+}else{
+  for(i in 1:max(data_SNPs_PARS_mRNA$freq)){
+    n <- assign(paste0('data_SNPs_PARS_mRNA_',i,collapse = NULL),subset(data_SNPs_PARS_mRNA, freq == i))
+    if(i==1){
+      dd_SNPs_freq <- data.frame(name = i, SNPs = c(nrow(n)))
+    }else{
+      dd_SNPs_freq <- rbind(dd_SNPs_freq, data.frame(name = i, SNPs = nrow(n)))
+    }
+    data_gene_process <- n["gene"]
+    data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+    if(i==1){
+      dd_gene_freq <- data.frame(name = i, gene=c(nrow(data_gene_process)))
+    }else{
+      dd_gene_freq <- rbind(dd_gene_freq, data.frame(name = i, gene = nrow(data_gene_process) ))
+    }
+    # 统计每个freq的stem-loop的SNPs和gene的情况 
+    'stem'
+    
+    data_stem <- subset(n,(structure == "stem"))
+    if(i==1){
+      dd_SNPs_freq_stem <- data.frame(name = i, SNPs = c(nrow(data_stem)))
+    }else{
+      dd_SNPs_freq_stem <- rbind(dd_SNPs_freq_stem , data.frame(name = i, SNPs = nrow(data_stem)))
+    }
+    
+    data_stem_AT_GC <- sqldf('SELECT * FROM [data_stem] where mutant_to == "A->G" OR mutant_to == "A->C" OR mutant_to == "T->G" OR mutant_to == "T->C"' )
+    if(i==1){
+      dd_SNPs_freq_stem_AT_GC <- data.frame(name = i, SNPs = c(nrow(data_stem_AT_GC)))
+    }else{
+      dd_SNPs_freq_stem_AT_GC <- rbind(dd_SNPs_freq_stem_AT_GC , data.frame(name = i, SNPs = nrow(data_stem_AT_GC)))
+    }
+    
+    data_stem_GC_AT <- sqldf('SELECT * FROM [data_stem] where mutant_to == "G->A" OR mutant_to == "C->A" OR mutant_to == "G->T" OR mutant_to == "C->T"') 
+    if(i==1){
+      dd_SNPs_freq_stem_GC_AT <- data.frame(name = i, SNPs = c(nrow(data_stem_GC_AT)))
+    }else{
+      dd_SNPs_freq_stem_GC_AT <- rbind(dd_SNPs_freq_stem_GC_AT , data.frame(name = i, SNPs = nrow(data_stem_GC_AT)))
+    }
+    
+    'loop'
+    
+    data_loop <- subset(n,(structure == "loop"))
+    if(i==1){
+      dd_SNPs_freq_loop <- data.frame(name = i, SNPs = c(nrow(data_loop)))
+    }else{
+      dd_SNPs_freq_loop <- rbind(dd_SNPs_freq_loop , data.frame(name = i, SNPs = nrow(data_loop)))
+    }
+    
+    data_loop_AT_GC <- sqldf('SELECT * FROM [data_loop] where mutant_to == "A->G" OR mutant_to == "A->C" OR mutant_to == "T->G" OR mutant_to == "T->C"' ) 
+    if(i==1){
+      dd_SNPs_freq_loop_AT_GC <- data.frame(name = i, SNPs = c(nrow(data_loop_AT_GC)))
+    }else{
+      dd_SNPs_freq_loop_AT_GC <- rbind(dd_SNPs_freq_loop_AT_GC , data.frame(name = i, SNPs = nrow(data_loop_AT_GC)))
+    }
+    
+    data_loop_GC_AT <- sqldf('SELECT * FROM [data_loop] where mutant_to == "G->A" OR mutant_to == "C->A" OR mutant_to == "G->T" OR mutant_to == "C->T"')    
+    if(i==1){
+      dd_SNPs_freq_loop_GC_AT <- data.frame(name = i, SNPs = c(nrow(data_loop_GC_AT)))
+    }else{
+      dd_SNPs_freq_loop_GC_AT <- rbind(dd_SNPs_freq_loop_GC_AT , data.frame(name = i, SNPs = nrow(data_loop_GC_AT)))
+    }
+    
+    assign(paste0('data_stat_',i),data.frame(structure=c("stem","loop"),AT_GC=c(nrow(data_stem_AT_GC),nrow(data_loop_AT_GC)),GC_AT=c(nrow(data_stem_GC_AT),nrow(data_loop_GC_AT))))
+  }
+    # 合并多个数据框
+    data <- lapply(paste0('data_stat_',1:max(data_SNPs_PARS_mRNA$freq)), function(data_stat_) eval(as.name(data_stat_)))
+    data_stat <- do.call("rbind", data)
+  
+}
+
+```
+
+```{r download}
+write.csv(dd_SNPs, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_SNPs.csv", row.names = FALSE)
+write.csv(dd_SNPs_freq, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_SNPs_freq.csv", row.names = FALSE)
+
+write.csv(dd_gene, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_gene.csv", row.names = FALSE)
+write.csv(dd_gene_freq, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_gene_freq.csv", row.names = FALSE)
+
+write.csv(data_stat, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/data_stat.csv", row.names = FALSE)
+
+write.csv(dd_SNPs_freq_loop, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_SNPs_freq_loop.csv", row.names = FALSE)
+write.csv(dd_SNPs_freq_stem, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_SNPs_freq_stem.csv", row.names = FALSE)
+write.csv(dd_SNPs_freq_stem_AT_GC, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_SNPs_freq_stem_AT_GC.csv", row.names = FALSE)
+write.csv(dd_SNPs_freq_loop_AT_GC, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_SNPs_freq_loop_AT_GC.csv", row.names = FALSE)
+write.csv(dd_SNPs_freq_stem_GC_AT, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_SNPs_freq_stem_GC_AT.csv", row.names = FALSE)
+write.csv(dd_SNPs_freq_loop_GC_AT, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/dd_SNPs_freq_loop_GC_AT.csv", row.names = FALSE)
+
+# 高频SNPs的基因
+data_gene_process <- n["gene"] # Attention!
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+write.csv(data_gene_process, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/gene_name_high_freq_90%.csv", row.names = FALSE)
+
+# perl count_stem_loop_chi_square.pl 
+
+```
+
+```{r 根据position分组 stem}
+
+data_SNPs_PARS_mRNA_stem = subset(data_SNPs_PARS_mRNA, structure == "stem")
+
+
+for(i in 1:10){
+    m <- assign(paste0('data_SNPs_PARS_mRNA_length_',i,collapse = NULL),subset(data_SNPs_PARS_mRNA_stem, island_length == i))
+    if (max(m$snp_pos)>=0){
+      for(j in 0:max(m$snp_pos)){
+        if(j==0){
+        l <- subset(m, snp_pos == j)
+        count_AT_GC <- sum(l$mutant_to=="A->G")+sum(l$mutant_to=="A->C")+sum(l$mutant_to=="T->G")+sum(l$mutant_to=="T->C")
+        count_GC_AT <- sum(l$mutant_to=="G->A")+sum(l$mutant_to=="C->A")+sum(l$mutant_to=="G->T")+sum(l$mutant_to=="C->T")
+        dd_SNPs_position <- data.frame(position = j, SNPs = c(nrow(subset(m,m$snp_pos==j))), AT_GC = count_AT_GC, GC_AT = count_GC_AT)
+        
+        }else{
+        l <- subset(m, snp_pos == j)
+        count_AT_GC <- sum(l$mutant_to=="A->G")+sum(l$mutant_to=="A->C")+sum(l$mutant_to=="T->G")+sum(l$mutant_to=="T->C")
+        count_GC_AT <- sum(l$mutant_to=="G->A")+sum(l$mutant_to=="C->A")+sum(l$mutant_to=="G->T")+sum(l$mutant_to=="C->T")
+        dd_SNPs_position <- rbind(dd_SNPs_position, data.frame(position = j, SNPs = c(nrow(subset(m,m$snp_pos==j))), AT_GC = count_AT_GC, GC_AT = count_GC_AT))
+        
+        }
+      }
+      assign(paste0('data_length_',i),dd_SNPs_position)
+    }
+}
+    # 合并多个数据框
+    data <- lapply(paste0('data_length_',1:10), function(data_length_) eval(as.name(data_length_)))
+    data_position <- do.call("rbind", data)
+
+    write.csv(data_position, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/data_position_stem.csv", row.names = FALSE)
+
+```
+
+```{r 根据position分组 loop}
+
+data_SNPs_PARS_mRNA_loop = subset(data_SNPs_PARS_mRNA, structure == "loop")
+
+
+for(i in 1:10){
+    m <- assign(paste0('data_SNPs_PARS_mRNA_length_',i,collapse = NULL),subset(data_SNPs_PARS_mRNA_loop, island_length == i))
+    if (max(m$snp_pos)>=0){
+      for(j in -4:max(m$snp_pos)){
+        if(j==-1){
+        l <- subset(m, snp_pos == j)
+        count_AT_GC <- sum(l$mutant_to=="A->G")+sum(l$mutant_to=="A->C")+sum(l$mutant_to=="T->G")+sum(l$mutant_to=="T->C")
+        count_GC_AT <- sum(l$mutant_to=="G->A")+sum(l$mutant_to=="C->A")+sum(l$mutant_to=="G->T")+sum(l$mutant_to=="C->T")
+        dd_SNPs_position <- data.frame(position = j, SNPs = c(nrow(subset(m,m$snp_pos==j))), AT_GC = count_AT_GC, GC_AT = count_GC_AT)
+        
+        }else{
+        l <- subset(m, snp_pos == j)
+        count_AT_GC <- sum(l$mutant_to=="A->G")+sum(l$mutant_to=="A->C")+sum(l$mutant_to=="T->G")+sum(l$mutant_to=="T->C")
+        count_GC_AT <- sum(l$mutant_to=="G->A")+sum(l$mutant_to=="C->A")+sum(l$mutant_to=="G->T")+sum(l$mutant_to=="C->T")
+        dd_SNPs_position <- rbind(dd_SNPs_position, data.frame(position = j, SNPs = c(nrow(subset(m,m$snp_pos==j))), AT_GC = count_AT_GC, GC_AT = count_GC_AT))
+        
+        }
+      }
+      assign(paste0('data_length_',i),dd_SNPs_position)
+    }
+}
+    # 合并多个数据框
+    data <- lapply(paste0('data_length_',1:10), function(data_length_) eval(as.name(data_length_)))
+    data_position <- do.call("rbind", data)
+
+    write.csv(data_position, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/data_position_loop.csv", row.names = FALSE)
+
+```
+
+```{r position}
+data_gene_process <- data_SNPs_PARS_mRNA["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+write.csv(data_gene_process, file="/Users/yumh/data_processing/n157_nonMosaic/result/profile/gene_name.csv", row.names = FALSE)
+# bash count_stem_length_gene.sh
+```
+
+#perl count_per_gene_ACGT_percent.pl
+
+
+
+
