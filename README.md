@@ -22,8 +22,6 @@
     - [ess, rich/minimal and chem](#ess-richminimal-and-chem)
     - [Recombination rates](#recombination-rates)
     - [Protein-protein interactions](#protein-protein-interactions)
-- [Stats](#stats)
-- [Pack all things up](#pack-all-things-up)
 
 
 # Download reference data
@@ -956,4 +954,19 @@ gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
         }
     ' \
     > interact_count.tsv
+```
+
+# Phylogeny
+
+## sgd/saccharomyces_cerevisiae.gff → protein coding gene list
+
+```bash
+mkdir -p ~/data/mrna-structure/phylogeny
+cd ~/data/mrna-structure/phylogeny
+
+perl ~/Scripts/pars/program/protein_coding_list.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output ~/data/mrna-structure/phylogeny/protein_coding_list.csv
+
+perl ~/Scripts/pars/program/protein_coding_list_range.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output ~/data/mrna-structure/phylogeny/protein_coding_list_range.csv
+
+perl ~/Scripts/pars/program/protein_coding_list_range_chr.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output ~/data/mrna-structure/phylogeny/protein_coding_list_range_chr.csv
 ```
