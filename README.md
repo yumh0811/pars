@@ -964,9 +964,24 @@ gzip -d -c sgadata_costanzo2009_stringentCutoff_101120.txt.gz \
 mkdir -p ~/data/mrna-structure/phylogeny
 cd ~/data/mrna-structure/phylogeny
 
-perl ~/Scripts/pars/program/protein_coding_list.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output ~/data/mrna-structure/phylogeny/protein_coding_list.csv
+perl ~/Scripts/pars/program/protein_coding_list.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list.csv
 
-perl ~/Scripts/pars/program/protein_coding_list_range.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output ~/data/mrna-structure/phylogeny/protein_coding_list_range.csv
+perl ~/Scripts/pars/program/protein_coding_list_range.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range.csv
 
-perl ~/Scripts/pars/program/protein_coding_list_range_chr.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output ~/data/mrna-structure/phylogeny/protein_coding_list_range_chr.csv
+perl ~/Scripts/pars/program/protein_coding_list_range_chr.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range_chr.csv
+
 ```
+
+## cut cds alignment
+
+### create cds_yml
+
+```bash
+cd ~/data/mrna-structure/phylogeny
+mkdir -p ~/data/mrna-structure/phylogeny/gene_cds_all_yml
+
+perl ~/Scripts/pars/program/cut_cds_yml.pl --file protein_coding_list_range_chr.csv --output gene_cds_all_yml
+
+```
+
+
