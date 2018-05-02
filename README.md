@@ -1077,4 +1077,6 @@ cat protein_coding_list.csv |
 
 unset NAME
 
+Rscript ~/Scripts/pars/program/Scer_n157_nonMosaic_Spar_distance_processed.R
+
 ```
