@@ -984,20 +984,74 @@ perl ~/Scripts/pars/program/cut_cds_yml.pl --file protein_coding_list_range_chr.
 
 ```
 
-## cut cds_alignment by cds_yml (n157_nonMosaic)
+### cut cds_alignment by cds_yml (n157_nonMosaic)
 
 ```bash
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/Scer_n157_nonMosaic_Spar_refined ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_refined
-cd ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_refined
+export NAME=Scer_n157_nonMosaic_Spar
+
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
+cd ~/data/mrna-structure/phylogeny/${NAME}_refined
 gunzip -rfvc *.maf.gz.fas.gz > species.fas
 
-cd ~/data/mrna-structure/phylogeny
-mkdir -p ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_gene_alignment_cds
-cd ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_gene_alignment_cds
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+
 cat ../protein_coding_list.csv |
    parallel --line-buffer -j 8 '
-   	   fasops slice ../Scer_n157_nonMosaic_Spar_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
    '
+unset NAME
+
 ```
 
+### count cds_alignment proporation in sgd (n157_nonMosaic)
 
+```bash
+export NAME=Scer_n157_nonMosaic_Spar
+
+cd ~/data/mrna-structure/phylogeny
+
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+
+unset NAME
+```
+
+## create gene_phylogeny (n157_nonMosaic)
+
+```bash
+export NAME=Scer_n157_nonMosaic_Spar
+
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_newick
+cd ~/data/mrna-structure/phylogeny/${NAME}_newick
+
+cat ../protein_coding_list.csv |
+  parallel --line-buffer -j 1 '
+      if [ -e {}.nwk ]; then
+          echo >&2 '    {}.nwk already presents  '
+          exit;
+      fi
+      egaz raxml ../${NAME}_gene_alignment_cds/{}.fas.fas --seed 999 --tmp . --parallel 8 --outgroup Spar -o {}.nwk
+  '
+unset NAME
+```
+
+## count distance
+
+```bash
+export NAME=Scer_n157_nonMosaic_Spar
+
+cd ~/data/mrna-structure/phylogeny
+echo 'S288c,beer001,beer002,beer003,beer004,beer005,beer006,beer007,beer008,beer009,beer010,beer011,beer012,beer013,beer014,beer015,beer016,beer020,beer021,beer022,beer023,beer024,beer025,beer026,beer027,beer028,beer029,beer030,beer031,beer032,beer033,beer034,beer036,beer037,beer038,beer039,beer040,beer041,beer043,beer044,beer045,beer046,beer047,beer048,beer049,beer050,beer051,beer052,beer053,beer054,beer055,beer056,beer059,beer061,beer062,beer063,beer064,beer065,beer066,beer067,beer068,beer069,beer070,beer071,beer073,beer075,beer076,beer077,beer078,beer079,beer080,beer081,beer082,beer083,beer084,beer085,beer086,beer087,beer088,beer089,beer090,beer091,beer092,beer094,beer095,beer096,beer097,beer098,beer099,beer100,beer101,beer102,bioethanol001,bioethanol003,bioethanol004,bread001,bread002,bread003,bread004,sake001,sake002,sake003,sake004,sake005,sake006,sake007,spirits001,spirits002,spirits003,spirits004,spirits005,spirits011,wine001,wine003,wine004,wine005,wine006,wine007,wine009,wine010,wine011,wine012,wine013,wine014,wine015,wine017,wine018,wild004,wild005,wild006,wild007,Spar' \
+| tr "," "\n" \
+> ${NAME}_strain_name.list
+
+mkdir ~/data/mrna-structure/phylogeny/${NAME}_distance
+cat protein_coding_list.csv |
+   parallel --line-buffer -j 8 '
+    if [ -e "${NAME}_newick/{}.nwk" ]; then
+       perl ~/Scripts/pars/program/count_distance.pl --file ~/data/mrna-structure/phylogeny/${NAME}_newick/{}.nwk --list ~/data/mrna-structure/phylogeny/${NAME}_strain_name.list --output ${NAME}_distance/{}.csv
+    fi
+    '
+
+unset NAME
+```
