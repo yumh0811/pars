@@ -28,7 +28,7 @@
         - [create cds_yml](#create-cds_yml)
         - [cut cds_alignment by cds_yml (n157_nonMosaic)](#cut-cds_alignment-by-cds_yml-n157_nonmosaic)
         - [count cds_alignment proporation in sgd (n157_nonMosaic)](#count-cds_alignment-proporation-in-sgd-n157_nonmosaic)
-    - [create gene_phylogeny (n157_nonMosaic)](#create-gene_phylogeny-n157_nonmosaic)
+    - [create gene_phylogeny (n157_nonMosaic)](#create-gene_phylogeny-n157_nonmosaic)
     - [count distance (n157_nonMosaic)](#count-distance-n157_nonmosaic)
 - [SNP](#snp)
 
