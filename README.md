@@ -26,8 +26,8 @@
     - [create protein coding gene list](#create-protein-coding-gene-list)
     - [cut cds alignment](#cut-cds-alignment)
         - [create cds_yml](#create-cds_yml)
-        - [cut cds_alignment by cds_yml (n157_nonMosaic)](#cut-cds_alignment-by-cds_yml-n157_nonmosaic)
-        - [count cds_alignment proporation in sgd (n157_nonMosaic)](#count-cds_alignment-proporation-in-sgd-n157_nonmosaic)
+        - [cut cds_alignment by cds_yml](#cut-cds_alignment-by-cds_yml)
+        - [count cds_alignment proporation in sgd](#count-cds_alignment-proporation-in-sgd)
     - [create gene_phylogeny (n157_nonMosaic)](#create-gene_phylogeny-n157_nonmosaic)
     - [count distance (n157_nonMosaic)](#count-distance-n157_nonmosaic)
 - [SNP](#snp)
@@ -987,18 +987,52 @@ perl ~/Scripts/pars/program/cut_cds_yml.pl --file protein_coding_list_range_chr.
 
 ```
 
-### cut cds_alignment by cds_yml (n157_nonMosaic)
+### cut cds_alignment by cds_yml
 
 ```bash
-export NAME=Scer_n157_nonMosaic_Spar
 
+export NAME=Scer_n7_Spar
 cp -rf ~/data/mrna-structure/alignment/scer_wgs/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
 cd ~/data/mrna-structure/phylogeny/${NAME}_refined
 gunzip -rfvc *.maf.gz.fas.gz > species.fas
-
 mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
 cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cat ../protein_coding_list.csv |
+   parallel --line-buffer -j 8 '
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   '
+unset NAME
 
+export NAME=Scer_n7p_Spar
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
+cd ~/data/mrna-structure/phylogeny/${NAME}_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cat ../protein_coding_list.csv |
+   parallel --line-buffer -j 8 '
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   '
+unset NAME
+
+export NAME=Scer_n157_Spar
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
+cd ~/data/mrna-structure/phylogeny/${NAME}_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cat ../protein_coding_list.csv |
+   parallel --line-buffer -j 8 '
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   '
+unset NAME
+
+export NAME=Scer_n157_nonMosaic_Spar
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
+cd ~/data/mrna-structure/phylogeny/${NAME}_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
 cat ../protein_coding_list.csv |
    parallel --line-buffer -j 8 '
    	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
@@ -1007,15 +1041,28 @@ unset NAME
 
 ```
 
-### count cds_alignment proporation in sgd (n157_nonMosaic)
+### count cds_alignment proporation in sgd
 
 ```bash
-export NAME=Scer_n157_nonMosaic_Spar
 
+export NAME=Scer_n7_Spar
 cd ~/data/mrna-structure/phylogeny
-
 perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+unset NAME
 
+export NAME=Scer_n7p_Spar
+cd ~/data/mrna-structure/phylogeny
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+unset NAME
+
+export NAME=Scer_n157_Spar
+cd ~/data/mrna-structure/phylogeny
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+unset NAME
+
+export NAME=Scer_n157_nonMosaic_Spar
+cd ~/data/mrna-structure/phylogeny
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
 unset NAME
 
 ```
@@ -1079,7 +1126,24 @@ unset NAME
 
 ```bash
 
-# n157_nonMosaic
+export NAME=Scer_n7_Spar
+mkdir -p ~/data/mrna-structure/result/$NAME
+cd ~/data/mrna-structure/result/$NAME
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
+unset NAME
+
+export NAME=Scer_n7p_Spar
+mkdir -p ~/data/mrna-structure/result/$NAME
+cd ~/data/mrna-structure/result/$NAME
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
+unset NAME
+
+export NAME=Scer_n157_Spar
+mkdir -p ~/data/mrna-structure/result/$NAME
+cd ~/data/mrna-structure/result/$NAME
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
+unset NAME
+
 export NAME=Scer_n157_nonMosaic_Spar
 mkdir -p ~/data/mrna-structure/result/$NAME
 cd ~/data/mrna-structure/result/$NAME
@@ -1106,7 +1170,24 @@ Rscript -e 'install.packages("gsubfn", repos="https://mirrors.tuna.tsinghua.edu.
 Rscript -e 'install.packages("RSQLite", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 Rscript -e 'install.packages("sqldf", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 
-# n157_nonMosaic
+export NAME=Scer_n7_Spar
+cd ~/data/mrna-structure/result/$NAME
+Rscript ~/Scripts/pars/program/${NAME}_stat_SNPs.R
+sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv  # debug "->"
+unset NAME
+
+export NAME=Scer_n7p_Spar
+cd ~/data/mrna-structure/result/$NAME
+Rscript ~/Scripts/pars/program/${NAME}_stat_SNPs.R
+sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv  # debug "->"
+unset NAME
+
+export NAME=Scer_n157_Spar
+cd ~/data/mrna-structure/result/$NAME
+Rscript ~/Scripts/pars/program/${NAME}_stat_SNPs.R
+sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv  # debug "->"
+unset NAME
+
 export NAME=Scer_n157_nonMosaic_Spar
 cd ~/data/mrna-structure/result/$NAME
 Rscript ~/Scripts/pars/program/${NAME}_stat_SNPs.R
@@ -1119,7 +1200,27 @@ unset NAME
 
 ```bash
 
-# n157_nonMosaic
+export NAME=Scer_n7_Spar
+cd ~/data/mrna-structure/result/$NAME
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
+Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+unset NAME
+
+export NAME=Scer_n7p_Spar
+cd ~/data/mrna-structure/result/$NAME
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
+Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+unset NAME
+
+export NAME=Scer_n157_Spar
+cd ~/data/mrna-structure/result/$NAME
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
+Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+unset NAME
+
 export NAME=Scer_n157_nonMosaic_Spar
 cd ~/data/mrna-structure/result/$NAME
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
