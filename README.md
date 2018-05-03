@@ -1119,3 +1119,16 @@ sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv
 unset NAME
 
 ```
+
+## count A/T <->G/C
+
+```bash
+export NAME=Scer_n157_nonMosaic_Spar
+
+cd ~/data/mrna-structure/result/$NAME
+
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
+Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+
+```
