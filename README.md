@@ -636,11 +636,6 @@ runlist position --op superset \
     sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
     -o ${NAME}.snp.intron.pos.txt
 
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
 # SNPs within utr
 runlist position --op superset \
     sce_utr.yml ${NAME}.snp.gene.pos.txt \
@@ -698,11 +693,6 @@ runlist position --op superset \
 runlist position --op superset \
     sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
     -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
 
 # SNPs within utr
 runlist position --op superset \
@@ -762,11 +752,6 @@ runlist position --op superset \
     sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
     -o ${NAME}.snp.intron.pos.txt
 
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
 # SNPs within utr
 runlist position --op superset \
     sce_utr.yml ${NAME}.snp.gene.pos.txt \
@@ -824,11 +809,6 @@ runlist position --op superset \
 runlist position --op superset \
     sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
     -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within orf_genomic
-runlist position --op superset \
-    sce_orf_genomic.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
 
 # SNPs within utr
 runlist position --op superset \
@@ -1095,4 +1075,19 @@ unset NAME
 
 # SNP
 
-[stat SNPs](https://github.com/yumh0811/pars/blob/master/stat_SNPs.rmd)
+## count per gene GC content
+
+```bash
+
+export NAME=Scer_n157_nonMosaic_Spar
+
+mkdir -p ~/data/mrna-structure/result/$NAME
+cd ~/data/mrna-structure/result/$NAME
+
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
+
+unset NAME
+
+```
+
+
