@@ -1079,13 +1079,11 @@ unset NAME
 
 ```bash
 
+# n157_nonMosaic
 export NAME=Scer_n157_nonMosaic_Spar
-
 mkdir -p ~/data/mrna-structure/result/$NAME
 cd ~/data/mrna-structure/result/$NAME
-
 perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
-
 unset NAME
 
 ```
@@ -1093,9 +1091,6 @@ unset NAME
 ## count SNPs and gene 
 
 ```bash
-export NAME=Scer_n157_nonMosaic_Spar
-
-cd ~/data/mrna-structure/result/$NAME
 
 Rscript -e 'install.packages("getopt", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 Rscript -e 'install.packages("ape", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
@@ -1111,11 +1106,11 @@ Rscript -e 'install.packages("gsubfn", repos="https://mirrors.tuna.tsinghua.edu.
 Rscript -e 'install.packages("RSQLite", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 Rscript -e 'install.packages("sqldf", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 
+# n157_nonMosaic
+export NAME=Scer_n157_nonMosaic_Spar
+cd ~/data/mrna-structure/result/$NAME
 Rscript ~/Scripts/pars/program/${NAME}_stat_SNPs.R
-
-# debug "->"
-sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv
-
+sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv  # debug "->"
 unset NAME
 
 ```
@@ -1123,12 +1118,13 @@ unset NAME
 ## count A/T <->G/C
 
 ```bash
+
+# n157_nonMosaic
 export NAME=Scer_n157_nonMosaic_Spar
-
 cd ~/data/mrna-structure/result/$NAME
-
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
 Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+unset NAME
 
 ```
