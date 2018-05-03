@@ -1089,6 +1089,7 @@ perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/p
 unset NAME
 
 ```
+
 ## count SNPs and gene 
 
 ```bash
@@ -1111,6 +1112,9 @@ Rscript -e 'install.packages("RSQLite", repos="https://mirrors.tuna.tsinghua.edu
 Rscript -e 'install.packages("sqldf", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 
 Rscript ~/Scripts/pars/program/${NAME}_stat_SNPs.R
+
+# debug "->"
+sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv
 
 unset NAME
 
