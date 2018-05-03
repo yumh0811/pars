@@ -1091,7 +1091,7 @@ unset NAME
 ```
 ## count SNPs and gene 
 
-```
+```bash
 export NAME=Scer_n157_nonMosaic_Spar
 
 cd ~/data/mrna-structure/result/$NAME
