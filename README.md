@@ -1120,6 +1120,23 @@ unset NAME
 
 ```
 
+```bash
+#  生成alignment_proporation_1.list
+
+export NAME=Scer_n7_Spar
+Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+unset NAME
+
+export NAME=Scer_n7p_Spar
+Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+unset NAME
+
+export NAME=Scer_n157_Spar
+Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+unset NAME
+
+```
+
 # SNP
 
 ## count per gene GC content
@@ -1203,15 +1220,21 @@ unset NAME
 export NAME=Scer_n7_Spar
 cd ~/data/mrna-structure/result/$NAME
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
-mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
 Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_cds_stat.csv --output freq_each/PARS_cds_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_utr_stat.csv --output freq_each/PARS_utr_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_syn_stat.csv --output freq_each/PARS_syn_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_nsy_stat.csv --output freq_each/PARS_nsy_stat_chi_square.csv
 unset NAME
 
 export NAME=Scer_n7p_Spar
 cd ~/data/mrna-structure/result/$NAME
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
-mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
 Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_cds_stat.csv --output freq_each/PARS_cds_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_utr_stat.csv --output freq_each/PARS_utr_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_syn_stat.csv --output freq_each/PARS_syn_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_nsy_stat.csv --output freq_each/PARS_nsy_stat_chi_square.csv
 unset NAME
 
 export NAME=Scer_n157_Spar
@@ -1219,6 +1242,10 @@ cd ~/data/mrna-structure/result/$NAME
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
 Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_cds_stat_freq_10.csv --output freq_10/PARS_cds_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_utr_stat_freq_10.csv --output freq_10/PARS_utr_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_syn_stat_freq_10.csv --output freq_10/PARS_syn_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_nsy_stat_freq_10.csv --output freq_10/PARS_nsy_stat_freq_10_chi_square.csv
 unset NAME
 
 export NAME=Scer_n157_nonMosaic_Spar
@@ -1226,6 +1253,10 @@ cd ~/data/mrna-structure/result/$NAME
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
 Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_cds_stat_freq_10.csv --output freq_10/PARS_cds_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_utr_stat_freq_10.csv --output freq_10/PARS_utr_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_syn_stat_freq_10.csv --output freq_10/PARS_syn_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_nsy_stat_freq_10.csv --output freq_10/PARS_nsy_stat_freq_10_chi_square.csv
 unset NAME
 
 ```
