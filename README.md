@@ -1146,25 +1146,25 @@ unset NAME
 export NAME=Scer_n7_Spar
 mkdir -p ~/data/mrna-structure/result/$NAME
 cd ~/data/mrna-structure/result/$NAME
-perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --varfold ~/data/mrna-structure/process/$NAME.gene_variation.fold_class.tsv --output $NAME.gene_variation.fold_class.csv
 unset NAME
 
 export NAME=Scer_n7p_Spar
 mkdir -p ~/data/mrna-structure/result/$NAME
 cd ~/data/mrna-structure/result/$NAME
-perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --varfold ~/data/mrna-structure/process/$NAME.gene_variation.fold_class.tsv --output $NAME.gene_variation.fold_class.csv
 unset NAME
 
 export NAME=Scer_n157_Spar
 mkdir -p ~/data/mrna-structure/result/$NAME
 cd ~/data/mrna-structure/result/$NAME
-perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --varfold ~/data/mrna-structure/process/$NAME.gene_variation.fold_class.tsv --output $NAME.gene_variation.fold_class.csv
 unset NAME
 
 export NAME=Scer_n157_nonMosaic_Spar
 mkdir -p ~/data/mrna-structure/result/$NAME
 cd ~/data/mrna-structure/result/$NAME
-perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --output $NAME.gene_variation.fold_class.csv
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --varfold ~/data/mrna-structure/process/$NAME.gene_variation.fold_class.tsv --output $NAME.gene_variation.fold_class.csv
 unset NAME
 
 ```
