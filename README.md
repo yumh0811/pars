@@ -117,6 +117,8 @@ cd ~/data/mrna-structure/GENOMES/ASSEMBLIES
 # Download, rename files and change fasta headers
 perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
     -p -f ~/Scripts/pars/scer_assembly.csv
+perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
+    -p -f ~/Scripts/pars/spar_assembly.csv
 
 ```
 
