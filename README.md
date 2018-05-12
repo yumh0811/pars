@@ -265,6 +265,11 @@ bash plan_Scer_n157_nonMosaic_Spar.sh
 bash 5_multi_cmd.sh
 bash 7_multi_db_only.sh
 
+# other plans
+bash plan_Scer_n157_nonMosaic_consensus.sh
+bash 5_multi_cmd.sh
+bash 7_multi_db_only.sh
+
 ```
 
 # AlignDB
