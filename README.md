@@ -1349,7 +1349,7 @@ perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/proc
 perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_utr.yml --output stem_loop_utr_length.csv
 perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_per_gene_ATGC.csv
 perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr_per_gene_ATGC.csv
-Rscript $NAME_cds_utr.R
+Rscript ~/Scripts/pars/program/$NAME_cds_utr.R
 unset NAME
 
 ```
