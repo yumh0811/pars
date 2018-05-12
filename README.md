@@ -106,6 +106,15 @@ aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
 
 find WGS -name "*.gz" | xargs gzip -t
 
+perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+    -f ~/Scripts/pars/spar_wgs.tsv \
+    --fix -a \
+    -o WGS
+
+aria2c -UWget -x 6 -s 3 -c -i WGS/spar_wgs.url.txt
+
+find WGS -name "*.gz" | xargs gzip -t
+
 ```
 
 ## Illumina (NCBI ASSEMBLY)
@@ -131,9 +140,67 @@ cat ~/Scripts/pars/scer_assembly.csv \
     | cut -d',' -f1,3 \
     | uniq \
     | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'
+    
+cat ~/Scripts/pars/spar_assembly.csv \
+    | grep -v "^#" \
+    | cut -d',' -f1,3 \
+    | uniq \
+    | perl -nl -a -F"," -e 'printf qq{    --download "name=%s;taxon=%s" \\\n}, $F[0], $F[1];'    
+
+mkdir -p ~/data/mrna-structure/alignment/spar_wgs
+cd ~/data/mrna-structure/alignment/spar_wgs
+
+perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
+    -i ~/data/mrna-structure/GENOMES/WGS/spar_wgs.data.yml \
+    -o spar_wgs.plan.yml \
+    -d ~/data/mrna-structure/GENOMES/WGS \
+    -m prefix \
+    -r '*.fsa_nt.gz' \
+    --opt group_name=spar_wgs \
+    --opt base_dir='~/data/mrna-structure/alignment' \
+    --opt data_dir="~/data/mrna-structure/alignment/spar_wgs" \
+    --opt rm_species=Fungi \
+    --dd ~/data/mrna-structure/GENOMES/ASSEMBLIES \
+    --download "name=CBS432;taxon=100000000007" \
+    --download "name=N44;taxon=100000000008" \
+    --download "name=UWOPS91_917_1;taxon=100000000009" \
+    --download "name=UFRJ50816;taxon=100000000010" \
+    --download "name=YPS138;taxon=100000000011" \
+    --plan 'name=Spar_n5_pop;t=CBS432;qs=N44,UWOPS91_917_1,UFRJ50816,YPS138' \
+    -y
+
+# pop_prep.pl
+perl ~/Scripts/withncbi/pop/pop_prep.pl -p 16 -i spar_wgs.plan.yml
+
+bash 01_file.sh
+bash 02_rm.sh
+bash 03_strain_info.sh
+
+# plan_ALL.sh
+bash plan_ALL.sh
+
+bash 1_real_chr.sh
+bash 3_pair_cmd.sh
+bash 4_rawphylo.sh
+bash 5_multi_cmd.sh
+
+# other plans
+bash plan_Spar_n5_pop.sh
+bash 5_multi_cmd.sh
+
+#consensus
+mkdir -p ~/data/mrna-structure/alignment/spar_wgs/consensus
+cd ~/data/mrna-structure/alignment/spar_wgs/consensus
+
+cp -rf ~/data/mrna-structure/alignment/spar_wgs/Spar_n5_pop_refined ~/data/mrna-structure/alignment/spar_wgs/consensus
+gunzip -rfvc Spar_n5_pop_refined/*.maf.gz.fas.gz > Spar_n5_pop_refined/Spar.fas
+fasops consensus Spar_n5_pop_refined/Spar.fas -o Spar_n5_pop_refined/consensus.fas -p 2
 
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
+
+mkdir -p ~/data/mrna-structure/GENOMES/ASSEMBLIES/consensus
+cp -rf ~/data/mrna-structure/alignment/spar_wgs/consensus/Spar_n5_pop_refined/consensus.fas ~/data/mrna-structure/GENOMES/ASSEMBLIES/consensus
 
 perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     -i ~/data/mrna-structure/GENOMES/WGS/scer_wgs.data.yml \
@@ -154,10 +221,12 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --download "name=YPS128;taxon=100000000005" \
     --download "name=DBVPG6765;taxon=100000000006" \
     --download "name=EC1118;taxon=643680" \
+    --download "name=consensus;taxon=100000000012" \
     --plan 'name=Scer_n7_Spar;t=S288c;qs=EC1118,Kyokai_no_7,RM11_1a,Sigma1278b,T7,YJM789,Spar;o=Spar' \
     --plan 'name=Scer_n7p_Spar;t=S288c;qs=DBVPG6044,UWOPS03_461_4,Y12,SK1,YPS128,DBVPG6765,Spar;o=Spar' \
     --plan 'name=Scer_n157_Spar;t=S288c;qs=beer001,beer002,beer003,beer004,beer005,beer006,beer007,beer008,beer009,beer010,beer011,beer012,beer013,beer014,beer015,beer016,beer017,beer018,beer019,beer020,beer021,beer022,beer023,beer024,beer025,beer026,beer027,beer028,beer029,beer030,beer031,beer032,beer033,beer034,beer035,beer036,beer037,beer038,beer039,beer040,beer041,beer042,beer043,beer044,beer045,beer046,beer047,beer048,beer049,beer050,beer051,beer052,beer053,beer054,beer055,beer056,beer057,beer058,beer059,beer060,beer061,beer062,beer063,beer064,beer065,beer066,beer067,beer068,beer069,beer070,beer071,beer072,beer073,beer074,beer075,beer076,beer077,beer078,beer079,beer080,beer081,beer082,beer083,beer084,beer085,beer086,beer087,beer088,beer089,beer090,beer091,beer092,beer093,beer094,beer095,beer096,beer097,beer098,beer099,beer100,beer101,beer102,bioethanol001,bioethanol002,bioethanol003,bioethanol004,bioethanol005,bread001,bread002,bread003,bread004,laboratory001,laboratory002,sake001,sake002,sake003,sake004,sake005,sake006,sake007,spirits001,spirits002,spirits003,spirits004,spirits005,spirits006,spirits007,spirits008,spirits009,spirits010,spirits011,wine001,wine002,wine003,wine004,wine005,wine006,wine007,wine008,wine009,wine010,wine011,wine012,wine013,wine014,wine015,wine016,wine017,wine018,wine019,wild001,wild002,wild003,wild004,wild005,wild006,wild007,Spar;o=Spar' \
     --plan 'name=Scer_n157_nonMosaic_Spar;t=S288c;qs=beer001,beer002,beer003,beer004,beer005,beer006,beer007,beer008,beer009,beer010,beer011,beer012,beer013,beer014,beer015,beer016,beer020,beer021,beer022,beer023,beer024,beer025,beer026,beer027,beer028,beer029,beer030,beer031,beer032,beer033,beer034,beer036,beer037,beer038,beer039,beer040,beer041,beer043,beer044,beer045,beer046,beer047,beer048,beer049,beer050,beer051,beer052,beer053,beer054,beer055,beer056,beer059,beer061,beer062,beer063,beer064,beer065,beer066,beer067,beer068,beer069,beer070,beer071,beer073,beer075,beer076,beer077,beer078,beer079,beer080,beer081,beer082,beer083,beer084,beer085,beer086,beer087,beer088,beer089,beer090,beer091,beer092,beer094,beer095,beer096,beer097,beer098,beer099,beer100,beer101,beer102,bioethanol001,bioethanol003,bioethanol004,bread001,bread002,bread003,bread004,sake001,sake002,sake003,sake004,sake005,sake006,sake007,spirits001,spirits002,spirits003,spirits004,spirits005,spirits011,wine001,wine003,wine004,wine005,wine006,wine007,wine009,wine010,wine011,wine012,wine013,wine014,wine015,wine017,wine018,wild004,wild005,wild006,wild007,Spar;o=Spar' \
+    --plan 'name=Scer_n157_nonMosaic_consensus;t=S288c;qs=beer001,beer002,beer003,beer004,beer005,beer006,beer007,beer008,beer009,beer010,beer011,beer012,beer013,beer014,beer015,beer016,beer020,beer021,beer022,beer023,beer024,beer025,beer026,beer027,beer028,beer029,beer030,beer031,beer032,beer033,beer034,beer036,beer037,beer038,beer039,beer040,beer041,beer043,beer044,beer045,beer046,beer047,beer048,beer049,beer050,beer051,beer052,beer053,beer054,beer055,beer056,beer059,beer061,beer062,beer063,beer064,beer065,beer066,beer067,beer068,beer069,beer070,beer071,beer073,beer075,beer076,beer077,beer078,beer079,beer080,beer081,beer082,beer083,beer084,beer085,beer086,beer087,beer088,beer089,beer090,beer091,beer092,beer094,beer095,beer096,beer097,beer098,beer099,beer100,beer101,beer102,bioethanol001,bioethanol003,bioethanol004,bread001,bread002,bread003,bread004,sake001,sake002,sake003,sake004,sake005,sake006,sake007,spirits001,spirits002,spirits003,spirits004,spirits005,spirits011,wine001,wine003,wine004,wine005,wine006,wine007,wine009,wine010,wine011,wine012,wine013,wine014,wine015,wine017,wine018,wild004,wild005,wild006,wild007,consensus;o=consensus' \
     -y
 
 # pop_prep.pl
@@ -1259,6 +1328,28 @@ perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_cd
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_utr_stat_freq_10.csv --output freq_10/PARS_utr_stat_freq_10_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_syn_stat_freq_10.csv --output freq_10/PARS_syn_stat_freq_10_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_nsy_stat_freq_10.csv --output freq_10/PARS_nsy_stat_freq_10_chi_square.csv
+unset NAME
+
+```
+
+## count stem length selection
+```bash
+export NAME=Scer_n157_nonMosaic_Spar
+cd ~/data/mrna-structure/result/$NAME 
+perl ~/Scripts/pars/program/count_position_gene.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --origin data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_pos.csv
+Rscript ~/Scripts/pars/program/$NAME_count_AT_GC_gene_trait.R
+unset NAME
+
+```
+
+## count per gene cds_utr
+```bash
+export NAME=Scer_n157_nonMosaic_Spar
+perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_cds.yml --output stem_loop_cds_length.csv 
+perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_utr.yml --output stem_loop_utr_length.csv
+perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_per_gene_ATGC.csv
+perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr_per_gene_ATGC.csv
+Rscript $NAME_cds_utr.R
 unset NAME
 
 ```
