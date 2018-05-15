@@ -191,16 +191,21 @@ bash 5_multi_cmd.sh
 #consensus
 mkdir -p ~/data/mrna-structure/alignment/spar_wgs/consensus
 cd ~/data/mrna-structure/alignment/spar_wgs/consensus
-
 cp -rf ~/data/mrna-structure/alignment/spar_wgs/Spar_n5_pop_refined ~/data/mrna-structure/alignment/spar_wgs/consensus
 gunzip -rfvc Spar_n5_pop_refined/*.maf.gz.fas.gz > Spar_n5_pop_refined/Spar.fas
 fasops consensus Spar_n5_pop_refined/Spar.fas -o Spar_n5_pop_refined/consensus.fas -p 2
 
+mkdir -p ~/data/mrna-structure/GENOMES/ASSEMBLIES/consensus
+cd ~/data/mrna-structure/GENOMES/ASSEMBLIES/consensus
+cp -rf ~/data/mrna-structure/alignment/spar_wgs/consensus/Spar_n5_pop_refined/consensus.fas ~/data/mrna-structure/GENOMES/ASSEMBLIES/consensus
+
+perl -p -i.bak -e 's/^(\w+)\n\n/$1\n/g','s/\A\s*\Z//' consensus.fas
+faops filter -a 1000 consensus.fas consensus.fasta
+perl ~/Scripts/pars/program/rename.pl consensus.fasta
+rm -rf consensus.fas.bak consensus.fasta.bak consensus.fas
+
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
-
-mkdir -p ~/data/mrna-structure/GENOMES/ASSEMBLIES/consensus
-cp -rf ~/data/mrna-structure/alignment/spar_wgs/consensus/Spar_n5_pop_refined/consensus.fas ~/data/mrna-structure/GENOMES/ASSEMBLIES/consensus
 
 perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     -i ~/data/mrna-structure/GENOMES/WGS/scer_wgs.data.yml \
