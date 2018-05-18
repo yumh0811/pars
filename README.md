@@ -363,6 +363,27 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
+## Build alignDB for multiple genomes n157_nonMosaic_consensus
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n157_nonMosaic_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n157_nonMosaic_consensus_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n157_nonMosaic_consensus -r 1-60
+
+```
+
 ## Extract gene-list and snp-codon-list n7
 
 ```bash
