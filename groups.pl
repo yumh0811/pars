@@ -51,7 +51,7 @@ my @mixed = (
 
 my @strains = Path::Tiny::path($file_strain)->lines( { chomp => 1, } );
 
-#print YAML::Syck::Dump \@strains;
+#warn YAML::Syck::Dump \@strains;
 
 print join( ",", ( "name", "asian", "wine", "beer1", "beer2", "mixed" ) ), "\n";
 
@@ -64,7 +64,7 @@ for my $line ( Path::Tiny::path($file_snp)->lines( { chomp => 1, } ) ) {
     my @bases = split //, $fields[3];
     if ( @bases != @strains ) {
         warn "bases and strains don't match each others\n";
-        print YAML::Syck::Dump {
+        warn YAML::Syck::Dump {
             bases   => scalar @bases,
             strains => scalar @strains,
         };
