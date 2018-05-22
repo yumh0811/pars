@@ -370,7 +370,7 @@ mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
 
 perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n157_nonMosaic_Spar \
+    -d Scer_n157_nonMosaic_consensus \
     -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n157_nonMosaic_consensus_refined \
     -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
     --ensembl saccharomyces_cerevisiae_core_29_82_4 \
