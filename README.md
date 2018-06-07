@@ -232,6 +232,7 @@ perl ~/Scripts/withncbi/pop/gen_pop_conf.pl \
     --plan 'name=Scer_n157_Spar;t=S288c;qs=beer001,beer002,beer003,beer004,beer005,beer006,beer007,beer008,beer009,beer010,beer011,beer012,beer013,beer014,beer015,beer016,beer017,beer018,beer019,beer020,beer021,beer022,beer023,beer024,beer025,beer026,beer027,beer028,beer029,beer030,beer031,beer032,beer033,beer034,beer035,beer036,beer037,beer038,beer039,beer040,beer041,beer042,beer043,beer044,beer045,beer046,beer047,beer048,beer049,beer050,beer051,beer052,beer053,beer054,beer055,beer056,beer057,beer058,beer059,beer060,beer061,beer062,beer063,beer064,beer065,beer066,beer067,beer068,beer069,beer070,beer071,beer072,beer073,beer074,beer075,beer076,beer077,beer078,beer079,beer080,beer081,beer082,beer083,beer084,beer085,beer086,beer087,beer088,beer089,beer090,beer091,beer092,beer093,beer094,beer095,beer096,beer097,beer098,beer099,beer100,beer101,beer102,bioethanol001,bioethanol002,bioethanol003,bioethanol004,bioethanol005,bread001,bread002,bread003,bread004,laboratory001,laboratory002,sake001,sake002,sake003,sake004,sake005,sake006,sake007,spirits001,spirits002,spirits003,spirits004,spirits005,spirits006,spirits007,spirits008,spirits009,spirits010,spirits011,wine001,wine002,wine003,wine004,wine005,wine006,wine007,wine008,wine009,wine010,wine011,wine012,wine013,wine014,wine015,wine016,wine017,wine018,wine019,wild001,wild002,wild003,wild004,wild005,wild006,wild007,Spar;o=Spar' \
     --plan 'name=Scer_n157_nonMosaic_Spar;t=S288c;qs=beer001,beer002,beer003,beer004,beer005,beer006,beer007,beer008,beer009,beer010,beer011,beer012,beer013,beer014,beer015,beer016,beer020,beer021,beer022,beer023,beer024,beer025,beer026,beer027,beer028,beer029,beer030,beer031,beer032,beer033,beer034,beer036,beer037,beer038,beer039,beer040,beer041,beer043,beer044,beer045,beer046,beer047,beer048,beer049,beer050,beer051,beer052,beer053,beer054,beer055,beer056,beer059,beer061,beer062,beer063,beer064,beer065,beer066,beer067,beer068,beer069,beer070,beer071,beer073,beer075,beer076,beer077,beer078,beer079,beer080,beer081,beer082,beer083,beer084,beer085,beer086,beer087,beer088,beer089,beer090,beer091,beer092,beer094,beer095,beer096,beer097,beer098,beer099,beer100,beer101,beer102,bioethanol001,bioethanol003,bioethanol004,bread001,bread002,bread003,bread004,sake001,sake002,sake003,sake004,sake005,sake006,sake007,spirits001,spirits002,spirits003,spirits004,spirits005,spirits011,wine001,wine003,wine004,wine005,wine006,wine007,wine009,wine010,wine011,wine012,wine013,wine014,wine015,wine017,wine018,wild004,wild005,wild006,wild007,Spar;o=Spar' \
     --plan 'name=Scer_n157_nonMosaic_consensus;t=S288c;qs=beer001,beer002,beer003,beer004,beer005,beer006,beer007,beer008,beer009,beer010,beer011,beer012,beer013,beer014,beer015,beer016,beer020,beer021,beer022,beer023,beer024,beer025,beer026,beer027,beer028,beer029,beer030,beer031,beer032,beer033,beer034,beer036,beer037,beer038,beer039,beer040,beer041,beer043,beer044,beer045,beer046,beer047,beer048,beer049,beer050,beer051,beer052,beer053,beer054,beer055,beer056,beer059,beer061,beer062,beer063,beer064,beer065,beer066,beer067,beer068,beer069,beer070,beer071,beer073,beer075,beer076,beer077,beer078,beer079,beer080,beer081,beer082,beer083,beer084,beer085,beer086,beer087,beer088,beer089,beer090,beer091,beer092,beer094,beer095,beer096,beer097,beer098,beer099,beer100,beer101,beer102,bioethanol001,bioethanol003,bioethanol004,bread001,bread002,bread003,bread004,sake001,sake002,sake003,sake004,sake005,sake006,sake007,spirits001,spirits002,spirits003,spirits004,spirits005,spirits011,wine001,wine003,wine004,wine005,wine006,wine007,wine009,wine010,wine011,wine012,wine013,wine014,wine015,wine017,wine018,wild004,wild005,wild006,wild007,consensus;o=consensus' \
+    --plan 'name=Scer_n128_Spar;t=S288c;qs=beer001,beer003,beer004,beer005,beer006,beer007,beer008,beer009,beer010,beer011,beer012,beer013,beer014,beer015,beer016,beer020,beer021,beer022,beer023,beer024,beer025,beer026,beer027,beer028,beer029,beer030,beer031,beer032,beer033,beer034,beer036,beer037,beer038,beer040,beer041,beer043,beer044,beer045,beer046,beer047,beer048,beer049,beer050,beer051,beer052,beer053,beer054,beer055,beer056,beer059,beer061,beer062,beer063,beer064,beer065,beer066,beer067,beer068,beer069,beer070,beer071,beer073,beer075,beer076,beer077,beer078,beer079,beer080,beer081,beer082,beer083,beer084,beer085,beer086,beer087,beer088,beer089,beer090,beer091,beer092,beer094,beer095,beer096,beer097,beer098,beer099,beer100,beer101,beer102,bioethanol001,bioethanol003,bioethanol004,bread001,bread002,bread003,bread004,sake001,sake002,sake003,sake004,sake005,sake006,sake007,spirits001,spirits002,spirits003,spirits004,spirits005,spirits011,wine001,wine003,wine004,wine005,wine006,wine007,wine009,wine010,wine011,wine012,wine013,wine014,wine015,wine017,wine018,wild005,wild006,wild007,Spar;o=Spar' \
     -y
 
 # pop_prep.pl
@@ -272,6 +273,11 @@ bash 7_multi_db_only.sh
 
 # other plans
 bash plan_Scer_n157_nonMosaic_consensus.sh
+bash 5_multi_cmd.sh
+bash 7_multi_db_only.sh
+
+# other plans
+bash plan_Scer_n128_Spar.sh
 bash 5_multi_cmd.sh
 bash 7_multi_db_only.sh
 
@@ -371,11 +377,11 @@ cd ~/data/mrna-structure/xlsx
 
 perl ~/Scripts/alignDB/alignDB.pl \
     -d Scer_n157_nonMosaic_consensus \
-    -da ~/data/mrna-structure/alignment/scer_wgs/Scer_n157_nonMosaic_consensus_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/Stats/anno.yml\
+    -da ~/data/mrna-structure/alignment/scer_wgs/multi160/Scer_n157_nonMosaic_consensus_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/multi160/Results/anno.yml\
     --ensembl saccharomyces_cerevisiae_core_29_82_4 \
     --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/chr_length.csv \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/multi160/Results/chr_length.csv \
     -lt 1000 --parallel 8 --batch 5 \
     --run gene
 
