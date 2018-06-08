@@ -390,6 +390,48 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 ```
 
+## Build alignDB for multiple genomes n128_Spar
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n128_Spar \
+    -da ~/data/mrna-structure/alignment/scer_wgs/multi160/Scer_n128_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/multi160/Results/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/multi160/Results/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n128_Spar -r 1-60
+
+```
+
+## Build alignDB for multiple genomes n128_consensus
+
+```bash
+mkdir -p ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/alignDB/alignDB.pl \
+    -d Scer_n128_consensus \
+    -da ~/data/mrna-structure/alignment/scer_wgs/multi160/Scer_n128_consensus_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/multi160/Results/anno.yml\
+    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
+    --outgroup \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/multi160/Results/chr_length.csv \
+    -lt 1000 --parallel 8 --batch 5 \
+    --run gene
+
+perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
+    -d Scer_n128_consensus -r 1-60
+  
+```
+
 ## Extract gene-list and snp-codon-list n7
 
 ```bash
