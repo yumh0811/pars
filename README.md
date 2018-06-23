@@ -497,6 +497,19 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_consensus.mvar.1-60.
     
 ```
 
+## Extract gene-list and snp-codon-list n128
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
+    > Scer_n128_Spar.mvar.gene_list.csv
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
+    > Scer_n128_Spar.mvar.gene_list.csv
+    
+```
+
 ## SNPs and indels n7
 
 Select columns `chr_name,snp_pos` for SNPs.
@@ -647,6 +660,35 @@ perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n157_nonMosaic_consensus.mvar.1-60.
 
 ```
 
+## SNPs and indels n128
+
+Select columns `chr_name,snp_pos` for SNPs.
+
+Select columns `chr_name,indel_start,indel_end` for indels.
+
+```bash
+cd ~/data/mrna-structure/xlsx
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        print qq{$F[2]:$F[3]};
+    ' \
+    > Scer_n128_Spar.snp.pos.txt
+
+perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
+    | perl -nla -F"," -e '
+        /^\d/ or next;
+        if ( $F[3] == $F[4] ) {
+            print qq{$F[2]:$F[3]};
+        }
+        else {
+            print qq{$F[2]:$F[3]-$F[4]};
+        }
+    ' \
+    > Scer_n128_Spar.indel.pos.txt
+
+```
 
 # Blast
 
@@ -1050,6 +1092,59 @@ unset NAME
 
 ```
 
+# Real Processing n128
+
+```bash
+export NAME=Scer_n128_Spar
+
+cd ~/data/mrna-structure/process
+
+# SNPs within transcripts
+runlist position --op superset \
+    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.gene.pos.txt
+
+# read gene and snp info file
+# produce ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/read_fold.pl \
+    --pars ../PARS10/pubs/PARS10/data \
+    --gene sce_genes.blast.tsv \
+    --pos  ${NAME}.snp.gene.pos.txt \
+    > fail_pos.txt
+
+# review fail_pos.txt to find SNPs located in overlapped genes
+
+# process ${NAME}.gene_variation.yml
+perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
+
+# SNPs within orf_genomic regions
+runlist position --op superset \
+    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.orf_genomic.pos.txt
+
+# SNPs within intergenic regions
+runlist position --op superset \
+    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intergenic.pos.txt
+
+# SNPs within introns
+runlist position --op superset \
+    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
+    -o ${NAME}.snp.intron.pos.txt
+
+# SNPs within utr
+runlist position --op superset \
+    sce_utr.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.utr.pos.txt
+
+# SNPs within cds
+runlist position --op superset \
+    sce_cds.yml ${NAME}.snp.gene.pos.txt \
+    -o ${NAME}.snp.cds.pos.txt
+unset NAME
+
+```
+
 # Download other reference data
 
 ## mRNA levels
@@ -1274,6 +1369,18 @@ mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
 cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
 cat ../protein_coding_list.csv |
    parallel --line-buffer -j 8 '
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   '
+unset NAME
+
+export NAME=Scer_n128_Spar
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
+cd ~/data/mrna-structure/phylogeny/${NAME}_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+cat ../protein_coding_list.csv |
+   parallel --line-buffer -j 16 '
    	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
    '
 unset NAME
