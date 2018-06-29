@@ -1416,6 +1416,10 @@ cd ~/data/mrna-structure/phylogeny
 perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
 unset NAME
 
+export NAME=Scer_n128_Spar
+cd ~/data/mrna-structure/phylogeny
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+unset NAME
 ```
 
 ## create gene_phylogeny (n157_nonMosaic)
@@ -1486,6 +1490,10 @@ export NAME=Scer_n157_Spar
 Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
 unset NAME
 
+export NAME=Scer_n128_Spar
+Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+unset NAME
+
 ```
 
 # SNP
@@ -1513,6 +1521,12 @@ perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/p
 unset NAME
 
 export NAME=Scer_n157_nonMosaic_Spar
+mkdir -p ~/data/mrna-structure/result/$NAME
+cd ~/data/mrna-structure/result/$NAME
+perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --varfold ~/data/mrna-structure/process/$NAME.gene_variation.fold_class.tsv --output $NAME.gene_variation.fold_class.csv
+unset NAME
+
+export NAME=Scer_n128_Spar
 mkdir -p ~/data/mrna-structure/result/$NAME
 cd ~/data/mrna-structure/result/$NAME
 perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --varfold ~/data/mrna-structure/process/$NAME.gene_variation.fold_class.tsv --output $NAME.gene_variation.fold_class.csv
@@ -1562,6 +1576,12 @@ Rscript ~/Scripts/pars/program/${NAME}_stat_SNPs.R
 sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv  # debug "->"
 unset NAME
 
+export NAME=Scer_n128_Spar
+cd ~/data/mrna-structure/result/$NAME
+Rscript ~/Scripts/pars/program/${NAME}_stat_SNPs.R
+sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv  # debug "->"
+unset NAME
+
 ```
 
 ## count A/T <->G/C
@@ -1600,6 +1620,18 @@ perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_ns
 unset NAME
 
 export NAME=Scer_n157_nonMosaic_Spar
+cd ~/data/mrna-structure/result/$NAME
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
+mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
+Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC.R
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_cds_stat_freq_10.csv --output freq_10/PARS_cds_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_utr_stat_freq_10.csv --output freq_10/PARS_utr_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_syn_stat_freq_10.csv --output freq_10/PARS_syn_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_nsy_stat_freq_10.csv --output freq_10/PARS_nsy_stat_freq_10_chi_square.csv
+unset NAME
+
+
+export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/$NAME
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_each
 mkdir -p ~/data/mrna-structure/result/$NAME/freq_10
