@@ -32,10 +32,7 @@
     - [count distance (n157_nonMosaic)](#count-distance-n157_nonmosaic)
 - [SNP](#snp)
 
-
-# Download reference data
-
-## Download PARS10 full site.
+# Download PARS10 full site.
 
 ```bash
 mkdir -p ~/data/mrna-structure/PARS10
@@ -48,87 +45,264 @@ find . -name "*.gz" | xargs gzip -d
 
 ```
 
-## Download S288c annotation data from ensembl by rsync
+# Download strains genomes
 
-http://www.ensembl.org/info/data/ftp/rsync.html?redirect=no
-
-S288c assembly version is not changed since 2011, R64-1-1
-(GCA_000146045.2).
+## Download S288c (soft-masked) from Ensembl
 
 ```bash
-mkdir -p ~/data/mrna-structure/ensembl82/mysql
-cd ~/data/mrna-structure/ensembl82/mysql
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/mysql/saccharomyces_cerevisiae_core_82_4 .
+mkdir -p ~/data/alignment/egaz/download/S288c
+cd ~/data/alignment/egaz/download/S288c
 
-mkdir -p ~/data/mrna-structure/ensembl82/fasta
-cd ~/data/mrna-structure/ensembl82/fasta
-rsync -avP rsync://ftp.ensembl.org/ensembl/pub/release-82/fasta/saccharomyces_cerevisiae .
-
-perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --checksum
-perl ~/Scripts/withncbi/ensembl/build_ensembl.pl -e ~/data/mrna-structure/ensembl82/mysql/saccharomyces_cerevisiae_core_82_4 --initdb --db saccharomyces_cerevisiae_core_29_82_4
+aria2c -x 6 -s 3 -c ftp://ftp.ensembl.org/pub/release-82/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz
+aria2c -x 6 -s 3 -c ftp://ftp.ensembl.org/pub/release-82/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.82.gff3.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz S288c.fa
 
 ```
 
-## SGD
+## Download strains from NCBI assembly
 
+**DBVPG6044**
 ```bash
-mkdir -p ~/data/mrna-structure/sgd
-cd ~/data/mrna-structure/sgd
-
-aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/intergenic/NotFeature.fasta.gz
-aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_coding_all.fasta.gz
-aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_genomic_all.fasta.gz
-aria2c -c http://downloads.yeastgenome.org/curation/chromosomal_feature/saccharomyces_cerevisiae.gff
-
-find . -name "*.gz" \
-    | parallel -j 1 "
-        echo {};
-        gzip -d -c {} > {.};
-    "
-    
+mkdir ~/data/alignment/egaz/download/DBVPG6044
+cd ~/data/alignment/egaz/download/DBVPG6044
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/025/GCA_002079025.1_ASM207902v1/GCA_002079025.1_ASM207902v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002079025.1_ASM207902v1_genomic.fna.gz DBVPG6044.fa
 ```
 
-
-# Download strains and outgroups
-
-## Sanger (NCBI WGS)
-
+**Y12**
 ```bash
-mkdir -p ~/data/mrna-structure/GENOMES
-cd ~/data/mrna-structure/GENOMES
+mkdir ~/data/alignment/egaz/download/Y12
+cd ~/data/alignment/egaz/download/Y12
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/058/645/GCA_002058645.1_ASM205864v1/GCA_002058645.1_ASM205864v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002058645.1_ASM205864v1_genomic.fna.gz Y12.fa
+```
 
+**SK1**
+```bash
+mkdir ~/data/alignment/egaz/download/SK1
+cd ~/data/alignment/egaz/download/SK1
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/885/GCA_002057885.1_ASM205788v1/GCA_002057885.1_ASM205788v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002057885.1_ASM205788v1_genomic.fna.gz SK1.fa
+```
+
+**UWOPS03-461.4**
+```bash
+mkdir ~/data/alignment/egaz/download/UWOPS03_461_4
+cd ~/data/alignment/egaz/download/UWOPS03_461_4
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/058/095/GCA_002058095.1_ASM205809v1/GCA_002058095.1_ASM205809v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002058095.1_ASM205809v1_genomic.fna.gz UWOPS03_461_4.fa
+```
+
+**YPS128**
+```bash
+mkdir ~/data/alignment/egaz/download/YPS128
+cd ~/data/alignment/egaz/download/YPS128
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/995/GCA_002057995.1_ASM205799v1/GCA_002057995.1_ASM205799v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002057995.1_ASM205799v1_genomic.fna.gz YPS128.fa
+```
+
+**DBVPG6765**
+```bash
+mkdir ~/data/alignment/egaz/download/DBVPG6765
+cd ~/data/alignment/egaz/download/DBVPG6765
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/805/GCA_002057805.1_ASM205780v1/GCA_002057805.1_ASM205780v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002057805.1_ASM205780v1_genomic.fna.gz DBVPG6765.fa
+```
+
+**CBS432**
+```bash
+mkdir ~/data/alignment/egaz/download/CBS432
+cd ~/data/alignment/egaz/download/CBS432
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/055/GCA_002079055.1_ASM207905v1/GCA_002079055.1_ASM207905v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002079055.1_ASM207905v1_genomic.fna.gz CBS432.fa
+```
+
+**N44**
+```bash
+mkdir ~/data/alignment/egaz/download/N44
+cd ~/data/alignment/egaz/download/N44
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/085/GCA_002079085.1_ASM207908v1/GCA_002079085.1_ASM207908v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002079085.1_ASM207908v1_genomic.fna.gz N44.fa
+```
+
+**YPS138**
+```bash
+mkdir ~/data/alignment/egaz/download/YPS138
+cd ~/data/alignment/egaz/download/YPS138
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/115/GCA_002079115.1_ASM207911v1/GCA_002079115.1_ASM207911v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002079115.1_ASM207911v1_genomic.fna.gz YPS138.fa
+```
+**UFRJ50816**
+```bash
+mkdir ~/data/alignment/egaz/download/UFRJ50816
+cd ~/data/alignment/egaz/download/UFRJ50816
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/145/GCA_002079145.1_ASM207914v1/GCA_002079145.1_ASM207914v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002079145.1_ASM207914v1_genomic.fna.gz UFRJ50816.fa
+```
+
+**UWOPS91-917.1**
+```bash
+mkdir ~/data/alignment/egaz/download/UWOPS91_917_1
+cd ~/data/alignment/egaz/download/UWOPS91_917_1
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/175/GCA_002079175.1_ASM207917v1/GCA_002079175.1_ASM207917v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_002079175.1_ASM207917v1_genomic.fna.gz UWOPS91_917_1.fa
+```
+
+**EC1118**
+```bash
+mkdir ~/data/alignment/egaz/download/EC1118
+cd ~/data/alignment/egaz/download/EC1118
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/218/975/GCA_000218975.1_ASM21897v1/GCA_000218975.1_ASM21897v1_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_000218975.1_ASM21897v1_genomic.fna.gz EC1118.fa
+```
+
+**Seub**
+```bash
+mkdir ~/data/alignment/egaz/download/Seub
+cd ~/data/alignment/egaz/download/Seub
+aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/298/625/GCA_001298625.1_SEUB3.0/GCA_001298625.1_SEUB3.0_genomic.fna.gz
+find . -name "*.gz" | xargs gzip -t
+faops filter -N -s GCA_001298625.1_SEUB3.0_genomic.fna.gz Seub.fa
+```
+
+## Download strains from NCBI WGS
+
+**scer**
+```bash
+cd ~/data/alignment/egaz/download
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
     -f ~/Scripts/pars/scer_wgs.tsv \
-    --fix -a \
-    -o WGS
-
-aria2c -UWget -x 6 -s 3 -c -i WGS/scer_wgs.url.txt
-
-find WGS -name "*.gz" | xargs gzip -t
-
-perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/pars/spar_wgs.tsv \
-    --fix -a \
-    -o WGS
-
-aria2c -UWget -x 6 -s 3 -c -i WGS/spar_wgs.url.txt
-
-find WGS -name "*.gz" | xargs gzip -t
-
+    --fix
+bash scer_wgs.rsync.sh
 ```
 
-## Illumina (NCBI ASSEMBLY)
+**spar**
+```bash
+cd ~/data/alignment/egaz/download
+perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
+    -f ~/Scripts/pars/spar_wgs.tsv \
+    --fix
+bash spar_wgs.rsync.sh
+```
+
+## Download strains from 1002genomes project
 
 ```bash
-mkdir -p ~/data/mrna-structure/GENOMES/ASSEMBLIES
-cd ~/data/mrna-structure/GENOMES/ASSEMBLIES
+cd ~/data/alignment/egaz/download
+wget -c http://1002genomes.u-strasbg.fr/files/1011Assemblies.tar.gz
+tar -zxvf 1011Assemblies.tar.gz
+```
 
-# Download, rename files and change fasta headers
-perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-    -p -f ~/Scripts/pars/scer_assembly.csv
-perl ~/Scripts/withncbi/taxon/batch_get_seq.pl \
-    -p -f ~/Scripts/pars/spar_assembly.csv
+# RepeatMasker
 
+```bash
+cd ~/data/alignment/egaz
+
+egaz prepseq download/S288c/S288c.fa -o S288c -v
+gzip -d -c download/S288c/Saccharomyces_cerevisiae.R64-1-1.82.gff3.gz > S288c/chr.gff
+egaz masked S288c/*.fa -o S288c/repeat.yml
+
+egaz prepseq \
+    download/DBVPG6044/DBVPG6044.fa -o DBVPG6044 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/Y12/Y12.fa -o Y12 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/SK1/SK1.fa -o SK1 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/UWOPS03_461_4/UWOPS03_461_4.fa -o UWOPS03_461_4 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/YPS128/YPS128.fa -o YPS128 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/DBVPG6765/DBVPG6765.fa -o DBVPG6765 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/CBS432/CBS432.fa -o CBS432 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/N44/N44.fa -o N44 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/YPS138/YPS138.fa -o YPS138 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/UFRJ50816/UFRJ50816.fa -o UFRJ50816 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/UWOPS91_917_1/UWOPS91_917_1.fa -o UWOPS91_917_1 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+egaz prepseq \
+    download/EC1118/EC1118.fa -o EC1118 \
+    --repeatmasker '--species Fungi --parallel 8' -v
+
+mkdir -p ~/data/alignment/egaz/Seub
+cd ~/data/alignment/egaz/Seub
+RepeatMasker --species Fungi --parallel 16 -xsmall ../download/Seub/Seub.fa
+egaz prepseq \
+    ../download/Seub/Seub.fa.masked -v
+
+cd ~/data/alignment/egaz
+cat download/scer_wgs.csv \
+    | grep -v "^prefix" \
+    | cut -d',' -f1,3 \
+    | uniq \
+    | perl -nl -a -F"," -e 'printf qq{egaz prepseq \\\n   download/%s/%s.*.fsa_nt.gz -o %s \\\n   --about 2000000 --repeatmasker " --species Fungi --parallel 8" --min 1000 --gi -v \n}, $F[1], $F[0], $F[1];' > rm_scer_wgs.sh   
+bash rm_scer_wgs.sh
+
+cat download/spar_wgs.csv \
+    | grep -v "^prefix" \
+    | cut -d',' -f1,3 \
+    | uniq \
+    | perl -nl -a -F"," -e 'printf qq{egaz prepseq \\\n   download/%s/%s.*.fsa_nt.gz -o %s \\\n   --about 2000000 --repeatmasker " --species Fungi --parallel 8" --min 1000 --gi -v \n}, $F[1], $F[0], $F[1];' > rm_spar_wgs.sh
+bash rm_spar_wgs.sh
+
+# 1011
+cd ~/data/alignment/egaz/download
+for file in $(ls ~/data/alignment/egaz/download/GENOMES_ASSEMBLED/*.re.fa);
+do
+cd ~/data/alignment/egaz/download
+cat $file | perl -nl -e '
+
+if (m/^>([A-Za-z]+)_/){
+
+my $dir = $1;
+mkdir ("../$dir") unless (-d "../$dir");
+last;
+
+}
+'
+filename=$(basename $file)
+dir=$(echo $filename | perl -p -e 's/^([A-Za-z]+).+/$1/;')
+
+cp -rf $file ../$dir
+sed -i".bak" "s/-/_/" ../$dir/*.re.fa
+
+faops filter -a 1000 ../$dir/*.re.fa ../$dir/$dir.fasta
+rm -rf ../$dir/*.re.fa
+RepeatMasker --species Fungi --parallel 16 -xsmall ../$dir/$dir.fasta
+
+cd ~/data/alignment/egaz/$dir
+egaz prepseq \
+    ../$dir/$dir.fasta.masked -v
+
+done
 ```
 
 # Plans of alignments
