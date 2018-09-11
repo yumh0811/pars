@@ -296,7 +296,8 @@ last;
 }
 '
 cp -rf $file ../$dir
-sed -i".bak" "s/-/_/" ../$dir/*.re.fa
+sed -i".bak" "s/-/_/g" ../$dir/*.re.fa
+sed -i".bak" "s/\./_/g" ../$dir/*.re.fa
 
 faops filter -a 1000 ../$dir/*.re.fa ../$dir/$dir.fasta
 rm -rf ../$dir/*.re.fa
@@ -307,6 +308,7 @@ egaz prepseq \
     ../$dir/$dir.fasta.masked -v
 fi
 done
+
 ```
 
 # Plans of alignments
