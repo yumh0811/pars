@@ -277,10 +277,17 @@ bash rm_spar_wgs.sh
 cd ~/data/alignment/egaz/download
 for file in $(ls ~/data/alignment/egaz/download/GENOMES_ASSEMBLED/*.re.fa);
 do
+
+filename=$(basename $file)
+dir=$(echo $filename | perl -p -e 's/^([A-Za-z]+).+/$1/;')
+
+if [ -d ../$dir ];
+then echo -n;
+else
 cd ~/data/alignment/egaz/download
 cat $file | perl -nl -e '
 
-if (m/^>([A-Za-z]+)_/){
+if (m/^>([A-Za-z]+)/){
 
 my $dir = $1;
 mkdir ("../$dir") unless (-d "../$dir");
@@ -288,9 +295,6 @@ last;
 
 }
 '
-filename=$(basename $file)
-dir=$(echo $filename | perl -p -e 's/^([A-Za-z]+).+/$1/;')
-
 cp -rf $file ../$dir
 sed -i".bak" "s/-/_/" ../$dir/*.re.fa
 
@@ -301,7 +305,7 @@ RepeatMasker --species Fungi --parallel 16 -xsmall ../$dir/$dir.fasta
 cd ~/data/alignment/egaz/$dir
 egaz prepseq \
     ../$dir/$dir.fasta.masked -v
-
+fi
 done
 ```
 
