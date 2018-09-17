@@ -21,7 +21,7 @@ use App::Rangeops;
 
 =head1 SYNOPSIS
 
-    perl ~/Scripts/pars/program/protein_coding_list_range.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output ~/data/mrna-structure/phylogeny/protein_coding_list_range.csv
+    perl ~/Scripts/pars/program/protein_coding_list_range_chr.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output ~/data/mrna-structure/phylogeny/protein_coding_list_range_chr.csv
 
 =cut
 

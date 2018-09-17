@@ -1,4 +1,4 @@
-name <- "Scer_n157_nonMosaic_Spar" 
+name <- "Scer_n128_Spar" 
 path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
 setwd(path)
 
@@ -14,17 +14,43 @@ library(gsubfn)
 library(RSQLite)
 library(sqldf)
 
-#输入csv
-file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.csv',collapse = NULL)
-data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
-file_SNPs_PARS_utr <- paste0(path,'/data_SNPs_PARS_utr.csv',collapse = NULL)
-data_SNPs_PARS_utr <- read.csv(file_SNPs_PARS_utr,header = TRUE,sep = ",")
-file_SNPs_PARS_syn <- paste0(path,'/data_SNPs_PARS_syn.csv',collapse = NULL)
-data_SNPs_PARS_syn <- read.csv(file_SNPs_PARS_syn,header = TRUE,sep = ",")
-file_SNPs_PARS_nsy <- paste0(path,'/data_SNPs_PARS_nsy.csv',collapse = NULL)
-data_SNPs_PARS_nsy <- read.csv(file_SNPs_PARS_nsy,header = TRUE,sep = ",")
 
-group = c("cds","utr","syn","nsy")
+
+#输入csv
+file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds_codon.csv',collapse = NULL)
+data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
+
+#codon
+data_SNPs_PARS_4D <- sqldf('SELECT * FROM [data_SNPs_PARS_cds] where snp_codons ==  
+                           "CCT->CCC" OR snp_codons == "CCT->CCA" OR snp_codons == "CCT->CCG" OR snp_codons == "CCC->CCT" OR snp_codons == "CCC->CCA" OR snp_codons == "CCC->CCG" OR snp_codons == "CCA->CCC" OR snp_codons == "CCA->CCT" OR snp_codons == "CCA->CCG" OR snp_codons == "CCG->CCC" OR snp_codons == "CCG->CCT" OR snp_codons == "CCG->CCA" OR snp_codons == 
+                           "GTT->GTC" OR snp_codons == "GTT->GTA" OR snp_codons == "GTT->GTG" OR snp_codons == "GTC->GTT" OR snp_codons == "GTC->GTA" OR snp_codons == "GTC->GTG" OR snp_codons == "GTA->GTC" OR snp_codons == "GTA->GTT" OR snp_codons == "GTA->GTG" OR snp_codons == "GTG->GTC" OR snp_codons == "GTG->GTT" OR snp_codons == "GTG->GTA" OR snp_codons == 
+                           "ACT->ACC" OR snp_codons == "ACT->ACA" OR snp_codons == "ACT->ACG" OR snp_codons == "ACC->ACT" OR snp_codons == "ACC->ACA" OR snp_codons == "ACC->ACG" OR snp_codons == "ACA->ACC" OR snp_codons == "ACA->ACT" OR snp_codons == "ACA->ACG" OR snp_codons == "ACG->ACC" OR snp_codons == "ACG->ACT" OR snp_codons == "ACG->ACA" OR snp_codons == 
+                           "GCT->GCC" OR snp_codons == "GCT->GCA" OR snp_codons == "GCT->GCG" OR snp_codons == "GCC->GCT" OR snp_codons == "GCC->GCA" OR snp_codons == "GCC->GCG" OR snp_codons == "GCA->GCC" OR snp_codons == "GCA->GCT" OR snp_codons == "GCA->GCG" OR snp_codons == "GCG->GCC" OR snp_codons == "GCG->GCT" OR snp_codons == "GCG->GCA" OR snp_codons == 
+                           "GGT->GGC" OR snp_codons == "GGT->GGA" OR snp_codons == "GGT->GGG" OR snp_codons == "GGC->GGT" OR snp_codons == "GGC->GGA" OR snp_codons == "GGC->GGG" OR snp_codons == "GGA->GGC" OR snp_codons == "GGA->GGT" OR snp_codons == "GGA->GGG" OR snp_codons == "GGG->GGC" OR snp_codons == "GGG->GGT" OR snp_codons == "GGG->GGA"
+                           ')
+write.csv(data_SNPs_PARS_4D,file=paste0(path,"/data_SNPs_PARS_4D.csv",collapse = NULL),row.names = FALSE)
+
+#tRNA
+data_SNPs_PARS_tRNA <- sqldf('SELECT * FROM [data_SNPs_PARS_cds] where 
+                             snp_codons == "CTA->CTG" OR snp_codons == "CTG->CTA" OR 
+                             snp_codons == "GTT->GTC" OR snp_codons == "GTT->GTA" OR snp_codons == "GTC->GTT" OR snp_codons == "GTC->GTA" OR snp_codons == "GTA->GTT" OR snp_codons == "GTA->GTC" OR
+                             snp_codons == "GGT->GGC" OR snp_codons == "GGC->GGT" OR
+                             snp_codons == "GCT->GCC" OR snp_codons == "GCT->GCA" OR snp_codons == "GCC->GCT" OR snp_codons == "GCC->GCA" OR snp_codons == "GCA->GCT" OR snp_codons == "GCA->GCC" OR
+                             snp_codons == "AGA->AGG" OR snp_codons == "AGG->AGA" OR
+                             snp_codons == "CGT->CGC" OR snp_codons == "CGT->CGA" OR snp_codons == "CGC->CGT" OR snp_codons == "CGC->CGA" OR snp_codons == "CGA->CGT" OR snp_codons == "CGA->CGC" OR
+                             snp_codons == "AAA->AAG" OR snp_codons == "AAG->AAA" OR
+                             snp_codons == "GAA->GAG" OR snp_codons == "GAG->GAA" OR
+                             snp_codons == "GAT->GAC" OR snp_codons == "GAC->GAT" OR
+                             snp_codons == "ACT->ACC" OR snp_codons == "ACT->ACA" OR snp_codons == "ACC->ACT" OR snp_codons == "ACC->ACA" OR snp_codons == "ACA->ACT" OR snp_codons == "ACA->ACC" OR
+                             snp_codons == "TAT->TAC" OR snp_codons == "TAC->TAT" OR
+                             snp_codons == "TCT->TCC" OR snp_codons == "TCT->TCA" OR snp_codons == "TCC->TCT" OR snp_codons == "TCC->TCA" OR snp_codons == "TCA->TCT" OR snp_codons == "TCA->TCC" OR
+                             snp_codons == "TCA->TCG" OR snp_codons == "TCG->TCA" OR
+                             snp_codons == "CAT->CAC" OR snp_codons == "CAC->CAT" OR
+                             snp_codons == "TTT->TTC" OR snp_codons == "TTC->TTT" OR
+                             snp_codons == "TGT->TGC" OR snp_codons == "TGC->TGT" ')
+write.csv(data_SNPs_PARS_tRNA,file=paste0(path,"/data_SNPs_PARS_tRNA.csv",collapse = NULL),row.names = FALSE)
+
+group = c("4D","tRNA")
 for (g in group){
   t <- get(paste0('data_SNPs_PARS_',g,collapse = NULL))
   for(i in 1:max(t$freq)){
@@ -93,7 +119,7 @@ for (g in group){
   # 合并多个数据框
   data <- lapply(paste0('data_stat_',1:max(t$freq)), function(data_stat_) eval(as.name(data_stat_)))
   data_stat <- do.call("rbind", data)
-
+  
   write.csv(data_stat, file=paste0(path,'/freq_each/PARS_',g,'_stat.csv'), row.names = FALSE)
   
   write.csv(dd_SNPs_freq, file=paste0(path,'/freq_each/PARS_',g,'_stat_SNPs.csv'), row.names = FALSE)
@@ -109,7 +135,7 @@ for (g in group){
 
 
 # 把freq分组（先判断freq是否>=10)
-group = c("cds","utr","syn","nsy")
+group = c("4D","tRNA")
 for (g in group){
   t <- get(paste0('data_SNPs_PARS_',g,collapse = NULL))
   if(max(t$freq)>=10){
@@ -193,5 +219,5 @@ for (g in group){
     write.csv(dd_SNPs_freq_stem_GC_AT, file=paste0(path,'/freq_10/PARS_',g,'_stat_stem_GC_AT_freq_10.csv'), row.names = FALSE)
     write.csv(dd_SNPs_freq_loop_GC_AT, file=paste0(path,'/freq_10/PARS_',g,'_stat_loop_GC_AT_freq_10.csv'), row.names = FALSE)
   }
-
+  
 }

@@ -24,7 +24,7 @@ use POSIX;
 
 =head1 SYNOPSIS
 
-    perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --varfold ~/data/mrna-structure/process/$NAME.gene_variation.fold_class.tsv --output $NAME.gene_variation.fold_class.csv
+    perl ~/Scripts/pars/program/count_ACGT_percent_cds.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --varfold ~/data/mrna-structure/process/$NAME.gene_variation.fold_class.tsv --cut ~/data/mrna-structure/process/sce_cds.yml --output $NAME.gene_variation.fold_class_cds.csv
 
 =cut
 
@@ -32,6 +32,7 @@ Getopt::Long::GetOptions(
     'help|?'     => sub { Getopt::Long::HelpMessage(0) },
     'file|f=s'   => \my $file,
     'varfold|vf=s'   => \my $varfold,
+    'cut|c=s'   => \my $cut,
     'output|o=s' => \my $output,
 ) or Getopt::Long::HelpMessage(1);
 
@@ -115,9 +116,37 @@ while (<$tsv_fh>) {
             $stem->add( $info->{fold_right} );
 
             my $loop = AlignDB::IntSpan->new( $info->{fold_dot} );
+            
+            my $chr = $info->{chr};
+  					my $chr_set = AlignDB::IntSpan->new($info->{chr_set});
+  					my @chr_set = $chr_set->ranges();
+            
+            #transfer relative position to absolute position
+  					my $stem2 = $stem->map_set(sub{$_+$chr_set[0]-1});
+  					#print $stem2."\n"."\n";sleep 1;
+  					my $loop2 = $loop->map_set(sub{$_+$chr_set[0]-1});
+  					#print $loop2."\n"."\n";sleep 1;
+  					
+  					print "Load $cut\n";
+  					my $gene_info2_of = YAML::Syck::LoadFile($cut);
+  
+  					my $info2 = $gene_info2_of->{ $chr };
+  
+  					my $cut_range = AlignDB::IntSpan->new;
+  					$cut_range->add( $info2 );
+  					#print $cut_range."\n";sleep 1;
+  					
+  					my $stem_intersection = AlignDB::IntSpan::intersect( $stem2, $cut_range );
+  					my $loop_intersection = AlignDB::IntSpan::intersect( $loop2, $cut_range );
+  					
+  					#transfer absolute position to relative position
+  					my $stem3 = $stem_intersection->map_set(sub{$_-($chr_set[0]-1)});
+  					#print $stem2."\n"."\n";sleep 1;
+  					my $loop3 = $loop_intersection->map_set(sub{$_-($chr_set[0]-1)});
+  					#print $loop2."\n"."\n";sleep 1;
 
-            my @stem_position = $stem->sets();
-            my @loop_position = $loop->sets();
+            my @stem_position = $stem3->sets();
+            my @loop_position = $loop3->sets();
 
             my @stem_seq = ();
             foreach my $ranges1 (@stem_position) {
@@ -140,50 +169,51 @@ while (<$tsv_fh>) {
             my $loop_seq = join "", @loop_seq;
 
             my $stem_A_num = ( $stem_seq =~ s/A/A/g );
-            my $stem_A_pre = $stem_A_num / length($stem_seq);
+            my $stem_A_pre = $stem_A_num / length($stem_seq) if(length($stem_seq) != 0);
             my $stem_C_num = ( $stem_seq =~ s/C/C/g );
-            my $stem_C_pre = $stem_C_num / length($stem_seq);
+            my $stem_C_pre = $stem_C_num / length($stem_seq) if(length($stem_seq) != 0);
             my $stem_G_num = ( $stem_seq =~ s/G/G/g );
-            my $stem_G_pre = $stem_G_num / length($stem_seq);
+            my $stem_G_pre = $stem_G_num / length($stem_seq) if(length($stem_seq) != 0);
             my $stem_U_num = ( $stem_seq =~ s/U/U/g );
-            my $stem_U_pre = $stem_U_num / length($stem_seq);
+            my $stem_U_pre = $stem_U_num / length($stem_seq) if(length($stem_seq) != 0);
             my $loop_A_num = ( $loop_seq =~ s/A/A/g );
-            my $loop_A_pre = $loop_A_num / length($loop_seq);
+            my $loop_A_pre = $loop_A_num / length($loop_seq) if(length($loop_seq) != 0);
             my $loop_C_num = ( $loop_seq =~ s/C/C/g );
-            my $loop_C_pre = $loop_C_num / length($loop_seq);
+            my $loop_C_pre = $loop_C_num / length($loop_seq) if(length($loop_seq) != 0);
             my $loop_G_num = ( $loop_seq =~ s/G/G/g );
-            my $loop_G_pre = $loop_G_num / length($loop_seq);
+            my $loop_G_pre = $loop_G_num / length($loop_seq) if(length($loop_seq) != 0);
             my $loop_U_num = ( $loop_seq =~ s/U/U/g );
-            my $loop_U_pre = $loop_U_num / length($loop_seq);
+            my $loop_U_pre = $loop_U_num / length($loop_seq) if(length($loop_seq) != 0);
             my $A_num = ( $seq =~ s/A/A/g );
-            my $A_pre = $A_num / length($seq);
+            my $A_pre = $A_num / length($seq) if(length($seq) != 0);
             my $C_num = ( $seq =~ s/C/C/g );
-            my $C_pre = $C_num / length($seq);
+            my $C_pre = $C_num / length($seq) if(length($seq) != 0);
             my $G_num = ( $seq =~ s/G/G/g );
-            my $G_pre = $G_num / length($seq);
+            my $G_pre = $G_num / length($seq) if(length($seq) != 0);
             my $U_num = ( $seq =~ s/U/U/g );
-            my $U_pre = $U_num / length($seq);
+            my $U_pre = $U_num / length($seq) if(length($seq) != 0);
             my $stem_AU_num = $stem_A_num + $stem_U_num;
             my $stem_CG_num = $stem_C_num + $stem_G_num;
             my $loop_AU_num = $loop_A_num + $loop_U_num;
             my $loop_CG_num = $loop_C_num + $loop_G_num;
             my $AU_num = $A_num + $U_num;
             my $CG_num = $C_num + $G_num;
-            my $stem_CG_content = $stem_CG_num / length($stem_seq);
-            my $loop_CG_content = $loop_CG_num / length($loop_seq);
+            my $stem_CG_content = $stem_CG_num / length($stem_seq) if(length($stem_seq) != 0);
+            my $loop_CG_content = $loop_CG_num / length($loop_seq) if(length($loop_seq) != 0);
             my $CG_content = $CG_num / length($seq);
             
-            my $stem_AU_num_th = ($stem_AU_num+$loop_AU_num)*($stem_AU_num+$stem_CG_num)/($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num);
-            my $loop_AU_num_th = ($stem_AU_num+$loop_AU_num)*($loop_AU_num+$loop_CG_num)/($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num);
-            my $stem_CG_num_th = ($stem_CG_num+$loop_CG_num)*($stem_AU_num+$stem_CG_num)/($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num);
-            my $loop_CG_num_th = ($stem_CG_num+$loop_CG_num)*($loop_AU_num+$loop_CG_num)/($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num);
-            my $X2 = (($stem_AU_num-$stem_AU_num_th)*($stem_AU_num-$stem_AU_num_th)/$stem_AU_num_th)+(($stem_CG_num-$stem_CG_num_th)*($stem_CG_num-$stem_CG_num_th)/$stem_CG_num_th)+(($loop_AU_num-$loop_AU_num_th)*($loop_AU_num-$loop_AU_num_th)/$loop_AU_num_th)+(($loop_CG_num-$loop_CG_num_th)*($loop_CG_num-$loop_CG_num_th)/$loop_CG_num_th);
+            my $stem_AU_num_th = ($stem_AU_num+$loop_AU_num)*($stem_AU_num+$stem_CG_num)/($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num) if(($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num) != 0);
+            my $loop_AU_num_th = ($stem_AU_num+$loop_AU_num)*($loop_AU_num+$loop_CG_num)/($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num) if(($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num) != 0);
+            my $stem_CG_num_th = ($stem_CG_num+$loop_CG_num)*($stem_AU_num+$stem_CG_num)/($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num) if(($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num) != 0);
+            my $loop_CG_num_th = ($stem_CG_num+$loop_CG_num)*($loop_AU_num+$loop_CG_num)/($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num) if(($stem_AU_num+$stem_CG_num+$loop_AU_num+$loop_CG_num) != 0);
+            #my $X2 = (($stem_AU_num-$stem_AU_num_th)*($stem_AU_num-$stem_AU_num_th)/$stem_AU_num_th)+(($stem_CG_num-$stem_CG_num_th)*($stem_CG_num-$stem_CG_num_th)/$stem_CG_num_th)+(($loop_AU_num-$loop_AU_num_th)*($loop_AU_num-$loop_AU_num_th)/$loop_AU_num_th)+(($loop_CG_num-$loop_CG_num_th)*($loop_CG_num-$loop_CG_num_th)/$loop_CG_num_th);
             
             my $obs = [[$stem_AU_num, $stem_CG_num], [$loop_AU_num,$loop_CG_num]];
 						my $chi = new Statistics::ChisqIndep;
 						$chi->load_data($obs);
 						$chi->print_summary();
-            my $P = ${$chi}{'p_value'};
+            my $P = ${$chi}{'p_value'} ;
+            my $X2 = ${$chi}{'chisq_statistic'} ;
             
             my @sum = (
                 $stem_A_num, $stem_A_pre, $stem_C_num, $stem_C_pre,

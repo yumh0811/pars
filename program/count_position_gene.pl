@@ -53,7 +53,7 @@ while (<$csv_fh>) {
     s/"//g;
     my @snp = split /,/, $_;
 
-    if ( $snp[1] eq "gene" ) {
+    if ( $snp[0] eq "gene" ) {
         $snp[60] = "snp_pos";
         $snp[61] = "island_length";
         my $snp = join ",", @snp;
@@ -66,10 +66,10 @@ while (<$csv_fh>) {
 
         if ( $snp[7] eq "stem" ) {
 
-            if ( grep ( $snp[1], keys %{$gene_info_of} ) )
+            if ( grep ( $snp[0], keys %{$gene_info_of} ) )
             {    # $snp[0] represents snp in which gene
 
-                my $info = $gene_info_of->{ $snp[1] };
+                my $info = $gene_info_of->{ $snp[0] };
 
                 my $stem = AlignDB::IntSpan->new;
 
@@ -105,10 +105,10 @@ while (<$csv_fh>) {
             print OUT $snp_processed, "\n";
         }
         else {
-            if ( grep ( $snp[1], keys %{$gene_info_of} ) )
+            if ( grep ( $snp[0], keys %{$gene_info_of} ) )
             {    # $snp[0] represents snp in which gene
 
-                my $info = $gene_info_of->{ $snp[1] };
+                my $info = $gene_info_of->{ $snp[0] };
 
                 my $stem = AlignDB::IntSpan->new;
 

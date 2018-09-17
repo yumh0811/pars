@@ -1,4 +1,4 @@
-name <- "Scer_n157_nonMosaic_Spar" 
+name <- "Scer_n128_Spar" 
 path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
 setwd(path)
 

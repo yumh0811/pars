@@ -15,6 +15,43 @@ library(RSQLite)
 library(sqldf)
 
 #输入csv
+file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.csv',collapse = NULL)
+data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
+data_gene_process <- data_SNPs_PARS_cds["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+dd_gene_dom <- data.frame(name = "cds", gene = c(nrow(data_gene_process)))
+
+file_gene_nodom <- "~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_gene_nodom.list"
+data_gene_nodom <- read.csv(file_gene_nodom,header = TRUE,sep = ",")
+data_SNPs_PARS_cds_nodom <- merge(data_SNPs_PARS_cds,data_gene_nodom,by="gene")
+data_gene_process <- data_SNPs_PARS_cds_nodom["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+dd_gene_dom <- rbind(dd_gene_dom, data.frame(name = "cds_nodom", gene = c(nrow(data_gene_process))))
+write.csv(data_gene_process , file=paste0(path,'/PARS_cds_gene_nodom.csv'), row.names = FALSE)
+write.csv(data_SNPs_PARS_cds_nodom , file=paste0(path,'/data_SNPs_PARS_cds_nodom.csv'), row.names = FALSE)
+
+file_gene_limdom <- "~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_gene_limdom.list"
+data_gene_limdom <- read.csv(file_gene_limdom,header = TRUE,sep = ",")
+data_SNPs_PARS_cds_limdom <- merge(data_SNPs_PARS_cds,data_gene_limdom,by="gene")
+data_gene_process <- data_SNPs_PARS_cds_limdom["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+dd_gene_dom <- rbind(dd_gene_dom, data.frame(name = "cds_limdom", gene = c(nrow(data_gene_process))))
+write.csv(data_gene_process , file=paste0(path,'/PARS_cds_gene_limdom.csv'), row.names = FALSE)
+write.csv(data_SNPs_PARS_cds_limdom , file=paste0(path,'/data_SNPs_PARS_cds_limdom.csv'), row.names = FALSE)
+
+file_gene_strdom <- "~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_gene_strdom.list"
+data_gene_strdom <- read.csv(file_gene_strdom,header = TRUE,sep = ",")
+data_SNPs_PARS_cds_strdom <- merge(data_SNPs_PARS_cds,data_gene_strdom,by="gene")
+data_gene_process <- data_SNPs_PARS_cds_strdom["gene"]
+data_gene_process <- unique(data_gene_process,fromLast=TRUE)
+dd_gene_dom <- rbind(dd_gene_dom, data.frame(name = "cds_strdom", gene = c(nrow(data_gene_process))))
+write.csv(data_gene_process , file=paste0(path,'/PARS_cds_gene_strdom.csv'), row.names = FALSE)
+write.csv(data_SNPs_PARS_cds_strdom , file=paste0(path,'/data_SNPs_PARS_cds_strdom.csv'), row.names = FALSE)
+
+write.csv(dd_gene_dom , file=paste0(path,'/PARS_cds_gene_dom.csv'), row.names = FALSE)
+
+
+#输入csv
 file_SNPs_PARS_syn <- paste0(path,'/data_SNPs_PARS_syn.csv',collapse = NULL)
 data_SNPs_PARS_syn <- read.csv(file_SNPs_PARS_syn,header = TRUE,sep = ",")
 
