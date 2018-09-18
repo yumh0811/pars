@@ -901,59 +901,6 @@ unset NAME
 # Real Processing n128
 
 ```bash
-export NAME=Scer_n128_Spar
-
-cd ~/data/mrna-structure/process
-
-# SNPs within transcripts
-runlist position --op superset \
-    sce_genes.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.gene.pos.txt
-
-# read gene and snp info file
-# produce ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/read_fold.pl \
-    --pars ../PARS10/pubs/PARS10/data \
-    --gene sce_genes.blast.tsv \
-    --pos  ${NAME}.snp.gene.pos.txt \
-    > fail_pos.txt
-
-# review fail_pos.txt to find SNPs located in overlapped genes
-
-# process ${NAME}.gene_variation.yml
-perl ~/Scripts/pars/process_vars_in_fold.pl --file ${NAME}.gene_variation.yml
-
-# SNPs within orf_genomic regions
-runlist position --op superset \
-    sce_orf_genomic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.orf_genomic.pos.txt
-
-# SNPs within intergenic regions
-runlist position --op superset \
-    sce_intergenic.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intergenic.pos.txt
-
-# SNPs within introns
-runlist position --op superset \
-    sce_intron.yml ../xlsx/${NAME}.snp.pos.txt \
-    -o ${NAME}.snp.intron.pos.txt
-
-# SNPs within utr
-runlist position --op superset \
-    sce_utr.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.utr.pos.txt
-
-# SNPs within cds
-runlist position --op superset \
-    sce_cds.yml ${NAME}.snp.gene.pos.txt \
-    -o ${NAME}.snp.cds.pos.txt
-unset NAME
-
-```
-
-# Real Processing n128
-
-```bash
 #Spar
 export NAME=Scer_n128_Spar
 
