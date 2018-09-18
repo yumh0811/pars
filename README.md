@@ -413,7 +413,6 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 ```
 
 ## Illumina 
-### n128_Spar
 ```bash
 # n128_Spar
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
@@ -455,8 +454,8 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
     -d Scer_n128_Spar -r 1-60
 ```
 
-### n128_Seub
-```bash
+# n128_Seub
+
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
 
