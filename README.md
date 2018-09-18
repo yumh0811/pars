@@ -334,11 +334,12 @@ done
 ```bash
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
+ln -s ~/data/alignment/egaz .
 
 egaz template \
     egaz/S288c egaz/EC1118 egaz/Kyokai_no_7 egaz/RM11_1a egaz/Sigma1278b egaz/T7 egaz/YJM789 egaz/Spar \
     --multi -o multi8/ \
-    --rawphylo --order --parallel 8 -v
+    --rawphylo --order --parallel 16 -v
 bash multi8/1_pair.sh
 bash multi8/2_rawphylo.sh
 bash multi8/3_multi.sh
@@ -348,7 +349,7 @@ egaz template \
     --multi -o multi8/ \
     --multiname Scer_n7_Spar --tree multi8/Results/multi8.nwk --outgroup Spar \
     --vcf --aligndb \
-    --parallel 8 -v
+    --parallel 16 -v
 
 bash multi8/3_multi.sh
 bash multi8/6_chr_length.sh
@@ -364,22 +365,24 @@ perl ~/Scripts/alignDB/alignDB.pl \
     --ensembl saccharomyces_cerevisiae_core_29_82_4 \
     --outgroup \
     --chr ~/data/mrna-structure/alignment/scer_wgs/multi8/Results/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
+    -lt 1000 --parallel 16 --batch 5 \
     --run gene
 
 perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
     -d Scer_n7_Spar -r 1-60
+
 ```
 
 ## PacBio
 ```bash
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
+ln -s ~/data/alignment/egaz .
 
 egaz template \
     egaz/S288c egaz/DBVPG6044 egaz/UWOPS03_461_4 egaz/Y12 egaz/SK1 egaz/YPS128 egaz/DBVPG6765 egaz/Spar \
     --multi -o multi8p/ \
-    --rawphylo --order --parallel 8 -v
+    --rawphylo --order --parallel 16 -v
 bash multi8p/1_pair.sh
 bash multi8p/2_rawphylo.sh
 bash multi8p/3_multi.sh
@@ -389,7 +392,7 @@ egaz template \
     --multi -o multi8p/ \
     --multiname Scer_n7p_Spar --tree multi8p/Results/multi8p.nwk --outgroup Spar \
     --vcf --aligndb \
-    --parallel 8 -v
+    --parallel 16 -v
 
 bash multi8p/3_multi.sh
 bash multi8p/6_chr_length.sh
@@ -405,7 +408,7 @@ perl ~/Scripts/alignDB/alignDB.pl \
     --ensembl saccharomyces_cerevisiae_core_29_82_4 \
     --outgroup \
     --chr ~/data/mrna-structure/alignment/scer_wgs/multi8/Results/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
+    -lt 1000 --parallel 16 --batch 5 \
     --run gene
 
 perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
@@ -418,11 +421,12 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
+ln -s ~/data/alignment/egaz .
 
 egaz template \
     egaz/S288c egaz/beer001 egaz/beer003 egaz/beer004 egaz/beer005 egaz/beer006 egaz/beer007 egaz/beer008 egaz/beer009 egaz/beer010 egaz/beer011 egaz/beer012 egaz/beer013 egaz/beer014 egaz/beer015 egaz/beer016 egaz/beer020 egaz/beer021 egaz/beer022 egaz/beer023 egaz/beer024 egaz/beer025 egaz/beer026 egaz/beer027 egaz/beer028 egaz/beer029 egaz/beer030 egaz/beer031 egaz/beer032 egaz/beer033 egaz/beer034 egaz/beer036 egaz/beer037 egaz/beer038 egaz/beer040 egaz/beer041 egaz/beer043 egaz/beer044 egaz/beer045 egaz/beer046 egaz/beer047 egaz/beer048 egaz/beer049 egaz/beer050 egaz/beer051 egaz/beer052 egaz/beer053 egaz/beer054 egaz/beer055 egaz/beer056 egaz/beer059 egaz/beer061 egaz/beer062 egaz/beer063 egaz/beer064 egaz/beer065 egaz/beer066 egaz/beer067 egaz/beer068 egaz/beer069 egaz/beer070 egaz/beer071 egaz/beer073 egaz/beer075 egaz/beer076 egaz/beer077 egaz/beer078 egaz/beer079 egaz/beer080 egaz/beer081 egaz/beer082 egaz/beer083 egaz/beer084 egaz/beer085 egaz/beer086 egaz/beer087 egaz/beer088 egaz/beer089 egaz/beer090 egaz/beer091 egaz/beer092 egaz/beer094 egaz/beer095 egaz/beer096 egaz/beer097 egaz/beer098 egaz/beer099 egaz/beer100 egaz/beer101 egaz/beer102 egaz/bioethanol001 egaz/bioethanol003 egaz/bioethanol004 egaz/bread001 egaz/bread002 egaz/bread003 egaz/bread004 egaz/sake001 egaz/sake002 egaz/sake003 egaz/sake004 egaz/sake005 egaz/sake006 egaz/sake007 egaz/spirits001 egaz/spirits002 egaz/spirits003 egaz/spirits004 egaz/spirits005 egaz/spirits011 egaz/wine001 egaz/wine003 egaz/wine004 egaz/wine005 egaz/wine006 egaz/wine007 egaz/wine009 egaz/wine010 egaz/wine011 egaz/wine012 egaz/wine013 egaz/wine014 egaz/wine015 egaz/wine017 egaz/wine018 egaz/wild005 egaz/wild006 egaz/wild007 egaz/Spar \
     --multi -o multi128_Spar/ \
-    --rawphylo --order --parallel 8 -v
+    --rawphylo --order --parallel 16 -v
 bash multi128_Spar/1_pair.sh
 bash multi128_Spar/2_rawphylo.sh
 bash multi128_Spar/3_multi.sh
@@ -432,7 +436,7 @@ egaz template \
     --multi -o multi128_Spar/ \
     --multiname Scer_n128_Spar --tree multi128_Spar/Results/multi128_Spar.nwk --outgroup Spar \
     --vcf --aligndb \
-    --parallel 8 -v
+    --parallel 16 -v
 
 bash multi128_Spar/3_multi.sh
 bash multi128_Spar/6_chr_length.sh
@@ -448,7 +452,7 @@ perl ~/Scripts/alignDB/alignDB.pl \
     --ensembl saccharomyces_cerevisiae_core_29_82_4 \
     --outgroup \
     --chr ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/Results/chr_length.csv \
-    -lt 1000 --parallel 8 --batch 5 \
+    -lt 1000 --parallel 16 --batch 5 \
     --run gene
 
 perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
@@ -458,11 +462,12 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
+ln -s ~/data/alignment/egaz .
 
 egaz template \
     egaz/S288c egaz/beer001 egaz/beer003 egaz/beer004 egaz/beer005 egaz/beer006 egaz/beer007 egaz/beer008 egaz/beer009 egaz/beer010 egaz/beer011 egaz/beer012 egaz/beer013 egaz/beer014 egaz/beer015 egaz/beer016 egaz/beer020 egaz/beer021 egaz/beer022 egaz/beer023 egaz/beer024 egaz/beer025 egaz/beer026 egaz/beer027 egaz/beer028 egaz/beer029 egaz/beer030 egaz/beer031 egaz/beer032 egaz/beer033 egaz/beer034 egaz/beer036 egaz/beer037 egaz/beer038 egaz/beer040 egaz/beer041 egaz/beer043 egaz/beer044 egaz/beer045 egaz/beer046 egaz/beer047 egaz/beer048 egaz/beer049 egaz/beer050 egaz/beer051 egaz/beer052 egaz/beer053 egaz/beer054 egaz/beer055 egaz/beer056 egaz/beer059 egaz/beer061 egaz/beer062 egaz/beer063 egaz/beer064 egaz/beer065 egaz/beer066 egaz/beer067 egaz/beer068 egaz/beer069 egaz/beer070 egaz/beer071 egaz/beer073 egaz/beer075 egaz/beer076 egaz/beer077 egaz/beer078 egaz/beer079 egaz/beer080 egaz/beer081 egaz/beer082 egaz/beer083 egaz/beer084 egaz/beer085 egaz/beer086 egaz/beer087 egaz/beer088 egaz/beer089 egaz/beer090 egaz/beer091 egaz/beer092 egaz/beer094 egaz/beer095 egaz/beer096 egaz/beer097 egaz/beer098 egaz/beer099 egaz/beer100 egaz/beer101 egaz/beer102 egaz/bioethanol001 egaz/bioethanol003 egaz/bioethanol004 egaz/bread001 egaz/bread002 egaz/bread003 egaz/bread004 egaz/sake001 egaz/sake002 egaz/sake003 egaz/sake004 egaz/sake005 egaz/sake006 egaz/sake007 egaz/spirits001 egaz/spirits002 egaz/spirits003 egaz/spirits004 egaz/spirits005 egaz/spirits011 egaz/wine001 egaz/wine003 egaz/wine004 egaz/wine005 egaz/wine006 egaz/wine007 egaz/wine009 egaz/wine010 egaz/wine011 egaz/wine012 egaz/wine013 egaz/wine014 egaz/wine015 egaz/wine017 egaz/wine018 egaz/wild005 egaz/wild006 egaz/wild007 egaz/Seub \
     --multi -o multi128_Seub/ \
-    --rawphylo --order --parallel 8 -v
+    --rawphylo --order --parallel 16 -v
 bash multi128_Seub/1_pair.sh
 bash multi128_Seub/2_rawphylo.sh
 bash multi128_Seub/3_multi.sh
@@ -472,7 +477,7 @@ egaz template \
     --multi -o multi128_Seub/ \
     --multiname Scer_n128_Seub --tree multi128_Seub/Results/multi128_Seub.nwk --outgroup Seub \
     --vcf --aligndb \
-    --parallel 8 -v
+    --parallel 16 -v
 
 bash multi128_Seub/3_multi.sh
 bash multi128_Seub/6_chr_length.sh
