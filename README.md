@@ -1016,46 +1016,45 @@ perl ~/Scripts/pars/program/protein_coding_list.pl --file ~/data/mrna-structure/
 perl ~/Scripts/pars/program/protein_coding_list_range.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range.csv
 
 perl ~/Scripts/pars/program/protein_coding_list_range_chr.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range_chr.csv
-
 ```
 
-## cut cds alignment
+## cut mRNA alignment
 
-### create cds_yml
+### create mRNA_yml
 
 ```bash
 cd ~/data/mrna-structure/phylogeny
-mkdir -p ~/data/mrna-structure/phylogeny/gene_cds_yml
+mkdir -p ~/data/mrna-structure/phylogeny/gene_mRNA_yml
 
-perl ~/Scripts/pars/program/cut_cds_yml.pl --file protein_coding_list_range_chr.csv --output gene_cds_yml
-
+#cut mRNA in Scer.gff
+perl ~/Scripts/pars/program/cut_mRNA_yml.pl --file protein_coding_list_range_chr.csv --output gene_mRNA_yml
 ```
 
-### cut cds_alignment by cds_yml
+### cut cds_alignment by mRNA_yml
 
 ```bash
 
 export NAME=Scer_n7_Spar
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi8/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
 cd ~/data/mrna-structure/phylogeny/${NAME}_refined
 gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
-cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
 cat ../protein_coding_list.csv |
    parallel --line-buffer -j 8 '
-   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
    '
 unset NAME
 
 export NAME=Scer_n7p_Spar
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi8p/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
 cd ~/data/mrna-structure/phylogeny/${NAME}_refined
 gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
-cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
 cat ../protein_coding_list.csv |
    parallel --line-buffer -j 8 '
-   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
    '
 unset NAME
 
@@ -1063,11 +1062,11 @@ export NAME=Scer_n128_Spar
 cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
 cd ~/data/mrna-structure/phylogeny/${NAME}_refined
 gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
-cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
 cat ../protein_coding_list.csv |
-   parallel --line-buffer -j 16 '
-   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   parallel --line-buffer -j 8 '
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
    '
 unset NAME
 
@@ -1075,11 +1074,11 @@ export NAME=Scer_n128_Seub
 cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Seub/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
 cd ~/data/mrna-structure/phylogeny/${NAME}_refined
 gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
-cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_cds
+mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
+cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
 cat ../protein_coding_list.csv |
-   parallel --line-buffer -j 16 '
-   	   fasops slice ../${NAME}_refined/species.fas ../gene_cds_yml/{}.yml -n S288c -o {}.fas.fas
+   parallel --line-buffer -j 8 '
+   	   fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
    '
 unset NAME
 ```
