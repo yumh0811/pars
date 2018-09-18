@@ -1302,7 +1302,7 @@ unset NAME
 
 ## count per gene cds_utr
 ```bash
-export NAME=Scer_n157_nonMosaic_Spar
+export NAME=Scer_n128_Spar
 perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_cds.yml --output stem_loop_cds_length.csv 
 perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_utr.yml --output stem_loop_utr_length.csv
 perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_per_gene_ATGC.csv
