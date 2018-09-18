@@ -415,6 +415,7 @@ perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
 ## Illumina 
 ```bash
 # n128_Spar
+
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
 
@@ -1090,7 +1091,7 @@ export NAME=Scer_n7p_Spar
 cd ~/data/mrna-structure/phylogeny
 perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
 unset NAME
-
+ 
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/phylogeny
 perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
