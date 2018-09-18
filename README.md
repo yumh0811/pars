@@ -452,7 +452,6 @@ perl ~/Scripts/alignDB/alignDB.pl \
 
 perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
     -d Scer_n128_Spar -r 1-60
-```
 
 # n128_Seub
 
@@ -778,7 +777,6 @@ for f in genes intergenic intron orf_genomic utr mRNA cds; do
 done >> coverage.stat.md
 
 cat coverage.stat.md
-
 ```
 
 | Name | chrLength | size | coverage |
@@ -841,7 +839,6 @@ runlist position --op superset \
     sce_cds.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.cds.pos.txt
 unset NAME
-
 ```
 
 # Real Processing n7p
@@ -894,7 +891,6 @@ runlist position --op superset \
     sce_cds.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.cds.pos.txt
 unset NAME
-
 ```
 
 # Real Processing n128
@@ -997,7 +993,6 @@ runlist position --op superset \
     sce_cds.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.cds.pos.txt
 unset NAME
-
 ```
 
 # Phylogeny
@@ -1092,11 +1087,6 @@ perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range
 unset NAME
 
 export NAME=Scer_n7p_Spar
-cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
-unset NAME
-
-export NAME=Scer_n157_Spar
 cd ~/data/mrna-structure/phylogeny
 perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
 unset NAME
