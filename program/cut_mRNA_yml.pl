@@ -15,7 +15,7 @@ use Path::Tiny;
 
 =head1 SYNOPSIS
 
-    perl ~/Scripts/pars/program/cut_cds_yml.pl --file ~/data/mrna-structure/phylogeny/protein_coding_list_range_chr.csv --output gene_cds_all_yml
+    perl ~/Scripts/pars/program/cut_mRNA_yml.pl --file ~/data/mrna-structure/phylogeny/protein_coding_list_range_chr.csv --output gene_mRNA_yml
 
 =cut
 
