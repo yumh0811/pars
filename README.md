@@ -1030,7 +1030,7 @@ mkdir -p ~/data/mrna-structure/phylogeny/gene_mRNA_yml
 perl ~/Scripts/pars/program/cut_mRNA_yml.pl --file protein_coding_list_range_chr.csv --output gene_mRNA_yml
 ```
 
-### cut cds_alignment by mRNA_yml
+### cut alignment by mRNA_yml
 
 ```bash
 
