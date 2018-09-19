@@ -353,7 +353,6 @@ egaz template \
 
 bash multi8/3_multi.sh
 bash multi8/6_chr_length.sh
-bash multi8/7_multi_aligndb.sh
 
 mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
@@ -370,7 +369,6 @@ perl ~/Scripts/alignDB/alignDB.pl \
 
 perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
     -d Scer_n7_Spar -r 1-60
-
 ```
 
 ## PacBio
@@ -396,7 +394,6 @@ egaz template \
 
 bash multi8p/3_multi.sh
 bash multi8p/6_chr_length.sh
-bash multi8p/7_multi_aligndb.sh
 
 mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
@@ -440,7 +437,6 @@ egaz template \
 
 bash multi128_Spar/3_multi.sh
 bash multi128_Spar/6_chr_length.sh
-bash multi128_Spar/7_multi_aligndb.sh
 
 mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
@@ -481,7 +477,6 @@ egaz template \
 
 bash multi128_Seub/3_multi.sh
 bash multi128_Seub/6_chr_length.sh
-bash multi128_Seub/7_multi_aligndb.sh
 
 mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
