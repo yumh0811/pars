@@ -400,11 +400,11 @@ cd ~/data/mrna-structure/xlsx
 
 perl ~/Scripts/alignDB/alignDB.pl \
     -d Scer_n7p_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/multi8/Scer_n7p_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/multi8/Results/anno.yml\
+    -da ~/data/mrna-structure/alignment/scer_wgs/multi8p/Scer_n7p_Spar_refined \
+    -a ~/data/mrna-structure/alignment/scer_wgs/multi8p/Results/anno.yml\
     --ensembl saccharomyces_cerevisiae_core_29_82_4 \
     --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/multi8/Results/chr_length.csv \
+    --chr ~/data/mrna-structure/alignment/scer_wgs/multi8p/Results/chr_length.csv \
     -lt 1000 --parallel 16 --batch 5 \
     --run gene
 
