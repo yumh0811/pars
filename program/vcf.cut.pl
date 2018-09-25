@@ -23,7 +23,7 @@ use Data::Dumper "Dumper";
 =head1 SYNOPSIS
     
     cd /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/
-    perl cut.pl --file chr1.gvcf --output chr1.tsv
+    perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.gvcf --output 1011Matrix.tsv
 
 =cut
 
