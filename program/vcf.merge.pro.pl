@@ -87,9 +87,11 @@ while (<$tsv_fh>) {
             $content[16] = ${$chi}{'chisq_statistic'};
             $content[17] = ${$chi}{'p_value'};
         }
-        my $content = join "\t", @content;
-        open OUT, '>>', $output;
-        print OUT $content, "\n";
+        if (($content[14] > 0) && ($content[14] < 1)){
+        		my $content = join "\t", @content;
+        		open OUT, '>>', $output;
+        		print OUT $content, "\n";
+        }
     }
 }
 
