@@ -1111,19 +1111,23 @@ unset NAME
 #生成alignment_proporation_1.list
 
 export NAME=Scer_n7_Spar
-Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+cd ~/data/mrna-structure/phylogeny
+Rscript ~/Scripts/pars/program/distance_processed.R -i ${NAME}_gene_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_distance_processed_pro_1.csv
 unset NAME
 
 export NAME=Scer_n7p_Spar
-Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+cd ~/data/mrna-structure/phylogeny
+Rscript ~/Scripts/pars/program/distance_processed.R -i ${NAME}_gene_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_distance_processed_pro_1.csv
 unset NAME
 
 export NAME=Scer_n128_Spar
-Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+cd ~/data/mrna-structure/phylogeny
+Rscript ~/Scripts/pars/program/distance_processed.R -i ${NAME}_gene_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_distance_processed_pro_1.csv
 unset NAME
 
 export NAME=Scer_n128_Seub
-Rscript ~/Scripts/pars/program/${NAME}_distance_processed.R
+cd ~/data/mrna-structure/phylogeny
+Rscript ~/Scripts/pars/program/distance_processed.R -i ${NAME}_gene_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_distance_processed_pro_1.csv
 unset NAME
 ```
 
