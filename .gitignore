@@ -40,7 +40,3 @@ xlsx
 *.log
 *.bak
 *.swp
-
-pacbio.pl
-
-sanger.pl
