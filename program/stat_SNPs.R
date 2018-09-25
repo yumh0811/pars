@@ -1,4 +1,35 @@
-name <- "Scer_n7p_Spar" 
+#!/usr/bin/env Rscript
+
+library(plyr)
+library(getopt)
+library(ape)
+
+spec = matrix(
+    c(
+        "help",
+        "h",
+        0,
+        "logical",
+        "brief help message",
+
+        "name",
+        "n",
+        1,
+        "character",
+        "input name",
+        
+        "outfile",
+        "o",
+        1,
+        "character",
+        "output filename"
+    ),
+    byrow = TRUE,
+    ncol = 5
+)
+opt = getopt(spec)
+
+name <- opt$name
 path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
 setwd(path)
 
