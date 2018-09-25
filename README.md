@@ -1326,9 +1326,15 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output n
 unset NAME
 
 # wild.strains in 1011
-cd ~/yumh/data/vcf/1011Matrix.gvcf
-bcftools view chr1.gvcf -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU | bcftools +fill-tags -o chr1.subset.vcf
-perl cut.pl --file chr1.subset.vcf --output chr1.subset.tsv
+cd ~/data/mrna-structure/vcf/1011Matrix.gvcf
+
+cat 1011Matrix.gvcf | perl -p -e 's/^(chromosome4\t193242)/#$1,/;' > 1011Matrix.gvcf.bak
+
+bcftools view 1011Matrix.gvcf.bak -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU | bcftools +fill-tags -o 1011Matrix.wild.gvcf.bak
+
+perl cut.pl --file 1011Matrix.wild.gvcf --output 1011Matrix.wild.tsv
+
+
 perl merge_pre.pl --file ~/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
 perl extract.pl --file chr1.subset.tsv --output chr1.subset.ext.tsv
 Rscript merge.subset.R
