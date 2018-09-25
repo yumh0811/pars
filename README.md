@@ -1000,32 +1000,6 @@ runlist position --op superset \
 unset NAME
 ```
 
-# vcf
-```bash
-mkdir -p ~/data/mrna-structure/vcf
-cd ~/data/mrna-structure/vcf
-wget -c http://1002genomes.u-strasbg.fr/files/1011Matrix.gvcf.gz
-gzip -d 1011Matrix.gvcf.gz
-
-# chr1 1011
-cd ~/data/vcf/1011Matrix.gvcf
-perl cut.pl --file chr1.gvcf --output chr1.tsv
-perl merge_pre.pl --file ~/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
-perl extract.pl --file chr1.tsv --output chr1.ext.tsv
-Rscript merge.R
-perl merge_pro.pl --file chr1.merge.tsv --output chr1.merge.pro.tsv
-
-
-# chr1 wild.strains
-cd ~/yumh/data/vcf/1011Matrix.gvcf
-bcftools view chr1.gvcf -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU | bcftools +fill-tags -o chr1.subset.vcf
-perl cut.pl --file chr1.subset.vcf --output chr1.subset.tsv
-perl merge_pre.pl --file ~/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
-perl extract.pl --file chr1.subset.tsv --output chr1.subset.ext.tsv
-Rscript merge.subset.R
-perl merge_pro.pl --file chr1.merge.subset.tsv --output chr1.merge.subset.pro.tsv
-```
-
 # Phylogeny
 
 ## create protein coding gene list
@@ -1067,7 +1041,7 @@ mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
 cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
 cat ../protein_coding_list.csv |
    parallel --line-buffer -j 8 '
-   	   fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
+       fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
    '
 unset NAME
 
@@ -1079,7 +1053,7 @@ mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
 cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
 cat ../protein_coding_list.csv |
    parallel --line-buffer -j 8 '
-   	   fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
+       fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
    '
 unset NAME
 
@@ -1108,28 +1082,28 @@ cat ../protein_coding_list.csv |
 unset NAME
 ```
 
-### count cds_alignment proporation in sgd
+### count mRNA_alignment proporation in sgd
 
 ```bash
 
 export NAME=Scer_n7_Spar
 cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_gene_range.csv
 unset NAME
 
 export NAME=Scer_n7p_Spar
 cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_gene_range.csv
 unset NAME
  
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_gene_range.csv
 unset NAME
 
 export NAME=Scer_n128_Seub
 cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_cds --output ${NAME}_gene_range.csv
+perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_gene_range.csv
 unset NAME
 ```
 
@@ -1339,4 +1313,35 @@ perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS
 perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr_per_gene_ATGC.csv
 Rscript ~/Scripts/pars/program/$NAME_cds_utr.R
 unset NAME
+```
+
+# vcf
+```bash
+mkdir -p ~/data/mrna-structure/vcf
+cd ~/data/mrna-structure/vcf
+wget -c http://1002genomes.u-strasbg.fr/files/1011Matrix.gvcf.gz
+gzip -d 1011Matrix.gvcf.gz
+
+#ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf.gz .
+#mkdir -p ~/data/mrna-structure/vcf/1011Matrix.gvcf
+#cd 1011Matrix.gvcf/
+#ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/1011Matrix.gvcf .
+
+# 1011
+cd ~/data/vcf/1011Matrix.gvcf
+perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.gvcf --output 1011Matrix.tsv
+perl ~/Scripts/pars/program/vcf.merge_pre.pl --file ~/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
+perl extract.pl --file chr1.tsv --output chr1.ext.tsv
+Rscript merge.R
+perl merge_pro.pl --file chr1.merge.tsv --output chr1.merge.pro.tsv
+
+
+# wild.strains in 1011
+cd ~/yumh/data/vcf/1011Matrix.gvcf
+bcftools view chr1.gvcf -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU | bcftools +fill-tags -o chr1.subset.vcf
+perl cut.pl --file chr1.subset.vcf --output chr1.subset.tsv
+perl merge_pre.pl --file ~/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
+perl extract.pl --file chr1.subset.tsv --output chr1.subset.ext.tsv
+Rscript merge.subset.R
+perl merge_pro.pl --file chr1.merge.subset.tsv --output chr1.merge.subset.pro.tsv
 ```
