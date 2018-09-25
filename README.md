@@ -1002,7 +1002,8 @@ unset NAME
 
 # vcf
 ```bash
-mkdir -p ~/data/vcf
+mkdir -p ~/data/mrna-structure/vcf
+cd ~/data/mrna-structure/vcf
 wget -c http://1002genomes.u-strasbg.fr/files/1011Matrix.gvcf.gz
 gzip -d 1011Matrix.gvcf.gz
 
