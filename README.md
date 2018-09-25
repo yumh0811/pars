@@ -1235,6 +1235,7 @@ perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file data_SNPs_PARS_nsy.csv.bak
 rm -rf data_SNPs_PARS_nsy.csv.bak
 
 perl ~/Scripts/pars/program/vcf.extract.pl --file ../1011Matrix.tsv --output 1011Matrix.ext.tsv
+
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a cds
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a utr
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a syn
@@ -1260,6 +1261,7 @@ perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file data_SNPs_PARS_nsy.csv.bak
 rm -rf data_SNPs_PARS_nsy.csv.bak
 
 perl ~/Scripts/pars/program/vcf.extract.pl --file ../1011Matrix.tsv --output 1011Matrix.ext.tsv
+
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a cds
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a utr
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a syn
@@ -1285,6 +1287,7 @@ perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file data_SNPs_PARS_nsy.csv.b
 rm -rf data_SNPs_PARS_nsy.csv.bak
 
 perl ~/Scripts/pars/program/vcf.extract.pl --file ../1011Matrix.tsv --output 1011Matrix.ext.tsv
+
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a cds
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a utr
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a syn
@@ -1310,6 +1313,7 @@ perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file data_SNPs_PARS_nsy.csv.b
 rm -rf data_SNPs_PARS_nsy.csv.bak
 
 perl ~/Scripts/pars/program/vcf.extract.pl --file ../1011Matrix.tsv --output 1011Matrix.ext.tsv
+
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a cds
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a utr
 Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a syn
