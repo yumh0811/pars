@@ -1218,13 +1218,108 @@ gzip -d 1011Matrix.gvcf.gz
 #ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/1011Matrix.gvcf .
 
 # 1011
-cd ~/data/vcf/1011Matrix.gvcf
+cd ~/data/mrna-structure/vcf/1011Matrix.gvcf
 perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.gvcf --output 1011Matrix.tsv
-perl ~/Scripts/pars/program/vcf.merge_pre.pl --file ~/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
-perl extract.pl --file chr1.tsv --output chr1.ext.tsv
-Rscript merge.R
-perl merge_pro.pl --file chr1.merge.tsv --output chr1.merge.pro.tsv
 
+export NAME=Scer_n7_Spar
+mkdir -p ~/data/mrna-structure/vcf/1011Matrix.gvcf/$NAME
+cd ~/data/mrna-structure/vcf/1011Matrix.gvcf/$NAME
+
+perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds.pars.tsv
+perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr.pars.tsv
+cat ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_syn.csv | perl -p -e 's/^(.+?),(.+?),/$2,$1,/;' > data_SNPs_PARS_syn.csv.bak
+perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file data_SNPs_PARS_syn.csv.bak --output data_SNPs_PARS_syn.pars.tsv
+rm -rf data_SNPs_PARS_syn.csv.bak
+cat ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_nsy.csv | perl -p -e 's/^(.+?),(.+?),/$2,$1,/;' > data_SNPs_PARS_nsy.csv.bak
+perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file data_SNPs_PARS_nsy.csv.bak --output data_SNPs_PARS_nsy.pars.tsv
+rm -rf data_SNPs_PARS_nsy.csv.bak
+
+perl ~/Scripts/pars/program/vcf.extract.pl --file ../1011Matrix.tsv --output 1011Matrix.ext.tsv
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a cds
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a utr
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a syn
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a nsy
+
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output cds_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output utr_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output syn_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output nsy_snp.merge.pro.tsv
+unset NAME
+
+export NAME=Scer_n7p_Spar
+mkdir -p ~/data/mrna-structure/vcf/1011Matrix.gvcf/$NAME
+cd ~/data/mrna-structure/vcf/1011Matrix.gvcf/$NAME
+
+perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds.pars.tsv
+perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr.pars.tsv
+cat ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_syn.csv | perl -p -e 's/^(.+?),(.+?),/$2,$1,/;' > data_SNPs_PARS_syn.csv.bak
+perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file data_SNPs_PARS_syn.csv.bak --output data_SNPs_PARS_syn.pars.tsv
+rm -rf data_SNPs_PARS_syn.csv.bak
+cat ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_nsy.csv | perl -p -e 's/^(.+?),(.+?),/$2,$1,/;' > data_SNPs_PARS_nsy.csv.bak
+perl ~/Scripts/pars/program/vcf.merge.pre_7.pl --file data_SNPs_PARS_nsy.csv.bak --output data_SNPs_PARS_nsy.pars.tsv
+rm -rf data_SNPs_PARS_nsy.csv.bak
+
+perl ~/Scripts/pars/program/vcf.extract.pl --file ../1011Matrix.tsv --output 1011Matrix.ext.tsv
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a cds
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a utr
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a syn
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a nsy
+
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output cds_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output utr_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output syn_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output nsy_snp.merge.pro.tsv
+unset NAME
+
+export NAME=Scer_n128_Spar
+mkdir -p ~/data/mrna-structure/vcf/1011Matrix.gvcf/$NAME
+cd ~/data/mrna-structure/vcf/1011Matrix.gvcf/$NAME
+
+perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds.pars.tsv
+perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr.pars.tsv
+cat ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_syn.csv | perl -p -e 's/^(.+?),(.+?),/$2,$1,/;' > data_SNPs_PARS_syn.csv.bak
+perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file data_SNPs_PARS_syn.csv.bak --output data_SNPs_PARS_syn.pars.tsv
+rm -rf data_SNPs_PARS_syn.csv.bak
+cat ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_nsy.csv | perl -p -e 's/^(.+?),(.+?),/$2,$1,/;' > data_SNPs_PARS_nsy.csv.bak
+perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file data_SNPs_PARS_nsy.csv.bak --output data_SNPs_PARS_nsy.pars.tsv
+rm -rf data_SNPs_PARS_nsy.csv.bak
+
+perl ~/Scripts/pars/program/vcf.extract.pl --file ../1011Matrix.tsv --output 1011Matrix.ext.tsv
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a cds
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a utr
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a syn
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a nsy
+
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output cds_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output utr_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output syn_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output nsy_snp.merge.pro.tsv
+unset NAME
+
+export NAME=Scer_n128_Seub
+mkdir -p ~/data/mrna-structure/vcf/1011Matrix.gvcf/$NAME
+cd ~/data/mrna-structure/vcf/1011Matrix.gvcf/$NAME
+
+perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds.pars.tsv
+perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr.pars.tsv
+cat ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_syn.csv | perl -p -e 's/^(.+?),(.+?),/$2,$1,/;' > data_SNPs_PARS_syn.csv.bak
+perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file data_SNPs_PARS_syn.csv.bak --output data_SNPs_PARS_syn.pars.tsv
+rm -rf data_SNPs_PARS_syn.csv.bak
+cat ~/data/mrna-structure/result/$NAME/data_SNPs_PARS_nsy.csv | perl -p -e 's/^(.+?),(.+?),/$2,$1,/;' > data_SNPs_PARS_nsy.csv.bak
+perl ~/Scripts/pars/program/vcf.merge.pre_128.pl --file data_SNPs_PARS_nsy.csv.bak --output data_SNPs_PARS_nsy.pars.tsv
+rm -rf data_SNPs_PARS_nsy.csv.bak
+
+perl ~/Scripts/pars/program/vcf.extract.pl --file ../1011Matrix.tsv --output 1011Matrix.ext.tsv
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a cds
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a utr
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a syn
+Rscript ~/Scripts/pars/program/vcf.merge.R -n $NAME -a nsy
+
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output cds_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output utr_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output syn_snp.merge.pro.tsv
+perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output nsy_snp.merge.pro.tsv
+unset NAME
 
 # wild.strains in 1011
 cd ~/yumh/data/vcf/1011Matrix.gvcf

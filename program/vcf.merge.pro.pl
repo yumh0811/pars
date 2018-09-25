@@ -18,6 +18,7 @@ use Data::Dumper "Dumper";
 
 use Statistics::ChisqIndep;
 use POSIX;
+
 #----------------------------------------------------------#
 # GetOpt section
 #----------------------------------------------------------#
@@ -46,7 +47,7 @@ while (<$tsv_fh>) {
     if (m/^name/) {
         my @content = split /\t/, $_;
         splice @content, 10, 1;
-        $content[9] = "mutant_to_vcf";
+        $content[9]  = "mutant_to_vcf";
         $content[11] = "REF_vcf";
         $content[13] = "ALT_vcf";
         push @content, "freq_vcf";
@@ -54,32 +55,41 @@ while (<$tsv_fh>) {
         push @content, "chi";
         push @content, "p-valve";
         my $content = join "\t", @content;
-        open OUT,'>>',$output;
+        open OUT, '>>', $output;
         print OUT $content, "\n";
-    }else{
-    		my @content = split /\t/, $_;
-    		if ($content[8] == 0){
-    				$content[9] = "$content[9]->$content[10]"
-    		}else{
-    				$content[9] = "$content[10]->$content[9]"
-            }
-            splice @content, 10, 1;
-            if ($content[8] == 0){
-                    $content[14] = $content[12] if($content[3] eq $content[9]);
-            }else{
-                    $content[14] = 1 - $content[12] if($content[3] eq $content[9]);
-            }
-            $content[13] = $content[13] - $content[11] if($content[14]);
-            $content[15] = $content[5] - $content[14] if($content[14] ne undef);
-            my $obs = [[$content[6], $content[7]], [$content[11],$content[13]]];
-			my $chi = new Statistics::ChisqIndep;
-			$chi->load_data($obs);
-			$chi->print_summary();
-            $content[16] = ${$chi}{'chisq_statistic'} ;
+    }
+    else {
+        my @content = split /\t/, $_;
+        if ( $content[8] == 0 ) {
+            $content[9] = "$content[9]->$content[10]";
+        }
+        else {
+            $content[9] = "$content[10]->$content[9]";
+        }
+        splice @content, 10, 1;
+        if ( $content[8] == 0 ) {
+            $content[14] = $content[12] if ( $content[3] eq $content[9] );
+            $content[11] = $content[13] - $content[11] if ( $content[14] );
+        	  $content[13] = $content[13] - $content[11] if ( $content[14] );
+        }
+        else {
+            $content[14] = 1 - $content[12] if ( $content[3] eq $content[9] );
+            $content[13] = $content[13] - $content[11] if ( $content[14] );
+        }
+        
+        $content[15] = $content[5] - $content[14]  if ( $content[14] );
+        if ( $content[14] ) {
+            my $obs =
+              [ [ $content[6], $content[7] ], [ $content[11], $content[13] ] ];
+            my $chi = new Statistics::ChisqIndep;
+            $chi->load_data($obs);
+            $chi->print_summary();
+            $content[16] = ${$chi}{'chisq_statistic'};
             $content[17] = ${$chi}{'p_value'};
-            my $content = join "\t", @content;
-            open OUT,'>>',$output;
-            print OUT $content, "\n";
+        }
+        my $content = join "\t", @content;
+        open OUT, '>>', $output;
+        print OUT $content, "\n";
     }
 }
 

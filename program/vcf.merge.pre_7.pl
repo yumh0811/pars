@@ -23,7 +23,7 @@ use Data::Dumper "Dumper";
 =head1 SYNOPSIS
     
     cd /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/
-    perl merge_pre.pl --file /Users/yumh/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
+    perl vcf.merge.pre.pl --file /Users/yumh/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
 
 =cut
 
@@ -56,7 +56,6 @@ while (<$csv_fh>) {
         open OUT,'>>',$output;;
         print OUT $content_new, "\n";
     }else{
-    		if (m/^I:/){
         		my @content = split /,/, $_;
         		my @content_new;
         		$content_new[0] = $content[0];
@@ -70,19 +69,18 @@ while (<$csv_fh>) {
         		#}
         		$content_new[3] = $content[10];
         		$content_new[4] = $content[11];
-        		$content_new[5] = $content[11]/128;
+        		$content_new[5] = $content[11]/7;
         		if ($content[13] == 0){
         				$content_new[6] = $content[11];
         		}else{
-        				$content_new[6] = 128-$content[11];
+        				$content_new[6] = 7-$content[11];
         		}
-        		$content_new[7] = 128-$content_new[6];
+        		$content_new[7] = 7-$content_new[6];
         		$content_new[8] = $content[13];
         		my $content_new = join "\t", @content_new;
         		my $content = join "\t", @content;
         		open OUT,'>>',$output;;
         		print OUT $content_new, "\n";
-        }
     }
 }
 
