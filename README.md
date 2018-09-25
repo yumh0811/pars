@@ -1336,28 +1336,3 @@ perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS
 Rscript ~/Scripts/pars/program/$NAME_cds_utr.R
 unset NAME
 ```
-
-# vcf
-```bash
-mkdir ~/data/vcf
-wget -c http://1002genomes.u-strasbg.fr/files/1011Matrix.gvcf.gz
-gzip -d 1011Matrix.gvcf.gz
-
-# chr1 1011
-cd ~/data/vcf/1011Matrix.gvcf
-perl cut.pl --file chr1.gvcf --output chr1.tsv
-perl merge_pre.pl --file ~/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
-perl extract.pl --file chr1.tsv --output chr1.ext.tsv
-Rscript merge.R
-perl merge_pro.pl --file chr1.merge.tsv --output chr1.merge.pro.tsv
-
-
-# chr1 wild.strains
-cd ~/yumh/data/vcf/1011Matrix.gvcf
-bcftools view chr1.gvcf -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU | bcftools +fill-tags -o chr1.subset.vcf
-perl cut.pl --file chr1.subset.vcf --output chr1.subset.tsv
-perl merge_pre.pl --file ~/data/mrna-structure/result/Scer_n128_Spar/data_SNPs_PARS_cds.csv --output chr1.pars.tsv
-perl extract.pl --file chr1.subset.tsv --output chr1.subset.ext.tsv
-Rscript merge.subset.R
-perl merge_pro.pl --file chr1.merge.subset.tsv --output chr1.merge.subset.pro.tsv
-```
