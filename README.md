@@ -1179,6 +1179,7 @@ Rscript -e 'install.packages("proto", repos="https://mirrors.tuna.tsinghua.edu.c
 Rscript -e 'install.packages("gsubfn", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 Rscript -e 'install.packages("RSQLite", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 Rscript -e 'install.packages("sqldf", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
+Rscript -e 'install.packages("sm", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 
 export NAME=Scer_n7_Spar
 cd ~/data/mrna-structure/result/${NAME}
@@ -1605,11 +1606,12 @@ unset NAME
 ## count per gene cds_utr
 ```bash
 export NAME=Scer_n128_Spar
+cd ~/data/mrna-structure/result/${NAME} 
 perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_cds.yml --output stem_loop_cds_length.csv 
 perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_utr.yml --output stem_loop_utr_length.csv
 perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_per_gene_ATGC.csv
 perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr_per_gene_ATGC.csv
-Rscript ~/Scripts/pars/program/${NAME}_cds_utr.R
+Rscript ~/Scripts/pars/program/count_cds_utr.R -n ${NAME}
 unset NAME
 ```
 
