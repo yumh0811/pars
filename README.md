@@ -1601,17 +1601,6 @@ Rscript ~/Scripts/pars/program/count_AT_GC_codon.R -n ${NAME}
 unset NAME
 
 ```
-## count GO KEGG
-```bash
-export NAME=Scer_n128_Spar
-cd ~/data/mrna-structure/result/${NAME} 
-mkdir -p freq_10/GO
-mkdir -p freq_10/KEGG
-Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC_GO.R
-Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC_KEGG.R
-unset NAME
-
-```
 
 ## count per gene cds_utr
 ```bash
@@ -1624,3 +1613,14 @@ Rscript ~/Scripts/pars/program/${NAME}_cds_utr.R
 unset NAME
 ```
 
+## count GO KEGG
+```bash
+export NAME=Scer_n128_Spar
+cd ~/data/mrna-structure/result/${NAME} 
+mkdir -p freq_10/GO
+mkdir -p freq_10/KEGG
+Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC_GO.R
+Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC_KEGG.R
+unset NAME
+
+```
