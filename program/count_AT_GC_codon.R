@@ -1,23 +1,52 @@
-name <- "Scer_n128_Spar" 
-path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
-setwd(path)
+#!/usr/bin/env Rscript
+
+library(plyr)
+library(getopt)
+library(ape)
 
 library(ggplot2)
 library(scales)
 library(reshape)
 library(pander)
 library(gridExtra)
-library(plyr)
 library(dplyr)
 library(proto)
 library(gsubfn)
 library(RSQLite)
 library(sqldf)
 
+spec = matrix(
+    c(
+        "help",
+        "h",
+        0,
+        "logical",
+        "brief help message",
 
+        "name",
+        "n",
+        1,
+        "character",
+        "input name",
+       
+        "outfile",
+        "o",
+        1,
+        "character",
+        "output filename"
+    ),
+    byrow = TRUE,
+    ncol = 5
+)
+opt = getopt(spec)
+
+name <- opt$name
+area <- opt$area
+path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
+setwd(path)
 
 #输入csv
-file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds_codon.csv',collapse = NULL)
+file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.update_codon.csv',collapse = NULL)
 data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
 
 #codon
