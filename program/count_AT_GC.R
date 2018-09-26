@@ -1,7 +1,7 @@
-name <- "Scer_n128_Seub" 
-path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
-setwd(path)
+#!/usr/bin/env Rscript
 
+library(getopt)
+library(ape)
 library(ggplot2)
 library(scales)
 library(reshape)
@@ -14,14 +14,43 @@ library(gsubfn)
 library(RSQLite)
 library(sqldf)
 
+spec = matrix(
+    c(
+        "help",
+        "h",
+        0,
+        "logical",
+        "brief help message",
+
+        "name",
+        "n",
+        1,
+        "character",
+        "input name",
+        
+        "outfile",
+        "o",
+        1,
+        "character",
+        "output filename"
+    ),
+    byrow = TRUE,
+    ncol = 5
+)
+opt = getopt(spec)
+
+name <- opt$name
+path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
+setwd(path)
+
 #输入csv
-file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.csv',collapse = NULL)
+file_SNPs_PARS_cds <- paste0("data_SNPs_PARS_cds.update",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
-file_SNPs_PARS_utr <- paste0(path,'/data_SNPs_PARS_utr.csv',collapse = NULL)
+file_SNPs_PARS_utr <- paste0("data_SNPs_PARS_utr.update",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_utr <- read.csv(file_SNPs_PARS_utr,header = TRUE,sep = ",")
-file_SNPs_PARS_syn <- paste0(path,'/data_SNPs_PARS_syn.csv',collapse = NULL)
+file_SNPs_PARS_syn <- paste0("data_SNPs_PARS_syn.update",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_syn <- read.csv(file_SNPs_PARS_syn,header = TRUE,sep = ",")
-file_SNPs_PARS_nsy <- paste0(path,'/data_SNPs_PARS_nsy.csv',collapse = NULL)
+file_SNPs_PARS_nsy <- paste0("data_SNPs_PARS_nsy.update",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_nsy <- read.csv(file_SNPs_PARS_nsy,header = TRUE,sep = ",")
 
 group = c("cds","utr","syn","nsy")
