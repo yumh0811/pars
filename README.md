@@ -1205,7 +1205,7 @@ sed -i "" "s/-&gt;/->/g" data_SNPs_PARS_*.csv  # debug "->"
 unset NAME
 ```
 
-# vcf
+## vcf
 ```bash
 mkdir -p ~/data/mrna-structure/vcf
 cd ~/data/mrna-structure/vcf
@@ -1246,6 +1246,11 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output $
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output $NAME.utr_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output $NAME.syn_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output $NAME.nsy_snp.merge.pro.tsv
+
+cat $NAME.cds_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.cds_snp.merge.pro.txt
+cat $NAME.utr_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.utr_snp.merge.pro.txt
+cat $NAME.syn_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.syn_snp.merge.pro.txt
+cat $NAME.nsy_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.nsy_snp.merge.pro.txt
 unset NAME
 
 export NAME=Scer_n7p_Spar
@@ -1272,6 +1277,11 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output $
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output $NAME.utr_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output $NAME.syn_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output $NAME.nsy_snp.merge.pro.tsv
+
+cat $NAME.cds_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.cds_snp.merge.pro.txt
+cat $NAME.utr_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.utr_snp.merge.pro.txt
+cat $NAME.syn_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.syn_snp.merge.pro.txt
+cat $NAME.nsy_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.nsy_snp.merge.pro.txt
 unset NAME
 
 export NAME=Scer_n128_Spar
@@ -1298,6 +1308,11 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output $
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output $NAME.utr_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output $NAME.syn_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output $NAME.nsy_snp.merge.pro.tsv
+
+cat $NAME.cds_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.cds_snp.merge.pro.txt
+cat $NAME.utr_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.utr_snp.merge.pro.txt
+cat $NAME.syn_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.syn_snp.merge.pro.txt
+cat $NAME.nsy_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.nsy_snp.merge.pro.txt
 unset NAME
 
 export NAME=Scer_n128_Seub
@@ -1324,6 +1339,11 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output $
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output $NAME.utr_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output $NAME.syn_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output $NAME.nsy_snp.merge.pro.tsv
+
+cat $NAME.cds_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.cds_snp.merge.pro.txt
+cat $NAME.utr_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.utr_snp.merge.pro.txt
+cat $NAME.syn_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.syn_snp.merge.pro.txt
+cat $NAME.nsy_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.nsy_snp.merge.pro.txt
 unset NAME
 
 # wild.strains in 1011
@@ -1359,6 +1379,11 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output $
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output $NAME.wild.utr_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output $NAME.wild.syn_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output $NAME.wild.nsy_snp.merge.pro.tsv
+
+cat $NAME.wild.cds_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.cds_snp.merge.pro.txt
+cat $NAME.wild.utr_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.utr_snp.merge.pro.txt
+cat $NAME.wild.syn_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.syn_snp.merge.pro.txt
+cat $NAME.wild.nsy_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.nsy_snp.merge.pro.txt
 unset NAME
 
 export NAME=Scer_n7p_Spar
@@ -1385,6 +1410,11 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output $
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output $NAME.wild.utr_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output $NAME.wild.syn_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output $NAME.wild.nsy_snp.merge.pro.tsv
+
+cat $NAME.wild.cds_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.cds_snp.merge.pro.txt
+cat $NAME.wild.utr_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.utr_snp.merge.pro.txt
+cat $NAME.wild.syn_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.syn_snp.merge.pro.txt
+cat $NAME.wild.nsy_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.nsy_snp.merge.pro.txt
 unset NAME
 
 export NAME=Scer_n128_Spar
@@ -1411,6 +1441,11 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output $
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output $NAME.wild.utr_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output $NAME.wild.syn_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output $NAME.wild.nsy_snp.merge.pro.tsv
+
+cat $NAME.wild.cds_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.cds_snp.merge.pro.txt
+cat $NAME.wild.utr_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.utr_snp.merge.pro.txt
+cat $NAME.wild.syn_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.syn_snp.merge.pro.txt
+cat $NAME.wild.nsy_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.nsy_snp.merge.pro.txt
 unset NAME
 
 export NAME=Scer_n128_Seub
@@ -1437,6 +1472,64 @@ perl ~/Scripts/pars/program/vcf.merge.pro.pl --file cds_snp.merge.tsv --output $
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file utr_snp.merge.tsv --output $NAME.wild.utr_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file syn_snp.merge.tsv --output $NAME.wild.syn_snp.merge.pro.tsv
 perl ~/Scripts/pars/program/vcf.merge.pro.pl --file nsy_snp.merge.tsv --output $NAME.wild.nsy_snp.merge.pro.tsv
+
+cat $NAME.wild.cds_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.cds_snp.merge.pro.txt
+cat $NAME.wild.utr_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.utr_snp.merge.pro.txt
+cat $NAME.wild.syn_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.syn_snp.merge.pro.txt
+cat $NAME.wild.nsy_snp.merge.pro.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > $NAME.wild.nsy_snp.merge.pro.txt
+unset NAME
+
+```
+
+## update
+
+```bash
+export NAME=Scer_n7_Spar
+cd ~/data/mrna-structure/result/$NAME
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a cds
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a utr
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a syn
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a nsy
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a cds -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a utr -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a syn -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a nsy -o .wild
+unset NAME
+
+export NAME=Scer_n7p_Spar
+cd ~/data/mrna-structure/result/$NAME
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a cds
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a utr
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a syn
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a nsy
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a cds -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a utr -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a syn -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a nsy -o .wild
+unset NAME
+
+export NAME=Scer_n128_Spar
+cd ~/data/mrna-structure/result/$NAME
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a cds
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a utr
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a syn
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a nsy
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a cds -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a utr -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a syn -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a nsy -o .wild
+unset NAME
+
+export NAME=Scer_n128_Seub
+cd ~/data/mrna-structure/result/$NAME
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a cds
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a utr
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a syn
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a nsy
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a cds -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a utr -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a syn -o .wild
+Rscript ~/Scripts/pars/program/update_SNPs.R -n $NAME -a nsy -o .wild
 unset NAME
 ```
 
