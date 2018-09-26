@@ -57,7 +57,7 @@ while (<$csv_fh>) {
     s/\"//g;
     my @content = split /,/, $_;
     my @content_new;
-    if ( $content[0] eq "gene" ) {
+    if ( $content[1] eq "gene" ) {
         $content_new[0] = "gene";
         $content_new[1] = "stem_AT_GC";
         $content_new[2] = "stem_GC_AT";
@@ -76,7 +76,7 @@ while (<$csv_fh>) {
     }
     else {
 
-        if ( exists $gene_name{ $content[0] } ) {
+        if ( exists $gene_name{ $content[1] } ) {
 
             if ( $content[7] eq "stem" ) {
                 if ( exists $mutation_AT_GC{ $content[10] } ) {
@@ -100,9 +100,9 @@ while (<$csv_fh>) {
             }
 
             #my %hash = %count_SNPs;
-            $gene_name{ $content[0] } = {%count_SNPs};
+            $gene_name{ $content[1] } = {%count_SNPs};
 
-            #print $content[0],"\n";
+            #print $content[1],"\n";
             #print Dumper(\%gene_name);sleep 2;
         }
         else {
@@ -138,9 +138,9 @@ while (<$csv_fh>) {
             }
 
             #my %hash = %count_SNPs;
-            $gene_name{ $content[0] } = {%count_SNPs};
+            $gene_name{ $content[1] } = {%count_SNPs};
 
-            #print $content[0],"\n";
+            #print $content[1],"\n";
             #print Dumper(\%gene_name);sleep 2;
 
         }
