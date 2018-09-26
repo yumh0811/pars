@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use strict;
-use warnings;
+#use warnings;
 use autodie;
 
 use Getopt::Long qw();
@@ -20,7 +20,7 @@ use List::Util qw/min/;
 
 =head1 SYNOPSIS
 
-    perl ~/Scripts/pars/program/count_codon_gene.pl --origin data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_codon.csv
+    perl ~/Scripts/pars/program/count_codon_gene.pl --origin data_SNPs_PARS_cds.update.csv --output data_SNPs_PARS_cds.update_codon.csv
 
 =cut
 
