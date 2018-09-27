@@ -1640,6 +1640,7 @@ cat ~/data/mrna-structure/vcf/1011Matrix.gvcf/${NAME}.wild/${NAME}.wild.syn_snp.
     ' \
     | sort | uniq > ${NAME}.syn.filtrate.txt
 
+#将filtrate后的gene list输入 https://david.ncifcrf.gov/ 中，得到GO，KEGG信息
 mkdir -p freq_10/GO
 mkdir -p freq_10/KEGG
 Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC_GO.R
