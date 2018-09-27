@@ -1630,7 +1630,16 @@ unset NAME
 ## count GO KEGG
 ```bash
 export NAME=Scer_n128_Spar
-cd ~/data/mrna-structure/result/${NAME} 
+cd ~/data/mrna-structure/result/${NAME}
+#筛选snp，freq显著高于（p<0.05）野生群体（stem中A/T->G/C）
+cat ~/data/mrna-structure/vcf/1011Matrix.gvcf/${NAME}.wild/${NAME}.wild.syn_snp.merge.pro.tsv \
+    | perl -nla -F"\t" -e '
+        if ( ( $F[15] > 0 ) && ( $F[17] <= 0.05 ) && ( $F[2] eq "stem" ) && ( ($F[3] eq "A->G") || ($F[3] eq "A->C") || ($F[3] eq "T->C") || ($F[3] eq "T->G") ) ){
+            print qq{$F[1]};
+        }
+    ' \
+    | sort | uniq > ${NAME}.syn.filtrate.txt
+
 mkdir -p freq_10/GO
 mkdir -p freq_10/KEGG
 Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC_GO.R
