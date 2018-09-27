@@ -1567,6 +1567,10 @@ perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_utr_stat.csv --output freq_each/PARS_utr_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_syn_stat.csv --output freq_each/PARS_syn_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_nsy_stat.csv --output freq_each/PARS_nsy_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_cds_stat_freq_10.csv --output freq_10/PARS_cds_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_utr_stat_freq_10.csv --output freq_10/PARS_utr_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_syn_stat_freq_10.csv --output freq_10/PARS_syn_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_nsy_stat_freq_10.csv --output freq_10/PARS_nsy_stat_freq_10_chi_square.csv
 unset NAME
 
 export NAME=Scer_n128_Seub
@@ -1578,6 +1582,10 @@ perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_utr_stat.csv --output freq_each/PARS_utr_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_syn_stat.csv --output freq_each/PARS_syn_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_nsy_stat.csv --output freq_each/PARS_nsy_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_cds_stat_freq_10.csv --output freq_10/PARS_cds_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_utr_stat_freq_10.csv --output freq_10/PARS_utr_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_syn_stat_freq_10.csv --output freq_10/PARS_syn_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_nsy_stat_freq_10.csv --output freq_10/PARS_nsy_stat_freq_10_chi_square.csv
 unset NAME
 
 ```
@@ -1599,6 +1607,10 @@ export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
 perl ~/Scripts/pars/program/count_codon_gene.pl --origin data_SNPs_PARS_cds.update.csv --output data_SNPs_PARS_cds.update_codon.csv
 Rscript ~/Scripts/pars/program/count_AT_GC_codon.R -n ${NAME}
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_tRNA_stat.csv --output freq_each/PARS_tRNA_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_4D_stat.csv --output freq_each/PARS_4D_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_tRNA_stat_freq_10.csv --output freq_10/PARS_tRNA_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_4D_stat_freq_10.csv --output freq_10/PARS_4D_stat_freq_10_chi_square.csv
 unset NAME
 
 ```
