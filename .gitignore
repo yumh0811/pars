@@ -40,3 +40,8 @@ xlsx
 *.log
 *.bak
 *.swp
+
+stat_n7.xlsx
+stat_n7p.xlsx
+stat_n128_Seub.xlsx
+stat_n128_Spar.xlsx
