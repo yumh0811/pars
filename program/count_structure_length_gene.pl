@@ -55,7 +55,7 @@ while (<$csv_fh>) {
     s/"//g;
     my @snp = split /,/, $_;
     
-    if ( $snp[0] eq "PARS_cds_gene" ) {
+    if ( $snp[0] eq "gene" ) {
         my @snp_new;
         $snp_new[0] = "gene";
         $snp_new[1] = "max";

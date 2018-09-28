@@ -1590,13 +1590,23 @@ unset NAME
 
 ```
 
-## count stem length selection cds
+## count stem length selection
 ```bash
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
 mkdir -p freq_10/stem_length
+
 perl ~/Scripts/pars/program/count_position_gene.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --origin data_SNPs_PARS_cds.update.csv --output data_SNPs_PARS_cds.update_pos.csv
+perl ~/Scripts/pars/program/count_position_gene.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --origin data_SNPs_PARS_utr.update.csv --output data_SNPs_PARS_utr.update_pos.csv
+
+cat data_SNPs_PARS_cds.update_pos.csv data_SNPs_PARS_utr.update_pos.csv | sort | uniq | perl -e 'print reverse <>' > data_SNPs_PARS_mRNA.update_pos.csv 
+
 Rscript ~/Scripts/pars/program/count_AT_GC_gene_trait.R -n ${NAME}
+
+cat data_SNPs_PARS_mRNA.update_pos.csv | perl -nl -a -F"," -e 'print qq{$F[1]};' | sort | uniq | perl -e 'print reverse <>' > mRNA.gene.list.csv
+
+perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure stem --output stem_length_mRNA.csv
+perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure loop --output loop_length_mRNA.csv
 unset NAME
 
 ```

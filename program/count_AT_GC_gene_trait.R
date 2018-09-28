@@ -45,7 +45,7 @@ setwd(path)
 
 #stem_length
 #输入csv
-file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.update_pos.csv',collapse = NULL)
+file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_mRNA.update_pos.csv',collapse = NULL)
 data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
 
 data_SNPs_PARS_cds_stem <- subset(data_SNPs_PARS_cds,structure == "stem")
