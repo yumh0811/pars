@@ -68,15 +68,14 @@ while (<$tsv_fh>) {
         }
         splice @content, 10, 1;
         if ( $content[8] == 0 ) {
-            $content[14] = $content[12] if ( $content[3] eq $content[9] );
-            $content[11] = $content[13] - $content[11] if ( $content[14] );
-        	  $content[13] = $content[13] - $content[11] if ( $content[14] );
+            $content[14] = $content[12] if ( $content[3] eq $content[9] );         
         }
         else {
-            $content[14] = 1 - $content[12] if ( $content[3] eq $content[9] );
-            $content[13] = $content[13] - $content[11] if ( $content[14] );
+            $content[14] = 1 - $content[12] if ( $content[3] eq $content[9] );           
         }
-        
+        $content[11] = $content[13] - $content[11] if ( $content[14] );
+        $content[13] = $content[13] - $content[11] if ( $content[14] );
+
         $content[15] = $content[5] - $content[14]  if ( $content[14] );
         if ( $content[14] ) {
             my $obs =

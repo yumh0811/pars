@@ -70,7 +70,7 @@ while (<$csv_fh>) {
         		$content_new[3] = $content[10];
         		$content_new[4] = $content[11];
         		$content_new[5] = $content[11]/128;
-        		if ($content[13] == 0){
+        		if ($content[13] == 1){
         				$content_new[6] = $content[11];
         		}else{
         				$content_new[6] = 128-$content[11];
