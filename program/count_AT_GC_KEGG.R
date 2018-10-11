@@ -1,7 +1,7 @@
-name <- "Scer_n128_Spar" 
-path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
-setwd(path)
+#!/usr/bin/env Rscript
 
+library(getopt)
+library(ape)
 library(ggplot2)
 library(scales)
 library(reshape)
@@ -14,22 +14,51 @@ library(gsubfn)
 library(RSQLite)
 library(sqldf)
 
+spec = matrix(
+    c(
+        "help",
+        "h",
+        0,
+        "logical",
+        "brief help message",
+
+        "name",
+        "n",
+        1,
+        "character",
+        "input name",
+        
+        "outfile",
+        "o",
+        1,
+        "character",
+        "output filename"
+    ),
+    byrow = TRUE,
+    ncol = 5
+)
+opt = getopt(spec)
+
+name <- opt$name
+path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
+setwd(path)
+
 #输入csv
-file_SNPs_PARS_syn <- paste0(path,'/data_SNPs_PARS_syn.update.wild.csv',collapse = NULL)
-data_SNPs_PARS_syn <- read.csv(file_SNPs_PARS_syn,header = TRUE,sep = ",")
-dd_SNP <- data.frame(name = "syn",SNP = c(nrow(data_SNPs_PARS_syn)))
-data_gene_process <- data_SNPs_PARS_syn["gene"]
+file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.update.csv',collapse = NULL)
+data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
+dd_SNP <- data.frame(name = "cds",SNP = c(nrow(data_SNPs_PARS_cds)))
+data_gene_process <- data_SNPs_PARS_cds["gene"]
 data_gene_process <- unique(data_gene_process,fromLast=TRUE)
-dd_gene<- data.frame(name = "syn", gene = c(nrow(data_gene_process)))
+dd_gene<- data.frame(name = "cds", gene = c(nrow(data_gene_process)))
 
 #KEGG
-file_gene_KEGG <- "~/data/mrna-structure/phylogeny/KEGG/KEGG.csv" 
+file_gene_KEGG <- "Scer_n128_Spar_KEGG.csv" 
 data_gene_KEGG <- read.csv(file_gene_KEGG,header = FALSE ,sep = ",")
-colnames(data_gene_KEGG) <- c(1:32)
-for (kegg in 1:32){
+colnames(data_gene_KEGG) <- c(1:34)
+for (kegg in 1:34){
   gene <- data.frame(data_gene_KEGG[3:nrow(data_gene_KEGG),kegg],row.names = NULL)
   colnames(gene) <- "gene"
-  snp <- assign(paste0("data_SNPs_PARS_syn_KEGG_",kegg),merge(data_SNPs_PARS_syn,gene,by="gene"))
+  snp <- assign(paste0("data_SNPs_PARS_cds_KEGG_",kegg),merge(data_SNPs_PARS_cds,gene,by="gene"))
   dd_SNP <- rbind(dd_SNP,data.frame(name=paste0("KEGG_",kegg,"_",data_gene_KEGG[2,kegg]),SNP = c(nrow(snp))))
   data_gene_process <- snp["gene"]
   data_gene_process <- unique(data_gene_process,fromLast=TRUE)

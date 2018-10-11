@@ -1641,20 +1641,32 @@ unset NAME
 ```bash
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME}
-#筛选snp，freq显著高于（p<0.05）野生群体（stem中A/T->G/C）
+
+#筛选snp（cds stem中A/T->G/C）
+cat ~/data/mrna-structure/vcf/1011Matrix.gvcf/${NAME}/${NAME}.cds_snp.merge.pro.tsv \
+    | perl -nla -F"\t" -e '
+        if ( ( $F[2] eq "stem" ) && ( ($F[3] eq "A->G") || ($F[3] eq "A->C") || ($F[3] eq "T->C") || ($F[3] eq "T->G") ) ){
+            print qq{$F[1]};
+        }
+    ' \
+    | sort | uniq > ${NAME}.cds.filtrate.txt
+
+#将filtrate后的gene list输入 https://david.ncifcrf.gov/ 中，得到GO，KEGG信息
+mkdir -p freq_10/GO
+mkdir -p freq_10/KEGG
+Rscript ~/Scripts/pars/program/count_AT_GC_GO.R -n ${NAME}
+Rscript ~/Scripts/pars/program/count_AT_GC_KEGG.R -n ${NAME}
+
+
+#筛选snp，freq显著高于（p<0.05）野生群体（syn stem中A/T->G/C）
 cat ~/data/mrna-structure/vcf/1011Matrix.gvcf/${NAME}.wild/${NAME}.wild.syn_snp.merge.pro.tsv \
     | perl -nla -F"\t" -e '
         if ( ( $F[15] > 0 ) && ( $F[17] <= 0.05 ) && ( $F[2] eq "stem" ) && ( ($F[3] eq "A->G") || ($F[3] eq "A->C") || ($F[3] eq "T->C") || ($F[3] eq "T->G") ) ){
             print qq{$F[1]};
         }
     ' \
-    | sort | uniq > ${NAME}.syn.filtrate.txt
+    | sort | uniq > ${NAME}.wild.syn.filtrate.txt
 
-#将filtrate后的gene list输入 https://david.ncifcrf.gov/ 中，得到GO，KEGG信息
-mkdir -p freq_10/GO
-mkdir -p freq_10/KEGG
-Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC_GO.R
-Rscript ~/Scripts/pars/program/${NAME}_count_AT_GC_KEGG.R
 unset NAME
 
 ```

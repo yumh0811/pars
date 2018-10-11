@@ -1,7 +1,7 @@
-name <- "Scer_n128_Spar" 
-path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
-setwd(path)
+#!/usr/bin/env Rscript
 
+library(getopt)
+library(ape)
 library(ggplot2)
 library(scales)
 library(reshape)
@@ -14,8 +14,37 @@ library(gsubfn)
 library(RSQLite)
 library(sqldf)
 
+spec = matrix(
+    c(
+        "help",
+        "h",
+        0,
+        "logical",
+        "brief help message",
+
+        "name",
+        "n",
+        1,
+        "character",
+        "input name",
+        
+        "outfile",
+        "o",
+        1,
+        "character",
+        "output filename"
+    ),
+    byrow = TRUE,
+    ncol = 5
+)
+opt = getopt(spec)
+
+name <- opt$name
+path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
+setwd(path)
+
 #输入csv
-file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.csv',collapse = NULL)
+file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.update.csv',collapse = NULL)
 data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
 dd_SNP <- data.frame(name = "cds",SNP = c(nrow(data_SNPs_PARS_cds)))
 data_gene_process <- data_SNPs_PARS_cds["gene"]
@@ -23,10 +52,10 @@ data_gene_process <- unique(data_gene_process,fromLast=TRUE)
 dd_gene<- data.frame(name = "cds", gene = c(nrow(data_gene_process)))
 
 #CC
-file_gene_CC <- "~/data/mrna-structure/phylogeny/GO/CC.csv" 
+file_gene_CC <- "Scer_n128_Spar_GO.CC.csv" 
 data_gene_CC <- read.csv(file_gene_CC,header = FALSE ,sep = ",")
-colnames(data_gene_CC) <- c(1:16)
-for (cc in 1:16){
+colnames(data_gene_CC) <- c(1:66)
+for (cc in 1:66){
   gene <- data.frame(data_gene_CC[3:nrow(data_gene_CC),cc],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_cds_CC_",cc),merge(data_SNPs_PARS_cds,gene,by="gene"))
@@ -122,10 +151,10 @@ for (cc in 1:16){
 }
   
 #BP
-file_gene_BP <- "~/data/mrna-structure/phylogeny/GO/BP.csv" 
+file_gene_BP <- "Scer_n128_Spar_GO.BP.csv" 
 data_gene_BP <- read.csv(file_gene_BP,header = FALSE ,sep = ",")
-colnames(data_gene_BP) <- c(1:16)
-for (bp in 1:16){
+colnames(data_gene_BP) <- c(1:132)
+for (bp in 1:132){
   gene <- data.frame(data_gene_BP[3:nrow(data_gene_BP),bp],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_cds_BP_",bp),merge(data_SNPs_PARS_cds,gene,by="gene"))
@@ -221,10 +250,10 @@ for (bp in 1:16){
 }
 
 #MF
-file_gene_MF <- "~/data/mrna-structure/phylogeny/GO/MF.csv" 
+file_gene_MF <- "Scer_n128_Spar_GO.MF.csv" 
 data_gene_MF <- read.csv(file_gene_MF,header = FALSE ,sep = ",")
-colnames(data_gene_MF) <- c(1:16)
-for (mf in 1:16){
+colnames(data_gene_MF) <- c(1:55)
+for (mf in 1:55){
   gene <- data.frame(data_gene_MF[3:nrow(data_gene_MF),mf],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_cds_MF_",mf),merge(data_SNPs_PARS_cds,gene,by="gene"))
