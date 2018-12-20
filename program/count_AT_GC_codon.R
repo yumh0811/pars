@@ -57,7 +57,7 @@ data_SNPs_PARS_4D <- sqldf('SELECT * FROM [data_SNPs_PARS_cds] where snp_codons 
                            "GCT->GCC" OR snp_codons == "GCT->GCA" OR snp_codons == "GCT->GCG" OR snp_codons == "GCC->GCT" OR snp_codons == "GCC->GCA" OR snp_codons == "GCC->GCG" OR snp_codons == "GCA->GCC" OR snp_codons == "GCA->GCT" OR snp_codons == "GCA->GCG" OR snp_codons == "GCG->GCC" OR snp_codons == "GCG->GCT" OR snp_codons == "GCG->GCA" OR snp_codons == 
                            "GGT->GGC" OR snp_codons == "GGT->GGA" OR snp_codons == "GGT->GGG" OR snp_codons == "GGC->GGT" OR snp_codons == "GGC->GGA" OR snp_codons == "GGC->GGG" OR snp_codons == "GGA->GGC" OR snp_codons == "GGA->GGT" OR snp_codons == "GGA->GGG" OR snp_codons == "GGG->GGC" OR snp_codons == "GGG->GGT" OR snp_codons == "GGG->GGA"
                            ')
-write.csv(data_SNPs_PARS_4D,file=paste0(path,"/data_SNPs_PARS_4D.csv",collapse = NULL),row.names = FALSE)
+write.csv(data_SNPs_PARS_4D,file=paste0(path,"/data_SNPs_PARS_4D.update.csv",collapse = NULL),row.names = FALSE)
 
 #tRNA
 data_SNPs_PARS_tRNA <- sqldf('SELECT * FROM [data_SNPs_PARS_cds] where 
@@ -77,7 +77,7 @@ data_SNPs_PARS_tRNA <- sqldf('SELECT * FROM [data_SNPs_PARS_cds] where
                              snp_codons == "CAT->CAC" OR snp_codons == "CAC->CAT" OR
                              snp_codons == "TTT->TTC" OR snp_codons == "TTC->TTT" OR
                              snp_codons == "TGT->TGC" OR snp_codons == "TGC->TGT" ')
-write.csv(data_SNPs_PARS_tRNA,file=paste0(path,"/data_SNPs_PARS_tRNA.csv",collapse = NULL),row.names = FALSE)
+write.csv(data_SNPs_PARS_tRNA,file=paste0(path,"/data_SNPs_PARS_tRNA.update.csv",collapse = NULL),row.names = FALSE)
 
 group = c("4D","tRNA")
 for (g in group){
