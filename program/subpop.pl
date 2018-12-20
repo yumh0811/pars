@@ -12,7 +12,8 @@ use AlignDB::IntSpan;
 
 use List::Util qw/min/;
 
-my $file_snp    = shift || "snp2.csv";
+
+my $file_snp    = shift || "filiter_snp.csv";
 my $file_strain = shift || "strainlist.csv";
 
 my @asian = (
