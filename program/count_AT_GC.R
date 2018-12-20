@@ -52,8 +52,10 @@ file_SNPs_PARS_syn <- paste0("data_SNPs_PARS_syn.update",opt$outfile,".csv", col
 data_SNPs_PARS_syn <- read.csv(file_SNPs_PARS_syn,header = TRUE,sep = ",")
 file_SNPs_PARS_nsy <- paste0("data_SNPs_PARS_nsy.update",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_nsy <- read.csv(file_SNPs_PARS_nsy,header = TRUE,sep = ",")
+file_SNPs_PARS_mRNA <- paste0("data_SNPs_PARS_mRNA.update",opt$outfile,".csv", collapse = NULL)
+data_SNPs_PARS_mRNA <- read.csv(file_SNPs_PARS_mRNA,header = TRUE,sep = ",")
 
-group = c("cds","utr","syn","nsy")
+group = c("cds","utr","syn","nsy","mRNA")
 for (g in group){
   t <- get(paste0('data_SNPs_PARS_',g,collapse = NULL))
   for(i in 1:max(t$freq)){
@@ -138,7 +140,7 @@ for (g in group){
 
 
 # 把freq分组（先判断freq是否>=10)
-group = c("cds","utr","syn","nsy")
+group = c("cds","utr","syn","nsy","mRNA")
 for (g in group){
   t <- get(paste0('data_SNPs_PARS_',g,collapse = NULL))
   if(max(t$freq)>=10){
