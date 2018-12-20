@@ -1519,6 +1519,7 @@ Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a cds -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a utr -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a syn -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a nsy -o .wild
+cat data_SNPs_PARS_cds.update.csv data_SNPs_PARS_utr.update.csv | sort | uniq | perl -e 'print reverse <>' > data_SNPs_PARS_mRNA.update.csv
 unset NAME
 
 export NAME=Scer_n128_Seub
@@ -1567,10 +1568,12 @@ perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_utr_stat.csv --output freq_each/PARS_utr_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_syn_stat.csv --output freq_each/PARS_syn_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_nsy_stat.csv --output freq_each/PARS_nsy_stat_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_mRNA_stat.csv --output freq_each/PARS_mRNA_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_cds_stat_freq_10.csv --output freq_10/PARS_cds_stat_freq_10_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_utr_stat_freq_10.csv --output freq_10/PARS_utr_stat_freq_10_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_syn_stat_freq_10.csv --output freq_10/PARS_syn_stat_freq_10_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_nsy_stat_freq_10.csv --output freq_10/PARS_nsy_stat_freq_10_chi_square.csv
+perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_mRNA_stat_freq_10.csv --output freq_10/PARS_mRNA_stat_freq_10_chi_square.csv
 unset NAME
 
 export NAME=Scer_n128_Seub
@@ -1631,8 +1634,8 @@ export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
 perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_cds.yml --output stem_loop_cds_length.csv 
 perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_utr.yml --output stem_loop_utr_length.csv
-perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_per_gene_ATGC.csv
-perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr_per_gene_ATGC.csv
+perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_cds.update.csv --output data_SNPs_PARS_cds.update_per_gene_ATGC.csv
+perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_utr.update.csv --output data_SNPs_PARS_utr.update_per_gene_ATGC.csv
 Rscript ~/Scripts/pars/program/count_cds_utr.R -n ${NAME}
 unset NAME
 ```
@@ -1666,6 +1669,31 @@ cat ~/data/mrna-structure/vcf/1011Matrix.gvcf/${NAME}.wild/${NAME}.wild.syn_snp.
         }
     ' \
     | sort | uniq > ${NAME}.wild.syn.filtrate.txt
+    
+mkdir -p freq_10/go_kegg
+mkdir -p freq_10/go_kegg/syn
+mkdir -p freq_10/go_kegg/nsy
+Rscript ~/Scripts/pars/program/count_AT_GC_go_kegg.R -n ${NAME}
+
+unset NAME
+
+```
+
+## stat subpopulation SNPs frequency
+```bash
+export NAME=Scer_n128_Spar
+mkdir -p ~/data/mrna-structure/result/${NAME}/subpop
+cd ~/data/mrna-structure/result/${NAME}/subpop
+
+#generate strainlist, order same as egaz template
+echo -e "S288c\nbeer001\nbeer003\nbeer004\nbeer005\nbeer006\nbeer007\nbeer008\nbeer009\nbeer010\nbeer011\nbeer012\nbeer013\nbeer014\nbeer015\nbeer016\nbeer020\nbeer021\nbeer022\nbeer023\nbeer024\nbeer025\nbeer026\nbeer027\nbeer028\nbeer029\nbeer030\nbeer031\nbeer032\nbeer033\nbeer034\nbeer036\nbeer037\nbeer038\nbeer040\nbeer041\nbeer043\nbeer044\nbeer045\nbeer046\nbeer047\nbeer048\nbeer049\nbeer050\nbeer051\nbeer052\nbeer053\nbeer054\nbeer055\nbeer056\nbeer059\nbeer061\nbeer062\nbeer063\nbeer064\nbeer065\nbeer066\nbeer067\nbeer068\nbeer069\nbeer070\nbeer071\nbeer073\nbeer075\nbeer076\nbeer077\nbeer078\nbeer079\nbeer080\nbeer081\nbeer082\nbeer083\nbeer084\nbeer085\nbeer086\nbeer087\nbeer088\nbeer089\nbeer090\nbeer091\nbeer092\nbeer094\nbeer095\nbeer096\nbeer097\nbeer098\nbeer099\nbeer100\nbeer101\nbeer102\nbioethanol001\nbioethanol003\nbioethanol004\nbread001\nbread002\nbread003\nbread004\nsake001\nsake002\nsake003\nsake004\nsake005\nsake006\nsake007\nspirits001\nspirits002\nspirits003\nspirits004\nspirits005\nspirits011\nwine001\nwine003\nwine004\nwine005\nwine006\nwine007\nwine009\nwine010\nwine011\nwine012\nwine013\nwine014\nwine015\nwine017\nwine018\nwild005\nwild006\nwild007" > strainlist.csv
+ 
+
+#download total SNPs from MySQL → total_snp.csv
+cat total_snp.csv | wc -l #check number
+
+
+
 
 unset NAME
 
