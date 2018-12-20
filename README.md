@@ -1712,7 +1712,6 @@ RScript ~/Scripts/pars/program/subpop.R -n ${NAME}
 #calculate subpopulation SNPs proporation
 perl ~/Scripts/pars/program/subpop.pl filiter_snp.csv strainlist.csv > subpop.csv
 
-
 unset NAME
 
 ```
