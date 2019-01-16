@@ -59,9 +59,6 @@ while (<$csv_fh>) {
 
     }
     else {
-        if ( $snp[8] eq '-' ) {             
-						$snp[10] =~ tr/ATGC/TACG/;
-        }
 				
 				my @codon_occured = split "\\|", $snp[17] if defined( $snp[17] );
 				my %count;
@@ -70,15 +67,35 @@ while (<$csv_fh>) {
 				my $codon_to;
 
             if ( $codon_num != 2 ) {
-                $codon_to = 'o1';
+                $codon_to = join( '|', keys %count );
             }
             else {
                 if ( $snp[10] eq 'Complex' ) {
-                    $codon_to = 'o2';
+                    $codon_to = join( '|', keys %count );
                 }
                 else {
                     #print YAML::Syck::Dump( \@unicodon );
-                    $codon_to = "$unicodon[0]\|$unicodon[1]"
+                    if ( $codon_num != 0 ) {
+                        if ( $count{ $unicodon[1] } ne $count{ $unicodon[0] } )
+                        {
+                            if ( $count{ $unicodon[1] } == $snp[11] ) {
+                                $codon_to = "$unicodon[0]->$unicodon[1]";
+                            }
+                            else {
+                                $codon_to = "$unicodon[1]->$unicodon[0]";
+                            }
+                        }else{
+                    	  		if ( $snp[8] eq '+'){
+                    	  				$codon_to = "$unicodon[0]->$unicodon[1]" if substr($unicodon[0], $snp[14], 1) eq substr($snp[10], 0 ,1);
+                    	  				$codon_to = "$unicodon[1]->$unicodon[0]" if substr($unicodon[1], $snp[14], 1) eq substr($snp[10], 0 ,1);
+                    	  		}else{
+                    	  				my $mutant_to = $snp[10];              
+                    	  		    $mutant_to =~ tr/ATGC/TACG/;
+                    	  				$codon_to = "$unicodon[0]->$unicodon[1]" if substr($unicodon[0], $snp[14], 1) eq substr($mutant_to, 0 ,1);
+                    	  				$codon_to = "$unicodon[1]->$unicodon[0]" if substr($unicodon[1], $snp[14], 1) eq substr($mutant_to, 0 ,1);
+                    	  		}
+                    	  }
+                    }
                 }
             }
 
