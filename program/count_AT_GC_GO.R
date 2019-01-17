@@ -54,8 +54,8 @@ dd_gene<- data.frame(name = "cds", gene = c(nrow(data_gene_process)))
 #CC
 file_gene_CC <- "Scer_n128_Spar_GO.CC.csv" 
 data_gene_CC <- read.csv(file_gene_CC,header = FALSE ,sep = ",")
-colnames(data_gene_CC) <- c(1:66)
-for (cc in 1:66){
+colnames(data_gene_CC) <- c(1:62)
+for (cc in 1:62){
   gene <- data.frame(data_gene_CC[3:nrow(data_gene_CC),cc],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_cds_CC_",cc),merge(data_SNPs_PARS_cds,gene,by="gene"))
@@ -137,7 +137,6 @@ for (cc in 1:66){
       data_stat <- do.call("rbind", data)
       
       write.csv(data_stat, file=paste0(path,'/freq_10/GO/CC_stat_',cc,"_",data_gene_CC[2,cc],'_freq_10.csv'), row.names = FALSE)
-                                   paste0(path,'/freq_10/GO/CC_stat_',cc,"_",data_gene_CC[2,cc],'_freq_10.csv')
       write.csv(dd_SNPs_freq, file=paste0(path,'/freq_10/GO/CC_',cc,'_stat_SNPs_freq_10.csv'), row.names = FALSE)
       write.csv(dd_gene_freq, file=paste0(path,'/freq_10/GO/CC_',cc,'_stat_gene_freq_10.csv'), row.names = FALSE)
       write.csv(dd_SNPs_freq_stem, file=paste0(path,'/freq_10/GO/CC_',cc,'_stat_stem_freq_10.csv'), row.names = FALSE)
@@ -153,8 +152,8 @@ for (cc in 1:66){
 #BP
 file_gene_BP <- "Scer_n128_Spar_GO.BP.csv" 
 data_gene_BP <- read.csv(file_gene_BP,header = FALSE ,sep = ",")
-colnames(data_gene_BP) <- c(1:132)
-for (bp in 1:132){
+colnames(data_gene_BP) <- c(1:104)
+for (bp in 1:104){
   gene <- data.frame(data_gene_BP[3:nrow(data_gene_BP),bp],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_cds_BP_",bp),merge(data_SNPs_PARS_cds,gene,by="gene"))
@@ -252,8 +251,8 @@ for (bp in 1:132){
 #MF
 file_gene_MF <- "Scer_n128_Spar_GO.MF.csv" 
 data_gene_MF <- read.csv(file_gene_MF,header = FALSE ,sep = ",")
-colnames(data_gene_MF) <- c(1:55)
-for (mf in 1:55){
+colnames(data_gene_MF) <- c(1:54)
+for (mf in 1:54){
   gene <- data.frame(data_gene_MF[3:nrow(data_gene_MF),mf],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_cds_MF_",mf),merge(data_SNPs_PARS_cds,gene,by="gene"))

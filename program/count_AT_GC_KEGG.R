@@ -54,8 +54,8 @@ dd_gene<- data.frame(name = "cds", gene = c(nrow(data_gene_process)))
 #KEGG
 file_gene_KEGG <- "Scer_n128_Spar_KEGG.csv" 
 data_gene_KEGG <- read.csv(file_gene_KEGG,header = FALSE ,sep = ",")
-colnames(data_gene_KEGG) <- c(1:34)
-for (kegg in 1:34){
+colnames(data_gene_KEGG) <- c(1:28)
+for (kegg in 1:28){
   gene <- data.frame(data_gene_KEGG[3:nrow(data_gene_KEGG),kegg],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_cds_KEGG_",kegg),merge(data_SNPs_PARS_cds,gene,by="gene"))
