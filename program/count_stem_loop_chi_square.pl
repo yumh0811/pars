@@ -22,7 +22,7 @@ use POSIX;
 
 =head1 SYNOPSIS
 
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file ~/data/mrna-structure/result/$NAMEfreq_10/PARS_nsy_stat_freq_10.csv --output ~/data/mrna-structure/result/$NAMEfreq_10/PARS_nsy_stat_freq_10_chi_square.csv
+    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file ~/data/mrna-structure/result/$NAME/freq_10/PARS_nsy_stat_freq_10.csv --output ~/data/mrna-structure/result/$NAME/freq_10/PARS_nsy_stat_freq_10_chi_square.csv
 
 =cut
 
