@@ -82,6 +82,12 @@ data_proporation_1_gene <- read.csv(file_proporation_1_gene,  header = TRUE, sep
 data_proporation_1_gene <- subset(data_proporation_1_gene,select = gene)
 data_protein_coding_list <- merge(data_protein_coding_list,data_proporation_1_gene,by="gene")
 
+# 取出non-overlap 的基因
+file_overlap_gene <- paste0("~/data/mrna-structure/phylogeny/protein_coding_overlap_unique.csv", collapse = NULL)
+data_overlap_gene <- read.csv(file_overlap_gene,  header = TRUE, sep = ",")
+colnames(data_overlap_gene) <- c("gene")
+data_protein_coding_list <- sqldf('SELECT * FROM [data_protein_coding_list] EXCEPT SELECT * FROM [data_overlap_gene]') 
+
 # 将有PARS信息的转录本分为mRNA和非mRNA
 data_fold_class_mRNA <- merge(data_fold_class, data_protein_coding_list , by="gene")
 data_fold_class_non_mRNA <- sqldf('SELECT * FROM [data_fold_class] EXCEPT SELECT * FROM [data_fold_class_mRNA]') # 备用
