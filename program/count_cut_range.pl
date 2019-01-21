@@ -16,8 +16,8 @@ use FindBin;
 
 =head1 SYNOPSIS
 
-    perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/Scer_n157_nonMosaic_Spar.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_cds.yml --output stem_loop_cds_length.csv 
-    perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/Scer_n157_nonMosaic_Spar.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_utr.yml --output stem_loop_utr_length.csv
+    perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/Scer_n128_Spar.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_cds.yml --output stem_loop_cds_length.csv 
+    perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/Scer_n128_Spar.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_utr.yml --output stem_loop_utr_length.csv
 
 =cut
 
