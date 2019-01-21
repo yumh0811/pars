@@ -32,6 +32,12 @@ spec = matrix(
         1,
         "character",
         "input name",
+        
+        "infile",
+        "i",
+        1,
+        "character",
+        "input filename",
        
         "outfile",
         "o",
@@ -48,14 +54,14 @@ name <- opt$name
 path <- paste0("~/data/mrna-structure/result/", name, "/subpop", collapse = NULL)
 setwd(path)
 
-data_snp_list <- read.csv("genelist.csv",header = T, sep = ",")
+data_snp_list <- read.csv(opt$infile,header = T, sep = ",")
 
 cds_snp <- read.csv("/Users/yumh/data/mrna-structure/vcf/1011Matrix.gvcf/Scer_n128_Spar.wild/Scer_n128_Spar.wild.cds_snp.merge.pro.tsv",header = T, sep = "\t")
 merge_snp <- merge(cds_snp,data_snp_list,by="gene")
 merge_snp_ATCG <- subset(merge_snp, structure=="stem")
 merge_snp_ATCG <- subset(merge_snp_ATCG, mutant_to_pars == "A->G"|mutant_to_pars == "T->G"|mutant_to_pars == "A->C"|mutant_to_pars == "T->C")
 
-write.csv(merge_snp_ATCG,file = "merge_snp.csv",row.names = F)
+#write.csv(merge_snp_ATCG,file = "merge_snp2.csv",row.names = F)
 
 snp <- read.csv("total_snp.csv",header=T,sep=",")
 mvar <- read.csv("/Users/yumh/data/mrna-structure/xlsx/Scer_n128_Spar.mvar.gene_list.csv",header=T,sep=",")
@@ -65,4 +71,4 @@ b <- subset(a,select = c("name","snp_freq","snp_outgroup_base","snp_all_bases","
 
 c <- merge(merge_snp_ATCG,b,by="name")
 
-write.csv(c,file = "filiter_snp.csv",row.names = F)
+write.csv(c,file = opt$outfile,row.names = F)
