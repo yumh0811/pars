@@ -54,8 +54,8 @@ dd_gene<- data.frame(name = "syn", gene = c(nrow(data_gene_process)))
 #go_kegg
 file_gene_go_kegg <- "Scer_n128_Spar_go_kegg.csv" 
 data_gene_go_kegg <- read.csv(file_gene_go_kegg,header = FALSE ,sep = ",")
-colnames(data_gene_go_kegg) <- c(1:42)
-for (go_kegg in 1:42){
+colnames(data_gene_go_kegg) <- c(1:39)
+for (go_kegg in 1:39){
   gene <- data.frame(data_gene_go_kegg[3:nrow(data_gene_go_kegg),go_kegg],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_syn_go_kegg_",go_kegg),merge(data_SNPs_PARS_syn,gene,by="gene"))
@@ -164,8 +164,8 @@ dd_gene<- data.frame(name = "nsy", gene = c(nrow(data_gene_process)))
 #go_kegg
 file_gene_go_kegg <- "Scer_n128_Spar_go_kegg.csv" 
 data_gene_go_kegg <- read.csv(file_gene_go_kegg,header = FALSE ,sep = ",")
-colnames(data_gene_go_kegg) <- c(1:42)
-for (go_kegg in 1:42){
+colnames(data_gene_go_kegg) <- c(1:39)
+for (go_kegg in 1:39){
   gene <- data.frame(data_gene_go_kegg[3:nrow(data_gene_go_kegg),go_kegg],row.names = NULL)
   colnames(gene) <- "gene"
   snp <- assign(paste0("data_SNPs_PARS_nsy_go_kegg_",go_kegg),merge(data_SNPs_PARS_nsy,gene,by="gene"))
