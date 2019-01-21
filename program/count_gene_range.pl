@@ -16,7 +16,7 @@ use FindBin;
 
 =head1 SYNOPSIS
 
-    perl ~/Scripts/pars/program/count_gene_range.pl --file ~/data/mrna-structure/phylogeny/protein_coding_list_range.csv --dir ~/data/mrna-structure/phylogeny/Scer_n157_nonMosaic_Spar_gene_alignment_cds --output ~/data/mrna-structure/phylogeny/gene_range.csv
+    perl ~/Scripts/pars/program/count_gene_range.pl --file ~/data/mrna-structure/phylogeny/protein_coding_list_range.csv --dir ~/data/mrna-structure/phylogeny/Scer_n128_Spar_gene_alignment_cds --output ~/data/mrna-structure/phylogeny/gene_range.csv
 
 =cut
 
