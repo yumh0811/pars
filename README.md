@@ -4,33 +4,42 @@
 - [Processing Yeast PARS Data](#processing-yeast-pars-data)
 - [Download reference data](#download-reference-data)
     - [Download PARS10 full site.](#download-pars10-full-site)
-    - [Download S288c annotation data from ensembl by rsync](#download-s288c-annotation-data-from-ensembl-by-rsync)
     - [SGD](#sgd)
-- [Download strains and outgroups](#download-strains-and-outgroups)
-    - [Sanger (NCBI WGS)](#sanger-ncbi-wgs)
-    - [Illumina (NCBI ASSEMBLY)](#illumina-ncbi-assembly)
-- [Plans of alignments](#plans-of-alignments)
-- [AlignDB](#aligndb)
-    - [Build alignDB for multiple genomes](#build-aligndb-for-multiple-genomes-n7)
-    - [Extract gene-list and snp-codon-list](#extract-gene-list-and-snp-codon-list-n7)
-    - [SNPs and indels](#snps-and-indels-n7)
+- [Download strains genomes](#download-strains-genomes)
+    - [Download S288c (soft-masked) from Ensembl](#download-s288c-soft-masked-from-ensembl)
+    - [Download strains from NCBI assembly](#download-strains-from-ncbi-assembly)
+    - [Download strains from NCBI WGS](#download-strains-from-ncbi-wgs)
+    - [Download strains from 1002genomes project](#download-strains-from-1002genomes-project)
+- [RepeatMasker](#repeatmasker)
+- [Align](#align)
+    - [Sanger](#sanger)
+    - [PacBio](#pacbio)
+    - [Illumina](#illumina)
+- [Blast](#blast)
+- [Gene_filiter](#gene_filiter)
+    - [create protein coding gene list](#create-protein-coding-gene-list)
+    - [cut mRNA alignment](#cut-mrna-alignment)
+        - [create mRNA_yml](#create-mrna_yml)
+        - [cut alignment by mRNA_yml](#cut-alignment-by-mrna_yml)
+        - [count mRNA_alignment proporation in sgd](#count-mrna_alignment-proporation-in-sgd)
+- [Extract SNP-list](#extract-snp-list)
 - [Blast](#blast)
 - [Features](#features)
-- [Real Processing](#real-processing)
-- [Download other reference data](#download-other-reference-data)
-    - [mRNA levels](#mrna-levels)
-    - [ess, rich/minimal and chem](#ess-richminimal-and-chem)
-    - [Recombination rates](#recombination-rates)
-    - [Protein-protein interactions](#protein-protein-interactions)
-- [Phylogeny](#phylogeny)
-    - [create protein coding gene list](#create-protein-coding-gene-list)
-    - [cut cds alignment](#cut-cds-alignment)
-        - [create cds_yml](#create-cds_yml)
-        - [cut cds_alignment by cds_yml](#cut-cds_alignment-by-cds_yml)
-        - [count cds_alignment proporation in sgd](#count-cds_alignment-proporation-in-sgd)
-    - [create gene_phylogeny (n157_nonMosaic)](#create-gene_phylogeny-n157_nonmosaic)
-    - [count distance (n157_nonMosaic)](#count-distance-n157_nonmosaic)
+- [Real Processing n7](#real-processing-n7)
+- [Real Processing n7p](#real-processing-n7p)
+- [Real Processing n128](#real-processing-n128)
 - [SNP](#snp)
+    - [count per gene GC content](#count-per-gene-gc-content)
+    - [count SNPs and gene](#count-snps-and-gene)
+    - [vcf](#vcf)
+    - [update](#update)
+    - [count A/T <-> G/C](#count-at---gc)
+    - [count stem length selection](#count-stem-length-selection)
+    - [count_codon_gene](#count_codon_gene)
+    - [count per gene cds_utr](#count-per-gene-cds_utr)
+    - [count GO KEGG](#count-go-kegg)
+    - [stat subpopulation SNPs frequency](#stat-subpopulation-snps-frequency)
+
 
 # Download reference data
 
@@ -81,6 +90,7 @@ faops filter -N -s Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz S288c.
 ## Download strains from NCBI assembly
 
 **DBVPG6044**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/DBVPG6044
 cd ~/data/alignment/egaz/download/DBVPG6044
@@ -90,6 +100,7 @@ faops filter -N -s GCA_002079025.1_ASM207902v1_genomic.fna.gz DBVPG6044.fa
 ```
 
 **Y12**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/Y12
 cd ~/data/alignment/egaz/download/Y12
@@ -99,6 +110,7 @@ faops filter -N -s GCA_002058645.1_ASM205864v1_genomic.fna.gz Y12.fa
 ```
 
 **SK1**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/SK1
 cd ~/data/alignment/egaz/download/SK1
@@ -108,6 +120,7 @@ faops filter -N -s GCA_002057885.1_ASM205788v1_genomic.fna.gz SK1.fa
 ```
 
 **UWOPS03-461.4**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/UWOPS03_461_4
 cd ~/data/alignment/egaz/download/UWOPS03_461_4
@@ -117,6 +130,7 @@ faops filter -N -s GCA_002058095.1_ASM205809v1_genomic.fna.gz UWOPS03_461_4.fa
 ```
 
 **YPS128**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/YPS128
 cd ~/data/alignment/egaz/download/YPS128
@@ -126,6 +140,7 @@ faops filter -N -s GCA_002057995.1_ASM205799v1_genomic.fna.gz YPS128.fa
 ```
 
 **DBVPG6765**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/DBVPG6765
 cd ~/data/alignment/egaz/download/DBVPG6765
@@ -135,6 +150,7 @@ faops filter -N -s GCA_002057805.1_ASM205780v1_genomic.fna.gz DBVPG6765.fa
 ```
 
 **CBS432**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/CBS432
 cd ~/data/alignment/egaz/download/CBS432
@@ -144,6 +160,7 @@ faops filter -N -s GCA_002079055.1_ASM207905v1_genomic.fna.gz CBS432.fa
 ```
 
 **N44**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/N44
 cd ~/data/alignment/egaz/download/N44
@@ -153,6 +170,7 @@ faops filter -N -s GCA_002079085.1_ASM207908v1_genomic.fna.gz N44.fa
 ```
 
 **YPS138**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/YPS138
 cd ~/data/alignment/egaz/download/YPS138
@@ -160,7 +178,9 @@ aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/115/GCA_0
 find . -name "*.gz" | xargs gzip -t
 faops filter -N -s GCA_002079115.1_ASM207911v1_genomic.fna.gz YPS138.fa
 ```
+
 **UFRJ50816**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/UFRJ50816
 cd ~/data/alignment/egaz/download/UFRJ50816
@@ -170,6 +190,7 @@ faops filter -N -s GCA_002079145.1_ASM207914v1_genomic.fna.gz UFRJ50816.fa
 ```
 
 **UWOPS91-917.1**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/UWOPS91_917_1
 cd ~/data/alignment/egaz/download/UWOPS91_917_1
@@ -179,6 +200,7 @@ faops filter -N -s GCA_002079175.1_ASM207917v1_genomic.fna.gz UWOPS91_917_1.fa
 ```
 
 **EC1118**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/EC1118
 cd ~/data/alignment/egaz/download/EC1118
@@ -188,6 +210,7 @@ faops filter -N -s GCA_000218975.1_ASM21897v1_genomic.fna.gz EC1118.fa
 ```
 
 **Seub**
+
 ```bash
 mkdir ~/data/alignment/egaz/download/Seub
 cd ~/data/alignment/egaz/download/Seub
@@ -199,6 +222,7 @@ faops filter -N -s GCA_001298625.1_SEUB3.0_genomic.fna.gz Seub.fa
 ## Download strains from NCBI WGS
 
 **scer**
+
 ```bash
 cd ~/data/alignment/egaz/download
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
@@ -208,6 +232,7 @@ bash scer_wgs.rsync.sh
 ```
 
 **spar**
+
 ```bash
 cd ~/data/alignment/egaz/download
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
@@ -331,6 +356,7 @@ done
 # Align
 
 ## Sanger
+
 ```bash
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
@@ -358,6 +384,7 @@ bash multi8/7_multi_aligndb.sh
 ```
 
 ## PacBio
+
 ```bash
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
 cd ~/data/mrna-structure/alignment/scer_wgs
@@ -384,7 +411,8 @@ bash multi8p/7_multi_aligndb.sh
 
 ```
 
-## Illumina 
+## Illumina
+
 ```bash
 # n128_Spar
 
@@ -662,11 +690,10 @@ unset NAME
 
 ----------------------------------------------------------------------------------------------------------------
 
-
-
 # Blast
 
-Prepare a combined fasta file of yeast genome and blast genes against the genome.
+Prepare a combined fasta file of yeast genome and blast genes against
+the genome.
 
 ```bash
 mkdir -p ~/data/mrna-structure/blast
@@ -790,15 +817,15 @@ done >> coverage.stat.md
 cat coverage.stat.md
 ```
 
-| Name | chrLength | size | coverage |
-|:--|--:|--:|--:|
-| genes | 12071326 | 4235405 | 0.3509 |
-| intergenic | 12071326 | 2864170 | 0.2373 |
-| intron | 12071326 | 65144 | 0.0054 |
-| orf_genomic | 12071326 | 8895737 | 0.7369 |
-| utr | 12071326 | 516569 | 0.0428 |
-| mRNA | 12071326 | 4233361 | 0.3507 |
-| cds | 12071326 | 3716792 | 0.3079 |
+| Name        | chrLength |    size | coverage |
+|:------------|----------:|--------:|---------:|
+| genes       |  12071326 | 4235405 |   0.3509 |
+| intergenic  |  12071326 | 2864170 |   0.2373 |
+| intron      |  12071326 |   65144 |   0.0054 |
+| orf_genomic |  12071326 | 8895737 |   0.7369 |
+| utr         |  12071326 |  516569 |   0.0428 |
+| mRNA        |  12071326 | 4233361 |   0.3507 |
+| cds         |  12071326 | 3716792 |   0.3079 |
 
 # Real Processing n7
 
@@ -1037,7 +1064,7 @@ perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/p
 unset NAME
 ```
 
-## count SNPs and gene 
+## count SNPs and gene
 
 ```bash
 
@@ -1082,6 +1109,7 @@ unset NAME
 ```
 
 ## vcf
+
 ```bash
 mkdir -p ~/data/mrna-structure/vcf
 cd ~/data/mrna-structure/vcf
@@ -1472,6 +1500,7 @@ unset NAME
 ```
 
 ## count stem length selection
+
 ```bash
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
@@ -1497,6 +1526,7 @@ unset NAME
 ```
 
 ## count_codon_gene
+
 ```bash
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
@@ -1512,6 +1542,7 @@ unset NAME
 ```
 
 ## count per gene cds_utr
+
 ```bash
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
@@ -1524,6 +1555,7 @@ unset NAME
 ```
 
 ## count GO KEGG
+
 ```bash
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME}
@@ -1555,6 +1587,7 @@ unset NAME
 ```
 
 ## stat subpopulation SNPs frequency
+
 ```bash
 export NAME=Scer_n128_Spar
 mkdir -p ~/data/mrna-structure/result/${NAME}/subpop
@@ -1584,3 +1617,4 @@ RScript ~/Scripts/pars/program/subpop_merge.R -n ${NAME}
 unset NAME
 
 ```
+
