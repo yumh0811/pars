@@ -653,27 +653,11 @@ cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]
 unset NAME
 
 
-
-
-
+```
 
 ----------------------------------------------------------------------------------------------------------------
 
-```
 
-# PARS process
-
-```bash
-
-mkdir -p ~/data/mrna-structure/process
-cd ~/data/mrna-structure/process
-
-export NAME=Scer_n128_Spar
-
-perl ~/Scripts/pars/program/PARS_score.process.pl --file ~/data/mrna-structure/PARS10/pubs/PARS10/data/sce_Score.tab --output ~/data/mrna-structure/process/${NAME}.gene_variation.process.update.yml
-
-unset NAME
-```
 
 # Blast
 
