@@ -52,7 +52,9 @@ cd ~/data/mrna-structure/PARS10
 perl ~/Scripts/download/list.pl -u http://genie.weizmann.ac.il/pubs/PARS10/
 perl ~/Scripts/download/download.pl -i pubs_PARS10.yml
 
-find . -name "*.gz" | xargs gzip -d
+find . -name "*.gz" |
+    parallel -j 1 'gzip -dcf {} > {.}'
+
 ```
 
 ## SGD
@@ -67,10 +69,8 @@ aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_
 aria2c -c http://downloads.yeastgenome.org/curation/chromosomal_feature/saccharomyces_cerevisiae.gff
 
 find . -name "*.gz" |
-    parallel -j 1 "
-        echo {};
-        gzip -d -c {} > {.};
-    "
+    parallel -j 1 'gzip -dcf {} > {.}'
+
 ```
 
 # Download strains genomes
@@ -85,6 +85,7 @@ aria2c -x 6 -s 3 -c ftp://ftp.ensembl.org/pub/release-82/fasta/saccharomyces_cer
 aria2c -x 6 -s 3 -c ftp://ftp.ensembl.org/pub/release-82/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.82.gff3.gz
 find . -name "*.gz" | xargs gzip -t
 faops filter -N -s Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz S288c.fa
+
 ```
 
 ## Download strains from NCBI assembly
