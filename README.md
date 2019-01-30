@@ -355,21 +355,6 @@ bash multi8/3_multi.sh
 bash multi8/6_chr_length.sh
 bash multi8/7_multi_aligndb.sh
 
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n7_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/multi8/Scer_n7_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/multi8/Results/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/multi8/Results/chr_length.csv \
-    -lt 1000 --parallel 16 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n7_Spar -r 1-60
 ```
 
 ## PacBio
@@ -397,21 +382,6 @@ bash multi8p/3_multi.sh
 bash multi8p/6_chr_length.sh
 bash multi8p/7_multi_aligndb.sh
 
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n7p_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/multi8p/Scer_n7p_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/multi8p/Results/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/multi8p/Results/chr_length.csv \
-    -lt 1000 --parallel 16 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n7p_Spar -r 1-60
 ```
 
 ## Illumina 
@@ -441,22 +411,6 @@ bash multi128_Spar/3_multi.sh
 bash multi128_Spar/6_chr_length.sh
 bash multi128_Spar/7_multi_aligndb.sh
 
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n128_Spar \
-    -da ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/Scer_n128_Spar_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/Results/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/Results/chr_length.csv \
-    -lt 1000 --parallel 16 --batch 5 \
-    --run gene
-
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n128_Spar -r 1-60
-
 # n128_Seub
 
 mkdir -p ~/data/mrna-structure/alignment/scer_wgs
@@ -482,179 +436,243 @@ bash multi128_Seub/3_multi.sh
 bash multi128_Seub/6_chr_length.sh
 bash multi128_Seub/7_multi_aligndb.sh
 
+```
+
+# Blast
+
+Prepare a combined fasta file of yeast genome and blast genes against
+the genome.
+
+```bash
+mkdir -p ~/data/mrna-structure/blast
+cd ~/data/mrna-structure/blast
+
+cat ~/data/alignment/egaz/S288c/{I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI,Mito}.fa \
+    > S288c.fa
+
+perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
+faops size S288c.fa > S288c.sizes
+
+# formatdb
+~/share/blast/bin/formatdb -p F -o T -i S288c.fa
+
+# blast every transcripts against genome
+~/share/blast/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 4 \
+    -i ../PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
+    
+# parse blastn output
+perl ~/Scripts/pars/blastn_transcript.pl -f sce_genes.blast -m 0
+
+```
+
+# Gene_filiter
+
+## create protein coding gene list
+
+```bash
+mkdir -p ~/data/mrna-structure/gene_filiter
+cd ~/data/mrna-structure/gene_filiter
+
+# sgd/saccharomyces_cerevisiae.gff → protein coding gene list
+perl ~/Scripts/pars/program/PARS_genes_list_range.pl --file ~/data/mrna-structure/blast/sce_genes.blast.tsv --output ~/data/mrna-structure/gene_filiter/PARS_genes_list_range.csv
+perl ~/Scripts/pars/program/PARS_genes_list_range_chr.pl --file ~/data/mrna-structure/blast/sce_genes.blast.tsv --output ~/data/mrna-structure/gene_filiter/PARS_genes_list_range_chr.csv
+perl ~/Scripts/pars/program/PARS_genes_list_range_chr_strand.pl --file ~/data/mrna-structure/blast/sce_genes.blast.tsv --output ~/data/mrna-structure/gene_filiter/PARS_genes_list_range_chr_strand.csv
+cat ~/data/mrna-structure/gene_filiter/PARS_genes_list_range_chr_strand.csv | perl -nl -a -F"," -e 'print qq{$F[0]};'  > PARS_genes_list.csv
+
+perl ~/Scripts/pars/program/PARS_genes_overlap.pl --file ~/data/mrna-structure/gene_filiter/PARS_genes_list_range_chr_strand.csv --output ~/data/mrna-structure/gene_filiter/PARS_genes_overlap.csv
+perl ~/Scripts/pars/program/PARS_genes_overlap_yml.pl --file ~/data/mrna-structure/gene_filiter/PARS_genes_overlap.csv --output ~/data/mrna-structure/gene_filiter/PARS_genes_overlap.yml
+cat ~/data/mrna-structure/gene_filiter/PARS_genes_overlap.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sort | uniq | perl -e 'print reverse <>' > PARS_genes_overlap_unique.csv
+cat PARS_genes_list.csv PARS_genes_overlap_unique.csv | sort | uniq -u | perl -e 'print reverse <>' > PARS_genes_non_overlap_unique.csv
+
+#protein coding 
+perl ~/Scripts/pars/program/protein_coding_list.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list.csv
+cat ~/data/mrna-structure/gene_filiter/protein_coding_list.csv | perl -nl -a -F"," -e 'print qq{$F[0]};'  > protein_coding_genes_list.csv
+cat PARS_genes_non_overlap_unique.csv protein_coding_genes_list.csv | sort | uniq -d > PARS_genes_non_overlap_unique_protein_coding.csv
+
+```
+
+## cut mRNA alignment
+
+### create mRNA_yml
+
+```bash
+cd ~/data/mrna-structure/gene_filiter
+
+#cut mRNA in PARS_Blast
+mkdir -p ~/data/mrna-structure/gene_filiter/gene_PARS_yml
+perl ~/Scripts/pars/program/cut_mRNA_yml.pl --file PARS_genes_list_range_chr.csv --output gene_PARS_yml
+```
+
+### cut alignment by mRNA_yml
+
+```bash
+
+export NAME=Scer_n7_Spar
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi8/${NAME}_refined ~/data/mrna-structure/gene_filiter/${NAME}_refined
+cd ~/data/mrna-structure/gene_filiter/${NAME}_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+mkdir -p ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_PARS
+cd ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_PARS
+cat ../PARS_genes_non_overlap_unique_protein_coding.csv |
+   parallel --line-buffer -j 16 '
+       fasops slice ../${NAME}_refined/species.fas ../gene_PARS_yml/{}.yml -n S288c -o {}.fas.fas
+   '
+unset NAME
+
+export NAME=Scer_n7p_Spar
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi8p/${NAME}_refined ~/data/mrna-structure/gene_filiter/${NAME}_refined
+cd ~/data/mrna-structure/gene_filiter/${NAME}_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+mkdir -p ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_PARS
+cd ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_PARS
+cat ../PARS_genes_non_overlap_unique_protein_coding.csv |
+   parallel --line-buffer -j 16 '
+       fasops slice ../${NAME}_refined/species.fas ../gene_PARS_yml/{}.yml -n S288c -o {}.fas.fas
+   '
+unset NAME
+
+export NAME=Scer_n128_Spar
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/${NAME}_refined ~/data/mrna-structure/gene_filiter/${NAME}_refined
+cd ~/data/mrna-structure/gene_filiter/${NAME}_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+mkdir -p ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_PARS
+cd ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_PARS
+cat ../PARS_genes_non_overlap_unique_protein_coding.csv |
+   parallel --line-buffer -j 16 '
+       fasops slice ../${NAME}_refined/species.fas ../gene_PARS_yml/{}.yml -n S288c -o {}.fas.fas
+   '
+unset NAME
+
+export NAME=Scer_n128_Seub
+cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Seub/${NAME}_refined ~/data/mrna-structure/gene_filiter/${NAME}_refined
+cd ~/data/mrna-structure/gene_filiter/${NAME}_refined
+gunzip -rfvc *.maf.gz.fas.gz > species.fas
+mkdir -p ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_PARS
+cd ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_PARS
+cat ../PARS_genes_non_overlap_unique_protein_coding.csv |
+   parallel --line-buffer -j 16 '
+       fasops slice ../${NAME}_refined/species.fas ../gene_PARS_yml/{}.yml -n S288c -o {}.fas.fas
+   '
+unset NAME
+```
+
+### count mRNA_alignment proporation in sgd
+
+```bash
+
+export NAME=Scer_n7_Spar
+cd ~/data/mrna-structure/gene_filiter
+perl ~/Scripts/pars/program/count_gene_range.pl --file PARS_genes_list_range.csv --dir ${NAME}_gene_alignment_PARS --output ${NAME}_PARS_gene_range.csv
+unset NAME
+
+export NAME=Scer_n7p_Spar
+cd ~/data/mrna-structure/gene_filiter
+perl ~/Scripts/pars/program/count_gene_range.pl --file PARS_genes_list_range.csv --dir ${NAME}_gene_alignment_PARS --output ${NAME}_PARS_gene_range.csv
+unset NAME
+
+export NAME=Scer_n128_Spar
+cd ~/data/mrna-structure/gene_filiter
+perl ~/Scripts/pars/program/count_gene_range.pl --file PARS_genes_list_range.csv --dir ${NAME}_gene_alignment_PARS --output ${NAME}_PARS_gene_range.csv
+unset NAME
+
+export NAME=Scer_n128_Seub
+cd ~/data/mrna-structure/gene_filiter
+perl ~/Scripts/pars/program/count_gene_range.pl --file PARS_genes_list_range.csv --dir ${NAME}_gene_alignment_PARS --output ${NAME}_PARS_gene_range.csv
+unset NAME
+```
+
+```bash
+#生成alignment_proporation_1.list
+
+export NAME=Scer_n7_Spar
+cd ~/data/mrna-structure/gene_filiter
+Rscript ~/Scripts/pars/program/proporation_1.R -i ${NAME}_PARS_gene_range.csv -r PARS_genes_list_range_chr.csv -o ${NAME}_non-overlap_pro_1.csv
+cat ~/data/mrna-structure/gene_filiter/${NAME}_non-overlap_pro_1.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sed "s/\"//g" | sed -e "/gene/d" > ${NAME}_final_genes.csv
+unset NAME
+
+export NAME=Scer_n7p_Spar
+cd ~/data/mrna-structure/gene_filiter
+Rscript ~/Scripts/pars/program/proporation_1.R -i ${NAME}_PARS_gene_range.csv -r PARS_genes_list_range_chr.csv -o ${NAME}_non-overlap_pro_1.csv
+cat ~/data/mrna-structure/gene_filiter/${NAME}_non-overlap_pro_1.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sed "s/\"//g" | sed -e "/gene/d" > ${NAME}_final_genes.csv
+unset NAME
+
+export NAME=Scer_n128_Spar
+cd ~/data/mrna-structure/gene_filiter
+Rscript ~/Scripts/pars/program/proporation_1.R -i ${NAME}_PARS_gene_range.csv -r PARS_genes_list_range_chr.csv -o ${NAME}_non-overlap_pro_1.csv
+cat ~/data/mrna-structure/gene_filiter/${NAME}_non-overlap_pro_1.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sed "s/\"//g" | sed -e "/gene/d" > ${NAME}_final_genes.csv
+unset NAME
+
+export NAME=Scer_n128_Seub
+cd ~/data/mrna-structure/gene_filiter
+Rscript ~/Scripts/pars/program/proporation_1.R -i ${NAME}_PARS_gene_range.csv -r PARS_genes_list_range_chr.csv -o ${NAME}_non-overlap_pro_1.csv
+cat ~/data/mrna-structure/gene_filiter/${NAME}_non-overlap_pro_1.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sed "s/\"//g" | sed -e "/gene/d" > ${NAME}_final_genes.csv
+unset NAME
+```
+
+# Extract SNP-list
+
+```bash
+
 mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
 
-perl ~/Scripts/alignDB/alignDB.pl \
-    -d Scer_n128_Seub \
-    -da ~/data/mrna-structure/alignment/scer_wgs/multi128_Seub/Scer_n128_Seub_refined \
-    -a ~/data/mrna-structure/alignment/scer_wgs/multi128_Seub/Results/anno.yml\
-    --ensembl saccharomyces_cerevisiae_core_29_82_4 \
-    --outgroup \
-    --chr ~/data/mrna-structure/alignment/scer_wgs/multi128_Seub/Results/chr_length.csv \
-    -lt 1000 --parallel 16 --batch 5 \
-    --run gene
+export NAME=Scer_n7_Spar
+mkdir -p ${NAME}_snp
+cat ../gene_filiter/${NAME}_final_genes.csv |
+   parallel --line-buffer -j 16 '
+       fasops vars --nosingle --outgroup --nocomplex ../gene_filiter/${NAME}_gene_alignment_PARS/{}.fas.fas -o ${NAME}_snp/{}.SNPs.tsv
+   '
+cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
+unset NAME
 
-perl ~/Scripts/alignDB/stat/mvar_stat_factory.pl \
-    -d Scer_n128_Seub -r 1-60
+export NAME=Scer_n7p_Spar
+mkdir -p ${NAME}_snp
+cat ../gene_filiter/${NAME}_final_genes.csv |
+   parallel --line-buffer -j 16 '
+       fasops vars --nosingle --outgroup --nocomplex ../gene_filiter/${NAME}_gene_alignment_PARS/{}.fas.fas -o ${NAME}_snp/{}.SNPs.tsv
+   '
+cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
+unset NAME
+
+export NAME=Scer_n128_Spar
+mkdir -p ${NAME}_snp
+cat ../gene_filiter/${NAME}_final_genes.csv |
+   parallel --line-buffer -j 16 '
+       fasops vars --nosingle --outgroup --nocomplex ../gene_filiter/${NAME}_gene_alignment_PARS/{}.fas.fas -o ${NAME}_snp/{}.SNPs.tsv
+   '
+cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
+unset NAME
+
+export NAME=Scer_n128_Seub
+mkdir -p ${NAME}_snp
+cat ../gene_filiter/${NAME}_final_genes.csv |
+   parallel --line-buffer -j 16 '
+       fasops vars --nosingle --outgroup --nocomplex ../gene_filiter/${NAME}_gene_alignment_PARS/{}.fas.fas -o ${NAME}_snp/{}.SNPs.tsv
+   '
+cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
+unset NAME
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------
+
 ```
 
-## Extract gene-list and snp-codon-list n7
+# PARS process
 
 ```bash
-cd ~/data/mrna-structure/xlsx
 
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n7_Spar.mvar.gene_list.csv
+mkdir -p ~/data/mrna-structure/process
+cd ~/data/mrna-structure/process
 
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n7_Spar.mvar.gene_list.csv
-```
+export NAME=Scer_n128_Spar
 
-## Extract gene-list and snp-codon-list n7p
+perl ~/Scripts/pars/program/PARS_score.process.pl --file ~/data/mrna-structure/PARS10/pubs/PARS10/data/sce_Score.tab --output ~/data/mrna-structure/process/${NAME}.gene_variation.process.update.yml
 
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n7p_Spar.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n7p_Spar.mvar.gene_list.csv 
-```
-
-## Extract gene-list and snp-codon-list n128
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Spar.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n128_Spar.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Spar.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n128_Spar.mvar.gene_list.csv
-
-
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Seub.mvar.1-60.xlsx --sheet 'gene_list' \
-    > Scer_n128_Seub.mvar.gene_list.csv
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Seub.mvar.1-60.xlsx --sheet 'snp_codon_list' \
-    > Scer_n128_Seub.mvar.gene_list.csv
-```
-
-## SNPs and indels n7
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n7_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n7_Spar.indel.pos.txt
-```
-
-## SNPs and indels n7p
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n7p_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n7p_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n7p_Spar.indel.pos.txt
-```
-
-## SNPs and indels n128
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-```bash
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Spar.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n128_Spar.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Spar.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n128_Spar.indel.pos.txt
-
-
-Select columns `chr_name,snp_pos` for SNPs.
-
-Select columns `chr_name,indel_start,indel_end` for indels.
-
-cd ~/data/mrna-structure/xlsx
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Seub.mvar.1-60.xlsx --sheet 'snp_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        print qq{$F[2]:$F[3]};
-    ' \
-    > Scer_n128_Seub.snp.pos.txt
-
-perl ~/Scripts/fig_table/xlsx2csv.pl -f Scer_n128_Seub.mvar.1-60.xlsx --sheet 'indel_list' \
-    | perl -nla -F"," -e '
-        /^\d/ or next;
-        if ( $F[3] == $F[4] ) {
-            print qq{$F[2]:$F[3]};
-        }
-        else {
-            print qq{$F[2]:$F[3]-$F[4]};
-        }
-    ' \
-    > Scer_n128_Seub.indel.pos.txt
+unset NAME
 ```
 
 # Blast
@@ -997,137 +1015,6 @@ runlist position --op superset \
 runlist position --op superset \
     sce_cds.yml ${NAME}.snp.gene.pos.txt \
     -o ${NAME}.snp.cds.pos.txt
-unset NAME
-```
-
-# Phylogeny
-
-## create protein coding gene list
-
-```bash
-mkdir -p ~/data/mrna-structure/phylogeny
-cd ~/data/mrna-structure/phylogeny
-
-# sgd/saccharomyces_cerevisiae.gff → protein coding gene list
-
-perl ~/Scripts/pars/program/protein_coding_list.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list.csv
-
-perl ~/Scripts/pars/program/protein_coding_list_range.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range.csv
-
-perl ~/Scripts/pars/program/protein_coding_list_range_chr.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range_chr.csv
-```
-
-## cut mRNA alignment
-
-### create mRNA_yml
-
-```bash
-cd ~/data/mrna-structure/phylogeny
-mkdir -p ~/data/mrna-structure/phylogeny/gene_mRNA_yml
-
-#cut mRNA in Scer.gff
-perl ~/Scripts/pars/program/cut_mRNA_yml.pl --file protein_coding_list_range_chr.csv --output gene_mRNA_yml
-```
-
-### cut alignment by mRNA_yml
-
-```bash
-
-export NAME=Scer_n7_Spar
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi8/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
-cd ~/data/mrna-structure/phylogeny/${NAME}_refined
-gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
-cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
-cat ../protein_coding_list.csv |
-   parallel --line-buffer -j 8 '
-       fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
-   '
-unset NAME
-
-export NAME=Scer_n7p_Spar
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi8p/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
-cd ~/data/mrna-structure/phylogeny/${NAME}_refined
-gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
-cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
-cat ../protein_coding_list.csv |
-   parallel --line-buffer -j 8 '
-       fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
-   '
-unset NAME
-
-export NAME=Scer_n128_Spar
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
-cd ~/data/mrna-structure/phylogeny/${NAME}_refined
-gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
-cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
-cat ../protein_coding_list.csv |
-   parallel --line-buffer -j 8 '
-   	   fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
-   '
-unset NAME
-
-export NAME=Scer_n128_Seub
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Seub/${NAME}_refined ~/data/mrna-structure/phylogeny/${NAME}_refined
-cd ~/data/mrna-structure/phylogeny/${NAME}_refined
-gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
-cd ~/data/mrna-structure/phylogeny/${NAME}_gene_alignment_mRNA
-cat ../protein_coding_list.csv |
-   parallel --line-buffer -j 8 '
-   	   fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
-   '
-unset NAME
-```
-
-### count mRNA_alignment proporation in sgd
-
-```bash
-
-export NAME=Scer_n7_Spar
-cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_gene_range.csv
-unset NAME
-
-export NAME=Scer_n7p_Spar
-cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_gene_range.csv
-unset NAME
- 
-export NAME=Scer_n128_Spar
-cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_gene_range.csv
-unset NAME
-
-export NAME=Scer_n128_Seub
-cd ~/data/mrna-structure/phylogeny
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_gene_range.csv
-unset NAME
-```
-
-```bash
-#生成alignment_proporation_1.list
-
-export NAME=Scer_n7_Spar
-cd ~/data/mrna-structure/phylogeny
-Rscript ~/Scripts/pars/program/distance_processed.R -i ${NAME}_gene_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_distance_processed_pro_1.csv
-unset NAME
-
-export NAME=Scer_n7p_Spar
-cd ~/data/mrna-structure/phylogeny
-Rscript ~/Scripts/pars/program/distance_processed.R -i ${NAME}_gene_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_distance_processed_pro_1.csv
-unset NAME
-
-export NAME=Scer_n128_Spar
-cd ~/data/mrna-structure/phylogeny
-Rscript ~/Scripts/pars/program/distance_processed.R -i ${NAME}_gene_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_distance_processed_pro_1.csv
-unset NAME
-
-export NAME=Scer_n128_Seub
-cd ~/data/mrna-structure/phylogeny
-Rscript ~/Scripts/pars/program/distance_processed.R -i ${NAME}_gene_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_distance_processed_pro_1.csv
 unset NAME
 ```
 
@@ -1495,6 +1382,7 @@ Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a cds -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a utr -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a syn -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a nsy -o .wild
+cat data_SNPs_PARS_cds.update.csv data_SNPs_PARS_utr.update.csv | sort | uniq | perl -e 'print reverse <>' > data_SNPs_PARS_mRNA.update.csv
 unset NAME
 
 export NAME=Scer_n7p_Spar
@@ -1507,6 +1395,7 @@ Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a cds -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a utr -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a syn -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a nsy -o .wild
+cat data_SNPs_PARS_cds.update.csv data_SNPs_PARS_utr.update.csv | sort | uniq | perl -e 'print reverse <>' > data_SNPs_PARS_mRNA.update.csv
 unset NAME
 
 export NAME=Scer_n128_Spar
@@ -1532,10 +1421,11 @@ Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a cds -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a utr -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a syn -o .wild
 Rscript ~/Scripts/pars/program/update_SNPs.R -n ${NAME} -a nsy -o .wild
+cat data_SNPs_PARS_cds.update.csv data_SNPs_PARS_utr.update.csv | sort | uniq | perl -e 'print reverse <>' > data_SNPs_PARS_mRNA.update.csv
 unset NAME
 ```
 
-## count A/T <->G/C
+## count A/T <-> G/C
 
 ```bash
 
@@ -1610,6 +1500,10 @@ cat data_SNPs_PARS_mRNA.update_pos.csv | perl -nl -a -F"," -e 'print qq{$F[1]};'
 
 perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure stem --output stem_length_mRNA.csv
 perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure loop --output loop_length_mRNA.csv
+
+#perl ~/Scripts/pars/program/count_structure_length_gene.update.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.update.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure stem --output stem_length_cds.update.csv
+#perl ~/Scripts/pars/program/count_structure_length_gene.update.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.update.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure loop --output loop_length_cds.update.csv
+
 unset NAME
 
 ```
@@ -1619,6 +1513,7 @@ unset NAME
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
 perl ~/Scripts/pars/program/count_codon_gene.pl --origin data_SNPs_PARS_cds.update.csv --output data_SNPs_PARS_cds.update_codon.csv
+perl ~/Scripts/pars/program/count_codon_gene.pl --origin data_SNPs_PARS_syn.update.csv --output data_SNPs_PARS_syn.update_codon.csv
 Rscript ~/Scripts/pars/program/count_AT_GC_codon.R -n ${NAME}
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_tRNA_stat.csv --output freq_each/PARS_tRNA_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_4D_stat.csv --output freq_each/PARS_4D_stat_chi_square.csv
@@ -1660,16 +1555,8 @@ mkdir -p freq_10/KEGG
 Rscript ~/Scripts/pars/program/count_AT_GC_GO.R -n ${NAME}
 Rscript ~/Scripts/pars/program/count_AT_GC_KEGG.R -n ${NAME}
 
+#得到Scer_n128_Spar_go_kegg.csv
 
-#筛选snp，freq显著高于（p<0.05）野生群体（syn stem中A/T->G/C）
-cat ~/data/mrna-structure/vcf/1011Matrix.gvcf/${NAME}.wild/${NAME}.wild.syn_snp.merge.pro.tsv \
-    | perl -nla -F"\t" -e '
-        if ( ( $F[15] > 0 ) && ( $F[17] <= 0.05 ) && ( $F[2] eq "stem" ) && ( ($F[3] eq "A->G") || ($F[3] eq "A->C") || ($F[3] eq "T->C") || ($F[3] eq "T->G") ) ){
-            print qq{$F[1]};
-        }
-    ' \
-    | sort | uniq > ${NAME}.wild.syn.filtrate.txt
-    
 mkdir -p freq_10/go_kegg
 mkdir -p freq_10/go_kegg/syn
 mkdir -p freq_10/go_kegg/nsy
@@ -1694,23 +1581,17 @@ cat total_snp.csv | wc -l #check number
 
 #get genelist by filitering strong selection from GO/KEGG annotation and deleting repeating item
 
-#GO:0005758	mitochondrial intermembrane space	YDL174C, YKR066C, YNR001C, YDR487C, YOR065W, YCL057W, YIR037W, YMR203W, YPL132W, YLR304C, YJL054W, YNL055C, YJR104C, YKR071C, YKL150W, YBR056W, YDR226W, YDR375C, YKL087C, YKL053C-A, YGL187C, YEL020W-A, YLR259C, YFR033C, YJR121W, YNR041C, YJL066C, YGR181W, YMR145C, YAL039C, YKL067W, YDL120W, YDR155C, YDR353W, YLL009C, YDR511W, YPR140W, YJL143W, YHR116W
-#GO:0005743	mitochondrial inner membrane	YLR008C, YKL016C, YDR204W, YMR241W, YKL148C, YGR096W, YJL166W, YOR065W, YOR297C, YMR089C, YGR257C, YPL134C, YCL044C, YPR024W, YJR045C, YKR087C, YGL187C, YBR039W, YEL052W, YHR194W, YGR222W, YER017C, YKR065C, YLR259C, YLR348C, YFR033C, YMR035W, YBR185C, YMR256C, YIL157C, YOR176W, YNL169C, YGR033C, YPR140W, YML110C, YKL141W, YLR203C, YHR024C, YBR085W, YDL174C, YER078C, YMR301C, YML120C, YPL270W, YLR253W, YPR125W, YLL041C, YLR164W, YNL003C, YER141W, YPR058W, YPR191W, YGR235C, YPL132W, YJL054W, YBL030C, YGR062C, YOL008W, YPL063W, YFR011C, YDR298C, YLR188W, YDR236C, YDR375C, YKR052C, YKL087C, YEL024W, YGR101W, YHR037W, YDR377W, YEL020W-A, YPL078C, YPL271W, YJR121W, YOR232W, YOR356W, YNR041C, YBR291C, YGR181W, YNL100W, YAL039C, YBR003W, YDL120W, YDL004W, YPL189C-A, YOR125C, YCL057C-A, YKL120W, YIL134W, YDR231C, YER014W, YIL022W, YOR222W, YOL027C, YJL143W
-#GO:0005762	mitochondrial large ribosomal subunit	YNR022C, YHR147C, YBR268W, YKR006C, YPR100W, YMR286W, YKL138C, YJL063C, YNL005C, YBR122C, YOR150W, YKL167C, YKR085C, YDR296W, YDR116C, YLR439W, YPL183W-A, YDL202W, YGR220C, YKL170W, YMR024W, YDR115W, YJL096W, YNL185C, YGL068W, YDR237W, YBL038W, YLR312W-A
-#GO:0005759	mitochondrial matrix	YGR193C, YER168C, YPR004C, YJR045C, YLR163C, YLL027W, YGR222W, YGR207C, YBL022C, YHR208W, YHR201C, YDR493W, YAL044W-A, YLR259C, YNL073W, YAL046C, YDR232W, YPL135W, YMR113W, YOR354C, YOL140W, YDR511W, YMR083W, YBR221C, YGL236C, YML110C, YHR024C, YDR194C, YML120C, YKR066C, YIL070C, YNR001C, YOR136W, YLR089C, YOR374W, YLR304C, YOR226C, YPR067W, YDR268W, YMR062C, YBR269C, YHR037W, YKL029C, YPL266W, YKL106W, YNL066W, YOR232W, YIL125W, YPL262W, YKL085W, YOR020C, YDL120W, YPL189C-A, YER178W, YNL071W
-#GO:0030150	protein import into mitochondrial matrix	YLR008C, YGR082W, YER017C, YKR065C, YOR232W, YMR203W, YLR090W, YPL063W, YPR024W, YNL131W, YJR045C, YNL121C, YGR033C, YIL022W, YNL070W, YJL143W
-#GO:0006626	protein targeting to mitochondrion	YHR024C, YLR008C, YDL174C, YNR001C, YOR065W, YMR203W, YOR297C, YLR304C, YJL054W, YNL055C, YPL063W, YLR163C, YDR375C, YKL053C-A, YGL187C, YNL121C, YHR117W, YNL070W, YGR082W, YEL020W-A, YKR065C, YNL026W, YLR259C, YOR027W, YJR121W, YOR232W, YNR041C, YGR181W, YHR083W, YGR028W, YNL064C, YDL120W, YNL131W, YLL009C, YPR140W, YGR033C, YIL022W, YJL143W
-#GO:0016887	ATPase activity	YIL003W, YMR312W, YGL008C, YMR089C, YDL007W, YEL032W, YLR397C, YDL166C, YNL329C, YHR187W, YJR045C, YBR039W, YBL022C, YDL126C, YFL028C, YER017C, YLR259C, YNL290W, YOR291W, YEL031W, YOR117W, YDL100C, YLR249W, YOR153W, YKL073W, YDR011W, YMR301C, YPL270W, YHR169W, YCR011C, YPR173C, YDR091C, YOR259C, YLR188W, YGR262C, YDR375C, YGR210C, YDR377W, YER036C, YDR061W, YPL271W, YJR121W, YJR072C, YCL047C, YGR028W, YKL145W, YDL004W, YPL226W, YGL048C, YFR009W, YBR080C
-#sce00860	Porphyrin and chlorophyll metabolism	YOR278W, YDR047W, YDR232W, YER141W, YPL172C, YOR176W, YAL039C, YDL120W, YKL087C, YGL040C, YGL245W, YDR044W, YER014W
-echo -e "gene\nYDL174C\nYKR066C\nYNR001C\nYDR487C\nYOR065W\nYCL057W\nYIR037W\nYMR203W\nYPL132W\nYLR304C\nYJL054W\nYNL055C\nYJR104C\nYKR071C\nYKL150W\nYBR056W\nYDR226W\nYDR375C\nYKL087C\nYKL053C-A\nYGL187C\nYEL020W-A\nYLR259C\nYFR033C\nYJR121W\nYNR041C\nYJL066C\nYGR181W\nYMR145C\nYAL039C\nYKL067W\nYDL120W\nYDR155C\nYDR353W\nYLL009C\nYDR511W\nYPR140W\nYJL143W\nYHR116W\nYLR008C\nYKL016C\nYDR204W\nYMR241W\nYKL148C\nYGR096W\nYJL166W\nYOR297C\nYMR089C\nYGR257C\nYPL134C\nYCL044C\nYPR024W\nYJR045C\nYKR087C\nYBR039W\nYEL052W\nYHR194W\nYGR222W\nYER017C\nYKR065C\nYLR348C\nYMR035W\nYBR185C\nYMR256C\nYIL157C\nYOR176W\nYNL169C\nYGR033C\nYML110C\nYKL141W\nYLR203C\nYHR024C\nYBR085W\nYER078C\nYMR301C\nYML120C\nYPL270W\nYLR253W\nYPR125W\nYLL041C\nYLR164W\nYNL003C\nYER141W\nYPR058W\nYPR191W\nYGR235C\nYBL030C\nYGR062C\nYOL008W\nYPL063W\nYFR011C\nYDR298C\nYLR188W\nYDR236C\nYKR052C\nYEL024W\nYGR101W\nYHR037W\nYDR377W\nYPL078C\nYPL271W\nYOR232W\nYOR356W\nYBR291C\nYNL100W\nYBR003W\nYDL004W\nYPL189C-A\nYOR125C\nYCL057C-A\nYKL120W\nYIL134W\nYDR231C\nYER014W\nYIL022W\nYOR222W\nYOL027C\nYNR022C\nYHR147C\nYBR268W\nYKR006C\nYPR100W\nYMR286W\nYKL138C\nYJL063C\nYNL005C\nYBR122C\nYOR150W\nYKL167C\nYKR085C\nYDR296W\nYDR116C\nYLR439W\nYPL183W-A\nYDL202W\nYGR220C\nYKL170W\nYMR024W\nYDR115W\nYJL096W\nYNL185C\nYGL068W\nYDR237W\nYBL038W\nYLR312W-A\nYGR193C\nYER168C\nYPR004C\nYLR163C\nYLL027W\nYGR207C\nYBL022C\nYHR208W\nYHR201C\nYDR493W\nYAL044W-A\nYNL073W\nYAL046C\nYDR232W\nYPL135W\nYMR113W\nYOR354C\nYOL140W\nYMR083W\nYBR221C\nYGL236C\nYDR194C\nYIL070C\nYOR136W\nYLR089C\nYOR374W\nYOR226C\nYPR067W\nYDR268W\nYMR062C\nYBR269C\nYKL029C\nYPL266W\nYKL106W\nYNL066W\nYIL125W\nYPL262W\nYKL085W\nYOR020C\nYER178W\nYNL071W\nYGR082W\nYLR090W\nYNL131W\nYNL121C\nYNL070W\nYHR117W\nYNL026W\nYOR027W\nYHR083W\nYGR028W\nYNL064C\nYIL003W\nYMR312W\nYGL008C\nYDL007W\nYEL032W\nYLR397C\nYDL166C\nYNL329C\nYHR187W\nYDL126C\nYFL028C\nYNL290W\nYOR291W\nYEL031W\nYOR117W\nYDL100C\nYLR249W\nYOR153W\nYKL073W\nYDR011W\nYHR169W\nYCR011C\nYPR173C\nYDR091C\nYOR259C\nYGR262C\nYGR210C\nYER036C\nYDR061W\nYJR072C\nYCL047C\nYKL145W\nYPL226W\nYGL048C\nYFR009W\nYBR080C\nYOR278W\nYDR047W\nYPL172C\nYGL040C\nYGL245W\nYDR044W" > genelist.csv
+echo -e "gene\nYDL174C\nYKR066C\nYNR001C\nYDR487C\nYOR065W\nYCL057W\nYIR037W\nYMR203W\nYPL132W\nYLR304C\nYJL054W\nYNL055C\nYJR104C\nYKR071C\nYKL150W\nYBR056W\nYDR226W\nYDR375C\nYKL053C-A\nYKL087C\nYGL187C\nYLR259C\nYFR033C\nYJR121W\nYMR145C\nYAL039C\nYKL067W\nYDL120W\nYDR353W\nYLL009C\nYDR511W\nYPR140W\nYJL143W\nYHR116W\nYNR022C\nYDR296W\nYHR147C\nYBR268W\nYDR116C\nYKR006C\nYLR439W\nYPL183W-A\nYMR286W\nYDL202W\nYKL138C\nYJL063C\nYMR024W\nYNL005C\nYBR122C\nYJL096W\nYOR150W\nYDR237W\nYBL038W\nYLR312W-A\nYKL167C\nYKR085C\nYLR008C\nYKL016C\nYDR204W\nYMR241W\nYKL148C\nYGR096W\nYJL166W\nYOR065W\nYOR297C\nYMR089C\nYGR257C\nYPL134C\nYCL044C\nYPR024W\nYJR045C\nYKR087C\nYGL187C\nYBR039W\nYEL052W\nYGR222W\nYER017C\nYKR065C\nYLR259C\nYFR033C\nYMR035W\nYBR185C\nYMR256C\nYOR176W\nYGR033C\nYPR140W\nYML110C\nYKL141W\nYLR203C\nYHR024C\nYBR085W\nYDL174C\nYMR301C\nYER078C\nYML120C\nYPL270W\nYLR253W\nYLL041C\nYLR164W\nYNL003C\nYER141W\nYPR191W\nYGR235C\nYPL132W\nYJL054W\nYBL030C\nYGR062C\nYOL008W\nYPL063W\nYDR298C\nYLR188W\nYDR236C\nYDR375C\nYKR052C\nYKL087C\nYEL024W\nYGR101W\nYHR037W\nYDR377W\nYPL078C\nYPL271W\nYJR121W\nYOR232W\nYOR356W\nYBR291C\nYNL100W\nYAL039C\nYBR003W\nYDL120W\nYDL004W\nYPL189C-A\nYOR125C\nYCL057C-A\nYKL120W\nYIL134W\nYIL022W\nYOR222W\nYJL143W\nYOL027C\nYGR082W\nYNL026W\nYLR099W-A\nYLR090W\nYML086C\nYNL055C\nYKL150W\nYNL131W\nYMR110C\nYNL121C\nYER019W\nYPR140W\nYNL070W\nYHR117W\nYLR008C\nYGR082W\nYER017C\nYKR065C\nYOR232W\nYMR203W\nYLR090W\nYPL063W\nYPR024W\nYNL131W\nYJR045C\nYNL121C\nYGR033C\nYIL022W\nYNL070W\nYJL143W\nYHR024C\nYLR008C\nYDL174C\nYNR001C\nYOR065W\nYMR203W\nYOR297C\nYLR304C\nYJL054W\nYNL055C\nYPL063W\nYDR375C\nYKL053C-A\nYGL187C\nYNL121C\nYHR117W\nYNL070W\nYGR082W\nYKR065C\nYNL026W\nYLR259C\nYOR027W\nYJR121W\nYOR232W\nYHR083W\nYGR028W\nYNL064C\nYDL120W\nYNL131W\nYLL009C\nYPR140W\nYGR033C\nYIL022W\nYJL143W\nYMR301C\nYIL003W\nYPL270W\nYMR312W\nYCR011C\nYHR169W\nYGL008C\nYMR089C\nYDL007W\nYPR173C\nYLR397C\nYOR259C\nYDR091C\nYLR188W\nYDL166C\nYNL329C\nYHR187W\nYJR045C\nYGR262C\nYDR375C\nYBR039W\nYGR210C\nYBL022C\nYDL126C\nYFL028C\nYER017C\nYER036C\nYDR377W\nYLR259C\nYDR061W\nYPL271W\nYJR121W\nYJR072C\nYNL290W\nYCL047C\nYOR291W\nYEL031W\nYOR117W\nYGR028W\nYDL100C\nYLR249W\nYDL004W\nYPL226W\nYOR153W\nYKL073W\nYGL048C\nYBR080C\nYDR011W\nYOR278W\nYAL039C\nYDR047W\nYDL120W\nYDR232W\nYKL087C\nYER141W\nYGL040C\nYDR044W\nYGL245W\nYPL172C\nYOR176W\nYDL174C\nYDL078C\nYPL061W\nYDR272W\nYML004C\nYBL015W\nYBR218C\nYOR374W\nYOR347C\nYPL262W\nYKL085W\nYPL028W\nYER178W\nYMR110C\nYLR153C\nYNL071W\nYBR221C\nYNR016C" | sort | uniq | perl -e 'print reverse <>' > genelist.csv
 
 #filiter SNPs
-RScript ~/Scripts/pars/program/subpop.R -n ${NAME}
+RScript ~/Scripts/pars/program/subpop.R -n ${NAME} -i genelist.csv -o filiter_snp.csv
 
 #delete "double quotation marks" and "blank" in filiter_snp.csv
 
 #calculate subpopulation SNPs proporation
 perl ~/Scripts/pars/program/subpop.pl filiter_snp.csv strainlist.csv > subpop.csv
+
+RScript ~/Scripts/pars/program/subpop_merge.R -n ${NAME}
 
 unset NAME
 

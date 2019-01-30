@@ -35,8 +35,8 @@ open $csv_fh, '<', $file;
 open OUT, ">",$output or die $!;
 open OUT1, '>>', $output;
 print OUT1 "gene" . ","
-  . "alignment_cds_length" . ","
-  . "sgd_cds_length" . ","
+  . "alignment_length" . ","
+  . "reference_length" . ","
   . "intersection_length" . ","
   . "proporation" . "\n";
 
