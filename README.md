@@ -57,8 +57,8 @@ aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_
 aria2c -c http://downloads.yeastgenome.org/sequence/S288C_reference/orf_dna/orf_genomic_all.fasta.gz
 aria2c -c http://downloads.yeastgenome.org/curation/chromosomal_feature/saccharomyces_cerevisiae.gff
 
-find . -name "*.gz" \
-    | parallel -j 1 "
+find . -name "*.gz" |
+    parallel -j 1 "
         echo {};
         gzip -d -c {} > {.};
     "
@@ -666,8 +666,7 @@ unset NAME
 
 # Blast
 
-Prepare a combined fasta file of yeast genome and blast genes against
-the genome.
+Prepare a combined fasta file of yeast genome and blast genes against the genome.
 
 ```bash
 mkdir -p ~/data/mrna-structure/blast
@@ -734,7 +733,7 @@ cat ../sgd/orf_coding_all.fasta \
         my @ranges = sort { $a <=> $b } grep {/^\d+$/} split /,|\-/, $range;
         my $intspan = AlignDB::IntSpan->new()->add_range(@ranges);
         my $hole = $intspan->holes;
-        
+
         printf qq{%s:%s\n}, $chr, $hole->as_string if $hole->is_not_empty;
     ' \
     > sce_intron.pos.txt
@@ -781,7 +780,7 @@ printf "|:--|--:|--:|--:|\n" >> coverage.stat.md
 for f in genes intergenic intron orf_genomic utr mRNA cds; do
     printf "| %s | %s | %s | %s |\n" \
         ${f} \
-        $( 
+        $(
             jrunlist stat ../blast/S288c.sizes sce_${f}.yml --all -o stdout \
             | grep -v coverage \
             | sed "s/,/ /g"

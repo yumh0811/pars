@@ -1,0 +1,6 @@
+#group	strains
+asian	bioethanol001,bioethanol003,bioethanol004,sake001,sake003,sake004,sake005,sake006,sake007,wild004
+wine	beer014,beer020,beer024,beer030,beer033,beer088,sake002,spirits002,spirits004,spirits011,wine001,wine003,wine004,wine005,wine006,wine007,wine009,wine010,wine011,wine013,wine014,wine015,wine017,wine018
+beer1	beer014,beer020,beer024,beer030,beer033,beer088,sake002,spirits002,spirits004,spirits011,wine001,wine003,wine004,wine005,wine006,wine007,wine009,wine010,wine011,wine013,wine014,wine015,wine017,wine018
+beer2	beer002,beer003,beer004,beer011,beer013,beer021,beer027,beer032,beer034,beer039,beer040,beer059,beer062,beer063,beer080,beer083,beer084,beer085,beer086,beer091,beer092
+mixed	beer005,beer006,beer023,beer025,beer028,beer029,beer038,beer061,bread001,bread002,bread003,bread004,spirits001,spirits003,wild005,wild006,wild007
