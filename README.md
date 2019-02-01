@@ -105,32 +105,26 @@ bash ASSEMBLY/scer.assembly.collect.sh
 
 ## Download strains from NCBI WGS
 
-**scer**
-
 ```bash
-cd ~/data/alignment/egaz/download
-perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/pars/scer_wgs.tsv \
-    --fix
-bash scer_wgs.rsync.sh
-```
+cd ~/data/mrna-structure/
 
-**spar**
-
-```bash
-cd ~/data/alignment/egaz/download
 perl ~/Scripts/withncbi/taxon/wgs_prep.pl \
-    -f ~/Scripts/pars/spar_wgs.tsv \
-    --fix
-bash spar_wgs.rsync.sh
+    -f ~/Scripts/pars/scer.wgs.tsv \
+    --fix \
+    -o WGS
+
+bash WGS/scer.wgs.rsync.sh
+
 ```
 
 ## Download strains from 1002genomes project
 
 ```bash
 cd ~/data/alignment/egaz/download
+
 wget -c http://1002genomes.u-strasbg.fr/files/1011Assemblies.tar.gz
 tar -zxvf 1011Assemblies.tar.gz
+
 ```
 
 # RepeatMasker
