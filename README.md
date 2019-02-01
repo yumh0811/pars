@@ -5,12 +5,12 @@
 - [Download reference data](#download-reference-data)
     - [Download PARS10 full site.](#download-pars10-full-site)
     - [SGD](#sgd)
-- [Download strains genomes](#download-strains-genomes)
+- [Download genomes of strains](#download-genomes-of-strains)
     - [Download S288c (soft-masked) from Ensembl](#download-s288c-soft-masked-from-ensembl)
     - [Download strains from NCBI assembly](#download-strains-from-ncbi-assembly)
     - [Download strains from NCBI WGS](#download-strains-from-ncbi-wgs)
     - [Download strains from 1002genomes project](#download-strains-from-1002genomes-project)
-- [RepeatMasker](#repeatmasker)
+- [Prepare sequences (RepeatMasker)](#prepare-sequences-repeatmasker)
 - [Align](#align)
     - [Sanger](#sanger)
     - [PacBio](#pacbio)
@@ -73,18 +73,18 @@ find . -name "*.gz" |
 
 ```
 
-# Download strains genomes
+# Download genomes of strains
 
 ## Download S288c (soft-masked) from Ensembl
 
 ```bash
-mkdir -p ~/data/alignment/egaz/download/S288c
-cd ~/data/alignment/egaz/download/S288c
+mkdir -p ~/data/mrna-structure/ensembl/
+cd ~/data/mrna-structure/ensembl/
 
-aria2c -x 6 -s 3 -c ftp://ftp.ensembl.org/pub/release-82/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz
-aria2c -x 6 -s 3 -c ftp://ftp.ensembl.org/pub/release-82/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.82.gff3.gz
+aria2c -x 6 -s 3 -c ftp://ftp.ensembl.org/pub/release-94/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz
+aria2c -x 6 -s 3 -c ftp://ftp.ensembl.org/pub/release-94/gff3/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.94.gff3.gz
+
 find . -name "*.gz" | xargs gzip -t
-faops filter -N -s Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz S288c.fa
 
 ```
 
@@ -120,115 +120,47 @@ bash WGS/scer.wgs.rsync.sh
 ## Download strains from 1002genomes project
 
 ```bash
-cd ~/data/alignment/egaz/download
+mkdir -p ~/data/mrna-structure/download/
+cd ~/data/mrna-structure/download/
 
 wget -c http://1002genomes.u-strasbg.fr/files/1011Assemblies.tar.gz
-tar -zxvf 1011Assemblies.tar.gz
+
+#tar -zxvf 1011Assemblies.tar.gz
 
 ```
 
-# RepeatMasker
+# Prepare sequences (RepeatMasker)
 
 ```bash
-cd ~/data/alignment/egaz
+cd ~/data/mrna-structure/
 
-egaz prepseq download/S288c/S288c.fa -o S288c -v
-gzip -d -c download/S288c/Saccharomyces_cerevisiae.R64-1-1.82.gff3.gz > S288c/chr.gff
-egaz masked S288c/*.fa -o S288c/repeat.yml
+# reference
+egaz prepseq \
+    ensembl/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz \
+    --repeatmasker "--species Fungi --parallel 12" \
+    --min 1000 --gi -v \
+    -o GENOMES/S288c
 
-egaz prepseq \
-    download/DBVPG6044/DBVPG6044.fa -o DBVPG6044 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/Y12/Y12.fa -o Y12 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/SK1/SK1.fa -o SK1 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/UWOPS03_461_4/UWOPS03_461_4.fa -o UWOPS03_461_4 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/YPS128/YPS128.fa -o YPS128 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/DBVPG6765/DBVPG6765.fa -o DBVPG6765 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/CBS432/CBS432.fa -o CBS432 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/N44/N44.fa -o N44 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/YPS138/YPS138.fa -o YPS138 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/UFRJ50816/UFRJ50816.fa -o UFRJ50816 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/UWOPS91_917_1/UWOPS91_917_1.fa -o UWOPS91_917_1 \
-    --repeatmasker '--species Fungi --parallel 8' -v
-egaz prepseq \
-    download/EC1118/EC1118.fa -o EC1118 \
-    --repeatmasker '--species Fungi --parallel 8' -v
+gzip -dcf ensembl/Saccharomyces_cerevisiae.R64-1-1.94.gff3.gz > GENOMES/S288c/chr.gff
 
-mkdir -p ~/data/alignment/egaz/Seub
-cd ~/data/alignment/egaz/Seub
-RepeatMasker --species Fungi --parallel 16 -xsmall ../download/Seub/Seub.fa
-egaz prepseq \
-    ../download/Seub/Seub.fa.masked -v
+# prep assembly
+egaz template \
+    ASSEMBLY \
+    --prep -o GENOMES \
+    --min 1000 --about 1_000_000 \
+    -v --repeatmasker "--species Fungi --parallel 12"
 
-cd ~/data/alignment/egaz
-cat download/scer_wgs.csv \
-    | grep -v "^prefix" \
-    | cut -d',' -f1,3 \
-    | uniq \
-    | perl -nl -a -F"," -e 'printf qq{egaz prepseq \\\n   download/%s/%s.*.fsa_nt.gz -o %s \\\n   --about 2000000 --repeatmasker " --species Fungi --parallel 8" --min 1000 --gi -v \n}, $F[1], $F[0], $F[1];' > rm_scer_wgs.sh   
-bash rm_scer_wgs.sh
+bash GENOMES/0_prep.sh
 
-cat download/spar_wgs.csv \
-    | grep -v "^prefix" \
-    | cut -d',' -f1,3 \
-    | uniq \
-    | perl -nl -a -F"," -e 'printf qq{egaz prepseq \\\n   download/%s/%s.*.fsa_nt.gz -o %s \\\n   --about 2000000 --repeatmasker " --species Fungi --parallel 8" --min 1000 --gi -v \n}, $F[1], $F[0], $F[1];' > rm_spar_wgs.sh
-bash rm_spar_wgs.sh
+# prep wgs
+egaz template \
+    WGS \
+    --prep -o GENOMES \
+    --min 1000 --about 1_000_000 \
+    -v --repeatmasker "--species Fungi --parallel 12"
 
-# 1011
-cd ~/data/alignment/egaz/download
-for file in $(ls ~/data/alignment/egaz/download/GENOMES_ASSEMBLED/*.re.fa);
-do
+bash GENOMES/0_prep.sh
 
-filename=$(basename $file)
-dir=$(echo $filename | perl -p -e 's/^([A-Za-z]+).+/$1/;')
-
-if [ -d ../$dir ];
-then echo -n;
-else
-cd ~/data/alignment/egaz/download
-cat $file | perl -nl -e '
-
-if (m/^>([A-Za-z]+)/){
-
-my $dir = $1;
-mkdir ("../$dir") unless (-d "../$dir");
-last;
-
-}
-'
-cp -rf $file ../$dir
-sed -i".bak" "s/-/_/g" ../$dir/*.re.fa
-sed -i".bak" "s/\./_/g" ../$dir/*.re.fa
-
-faops filter -a 1000 ../$dir/*.re.fa ../$dir/$dir.fasta
-rm -rf ../$dir/*.re.fa
-RepeatMasker --species Fungi --parallel 16 -xsmall ../$dir/$dir.fasta
-
-cd ~/data/alignment/egaz/$dir
-egaz prepseq \
-    ../$dir/$dir.fasta.masked -v
-fi
-done
 ```
 
 # Align
