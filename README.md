@@ -2,6 +2,7 @@
 
 [TOC level=1-3]: # " "
 - [Processing Yeast PARS Data](#processing-yeast-pars-data)
+- [Install needed softwares](#install-needed-softwares)
 - [Download reference data](#download-reference-data)
     - [Download PARS10 full site.](#download-pars10-full-site)
     - [SGD](#sgd)
@@ -40,6 +41,14 @@
     - [count GO KEGG](#count-go-kegg)
     - [stat subpopulation SNPs frequency](#stat-subpopulation-snps-frequency)
 
+
+# Install needed softwares
+
+```bash
+brew tap wang-q/tap
+brew install multiz faops
+
+```
 
 # Download reference data
 
@@ -278,8 +287,7 @@ bash multi128_Seub/7_multi_aligndb.sh
 
 # Blast
 
-Prepare a combined fasta file of yeast genome and blast genes against
-the genome.
+Prepare a combined fasta file of yeast genome and blast genes against the genome.
 
 ```bash
 mkdir -p ~/data/mrna-structure/blast
@@ -502,8 +510,7 @@ unset NAME
 
 # Blast
 
-Prepare a combined fasta file of yeast genome and blast genes against
-the genome.
+Prepare a combined fasta file of yeast genome and blast genes against the genome.
 
 ```bash
 mkdir -p ~/data/mrna-structure/blast
