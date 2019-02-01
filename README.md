@@ -90,134 +90,17 @@ faops filter -N -s Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz S288c.
 
 ## Download strains from NCBI assembly
 
-**DBVPG6044**
-
 ```bash
-mkdir ~/data/alignment/egaz/download/DBVPG6044
-cd ~/data/alignment/egaz/download/DBVPG6044
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/025/GCA_002079025.1_ASM207902v1/GCA_002079025.1_ASM207902v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002079025.1_ASM207902v1_genomic.fna.gz DBVPG6044.fa
-```
+cd ~/data/mrna-structure/
 
-**Y12**
+perl ~/Scripts/withncbi/taxon/assembly_prep.pl \
+    -f ~/Scripts/pars/scer.assembly.tsv \
+    -o ASSEMBLY
 
-```bash
-mkdir ~/data/alignment/egaz/download/Y12
-cd ~/data/alignment/egaz/download/Y12
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/058/645/GCA_002058645.1_ASM205864v1/GCA_002058645.1_ASM205864v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002058645.1_ASM205864v1_genomic.fna.gz Y12.fa
-```
+bash ASSEMBLY/scer.assembly.rsync.sh
 
-**SK1**
+bash ASSEMBLY/scer.assembly.collect.sh
 
-```bash
-mkdir ~/data/alignment/egaz/download/SK1
-cd ~/data/alignment/egaz/download/SK1
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/885/GCA_002057885.1_ASM205788v1/GCA_002057885.1_ASM205788v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002057885.1_ASM205788v1_genomic.fna.gz SK1.fa
-```
-
-**UWOPS03-461.4**
-
-```bash
-mkdir ~/data/alignment/egaz/download/UWOPS03_461_4
-cd ~/data/alignment/egaz/download/UWOPS03_461_4
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/058/095/GCA_002058095.1_ASM205809v1/GCA_002058095.1_ASM205809v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002058095.1_ASM205809v1_genomic.fna.gz UWOPS03_461_4.fa
-```
-
-**YPS128**
-
-```bash
-mkdir ~/data/alignment/egaz/download/YPS128
-cd ~/data/alignment/egaz/download/YPS128
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/995/GCA_002057995.1_ASM205799v1/GCA_002057995.1_ASM205799v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002057995.1_ASM205799v1_genomic.fna.gz YPS128.fa
-```
-
-**DBVPG6765**
-
-```bash
-mkdir ~/data/alignment/egaz/download/DBVPG6765
-cd ~/data/alignment/egaz/download/DBVPG6765
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/805/GCA_002057805.1_ASM205780v1/GCA_002057805.1_ASM205780v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002057805.1_ASM205780v1_genomic.fna.gz DBVPG6765.fa
-```
-
-**CBS432**
-
-```bash
-mkdir ~/data/alignment/egaz/download/CBS432
-cd ~/data/alignment/egaz/download/CBS432
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/055/GCA_002079055.1_ASM207905v1/GCA_002079055.1_ASM207905v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002079055.1_ASM207905v1_genomic.fna.gz CBS432.fa
-```
-
-**N44**
-
-```bash
-mkdir ~/data/alignment/egaz/download/N44
-cd ~/data/alignment/egaz/download/N44
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/085/GCA_002079085.1_ASM207908v1/GCA_002079085.1_ASM207908v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002079085.1_ASM207908v1_genomic.fna.gz N44.fa
-```
-
-**YPS138**
-
-```bash
-mkdir ~/data/alignment/egaz/download/YPS138
-cd ~/data/alignment/egaz/download/YPS138
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/115/GCA_002079115.1_ASM207911v1/GCA_002079115.1_ASM207911v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002079115.1_ASM207911v1_genomic.fna.gz YPS138.fa
-```
-
-**UFRJ50816**
-
-```bash
-mkdir ~/data/alignment/egaz/download/UFRJ50816
-cd ~/data/alignment/egaz/download/UFRJ50816
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/145/GCA_002079145.1_ASM207914v1/GCA_002079145.1_ASM207914v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002079145.1_ASM207914v1_genomic.fna.gz UFRJ50816.fa
-```
-
-**UWOPS91-917.1**
-
-```bash
-mkdir ~/data/alignment/egaz/download/UWOPS91_917_1
-cd ~/data/alignment/egaz/download/UWOPS91_917_1
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/175/GCA_002079175.1_ASM207917v1/GCA_002079175.1_ASM207917v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_002079175.1_ASM207917v1_genomic.fna.gz UWOPS91_917_1.fa
-```
-
-**EC1118**
-
-```bash
-mkdir ~/data/alignment/egaz/download/EC1118
-cd ~/data/alignment/egaz/download/EC1118
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/218/975/GCA_000218975.1_ASM21897v1/GCA_000218975.1_ASM21897v1_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_000218975.1_ASM21897v1_genomic.fna.gz EC1118.fa
-```
-
-**Seub**
-
-```bash
-mkdir ~/data/alignment/egaz/download/Seub
-cd ~/data/alignment/egaz/download/Seub
-aria2c -x 6 -s 3 -c ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/298/625/GCA_001298625.1_SEUB3.0/GCA_001298625.1_SEUB3.0_genomic.fna.gz
-find . -name "*.gz" | xargs gzip -t
-faops filter -N -s GCA_001298625.1_SEUB3.0_genomic.fna.gz Seub.fa
 ```
 
 ## Download strains from NCBI WGS

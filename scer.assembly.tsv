@@ -1,0 +1,16 @@
+#name	ftp_path	organism	assembly_level
+S288c	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/146/045/GCF_000146045.2_R64	Saccharomyces cerevisiae	Complete Genome
+CBS432	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/055/GCA_002079055.1_ASM207905v1	Saccharomyces cerevisiae	Chromosome
+DBVPG6044	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/025/GCA_002079025.1_ASM207902v1	Saccharomyces cerevisiae	Chromosome
+DBVPG6765	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/805/GCA_002057805.1_ASM205780v1	Saccharomyces cerevisiae	Chromosome
+N44	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/085/GCA_002079085.1_ASM207908v1	Saccharomyces cerevisiae	Chromosome
+SK1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/885/GCA_002057885.1_ASM205788v1	Saccharomyces cerevisiae	Chromosome
+UFRJ50816	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/145/GCA_002079145.1_ASM207914v1	Saccharomyces cerevisiae	Chromosome
+UWOPS03_461_4	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/058/095/GCA_002058095.1_ASM205809v1	Saccharomyces cerevisiae	Chromosome
+UWOPS91_917_1	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/175/GCA_002079175.1_ASM207917v1	Saccharomyces cerevisiae	Chromosome
+Y12	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/058/645/GCA_002058645.1_ASM205864v1	Saccharomyces cerevisiae	Chromosome
+YPS128	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/057/995/GCA_002057995.1_ASM205799v1	Saccharomyces cerevisiae	Chromosome
+YPS138	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/079/115/GCA_002079115.1_ASM207911v1	Saccharomyces cerevisiae	Chromosome
+EC1118	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/218/975/GCA_000218975.1_ASM21897v1	Saccharomyces cerevisiae	Scaffold
+Spar	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/166/955/GCA_000166955.1_ASM16695v1	Saccharomyces paradoxus NRRL Y-17217	Contig
+Seub	ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/298/625/GCA_001298625.1_SEUB3.0	Saccharomyces eubayanus	FM1318 Chromosome

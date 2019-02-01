@@ -19,7 +19,6 @@ xlsx
 *.doc
 *.docx
 *.csv
-*.tsv
 
 *.bed
 *.yml
