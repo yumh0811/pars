@@ -24,7 +24,6 @@
         - [cut alignment by mRNA_yml](#cut-alignment-by-mrna_yml)
         - [count mRNA_alignment proporation in sgd](#count-mrna_alignment-proporation-in-sgd)
 - [Extract SNP-list](#extract-snp-list)
-- [Blast](#blast)
 - [Features](#features)
 - [Real Processing n7](#real-processing-n7)
 - [Real Processing n7p](#real-processing-n7p)
@@ -500,28 +499,6 @@ cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]
 unset NAME
 
 
-```
-
-# Blast
-
-Prepare a combined fasta file of yeast genome and blast genes against the genome.
-
-```bash
-mkdir -p ~/data/mrna-structure/blast
-cd ~/data/mrna-structure/blast
-
-cat ~/data/alignment/egaz/S288c/{I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI,Mito}.fa \
-    > S288c.fa
-
-perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
-faops size S288c.fa > S288c.sizes
-
-# formatdb
-~/share/blast/bin/formatdb -p F -o T -i S288c.fa
-
-# blast every transcripts against genome
-~/share/blast/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 4 \
-    -i ../PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
 ```
 
 # Features
