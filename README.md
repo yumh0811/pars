@@ -177,56 +177,47 @@ bash GENOMES/0_prep.sh
 ## Sanger
 
 ```bash
-mkdir -p ~/data/mrna-structure/alignment/scer_wgs
-cd ~/data/mrna-structure/alignment/scer_wgs
-ln -s ~/data/alignment/egaz .
+mkdir -p ~/data/mrna-structure/alignment
+cd ~/data/mrna-structure/alignment
+
+ln -s ~/data/mrna-structure/GENOMES .
 
 egaz template \
-    egaz/S288c egaz/EC1118 egaz/Kyokai_no_7 egaz/RM11_1a egaz/Sigma1278b egaz/T7 egaz/YJM789 egaz/Spar \
-    --multi -o multi8/ \
-    --rawphylo --order --parallel 16 -v
-bash multi8/1_pair.sh
-bash multi8/2_rawphylo.sh
-bash multi8/3_multi.sh
-
-egaz template \
-    egaz/S288c egaz/EC1118 egaz/Kyokai_no_7 egaz/RM11_1a egaz/Sigma1278b egaz/T7 egaz/YJM789 egaz/Spar \
-    --multi -o multi8/ \
-    --multiname Scer_n7_Spar --order --outgroup Spar \
+    GENOMES/S288c GENOMES/EC1118 GENOMES/Kyokai_no_7 GENOMES/RM11_1a \
+    GENOMES/Sigma1278b GENOMES/T7 GENOMES/YJM789 GENOMES/Spar \
+    --multi -o n7 \
+    --multiname Scer_n7_Spar --outgroup Spar \
     --vcf --aligndb \
-    --parallel 16 -v
+    --order -v --parallel 12
 
-bash multi8/3_multi.sh
-bash multi8/6_chr_length.sh
-bash multi8/7_multi_aligndb.sh
+bash n7/1_pair.sh
+bash n7/3_multi.sh
+bash n7/6_chr_length.sh
+bash n7/7_multi_aligndb.sh
+
+# clean
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
 ## PacBio
 
 ```bash
-mkdir -p ~/data/mrna-structure/alignment/scer_wgs
-cd ~/data/mrna-structure/alignment/scer_wgs
-ln -s ~/data/alignment/egaz .
+cd ~/data/mrna-structure/alignment
 
 egaz template \
-    egaz/S288c egaz/DBVPG6044 egaz/UWOPS03_461_4 egaz/Y12 egaz/SK1 egaz/YPS128 egaz/DBVPG6765 egaz/Spar \
-    --multi -o multi8p/ \
-    --rawphylo --order --parallel 16 -v
-bash multi8p/1_pair.sh
-bash multi8p/2_rawphylo.sh
-bash multi8p/3_multi.sh
-
-egaz template \
-    egaz/S288c egaz/DBVPG6044 egaz/UWOPS03_461_4 egaz/Y12 egaz/SK1 egaz/YPS128 egaz/DBVPG6765 egaz/Spar \
-    --multi -o multi8p/ \
+    GENOMES/S288c GENOMES/DBVPG6044 GENOMES/UWOPS03_461_4 GENOMES/Y12 \
+    GENOMES/SK1 GENOMES/YPS128 GENOMES/DBVPG6765 GENOMES/Spar \
+    --multi -o n7p \
     --multiname Scer_n7p_Spar --order --outgroup Spar \
     --vcf --aligndb \
-    --parallel 16 -v
+    --order -v --parallel 12
 
-bash multi8p/3_multi.sh
-bash multi8p/6_chr_length.sh
-bash multi8p/7_multi_aligndb.sh
+bash n7p/1_pair.sh
+bash n7p/3_multi.sh
+bash n7p/6_chr_length.sh
+bash n7p/7_multi_aligndb.sh
 
 ```
 
