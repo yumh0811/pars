@@ -288,19 +288,20 @@ Prepare a combined fasta file of yeast genome and blast genes against the genome
 mkdir -p ~/data/mrna-structure/blast
 cd ~/data/mrna-structure/blast
 
-cat ~/data/alignment/egaz/S288c/{I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI,Mito}.fa \
+cat ~/data/mrna-structure/GENOMES/S288c/{I,II,III,IV,V,VI,VII,VIII,IX,X,XI,XII,XIII,XIV,XV,XVI,Mito}.fa \
     > S288c.fa
 
 perl -nl -i -e '/^>/ or $_ = uc $_; print'  S288c.fa
 faops size S288c.fa > S288c.sizes
 
 # formatdb
-~/share/blast/bin/formatdb -p F -o T -i S288c.fa
+makeblastdb -dbtype nucl -in S288c.fa -parse_seqids 
 
 # blast every transcripts against genome
-~/share/blast/bin/blastall -p blastn -F "m D" -m 0 -b 10 -v 10 -e 1e-3 -a 4 \
-    -i ../PARS10/pubs/PARS10/data/sce_genes.fasta -d S288C.fa -o sce_genes.blast
-    
+blastn -task blastn -evalue 1e-3 -num_threads 4 -num_descriptions 10 -num_alignments 10 -outfmt 0 \
+    -dust yes -soft_masking true \
+    -db S288c.fa -query ../PARS10/pubs/PARS10/data/sce_genes.fasta -out sce_genes.blast
+
 # parse blastn output
 perl ~/Scripts/pars/blastn_transcript.pl -f sce_genes.blast -m 0
 
