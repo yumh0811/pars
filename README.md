@@ -316,10 +316,18 @@ mkdir -p ~/data/mrna-structure/gene_filiter
 cd ~/data/mrna-structure/gene_filiter
 
 # sgd/saccharomyces_cerevisiae.gff → protein coding gene list
-perl ~/Scripts/pars/program/protein_coding_list.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list.csv
-perl ~/Scripts/pars/program/protein_coding_list_range.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range.csv
-perl ~/Scripts/pars/program/protein_coding_list_range_chr.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range_chr.csv
-perl ~/Scripts/pars/program/protein_coding_list_range_chr_strand.pl --file ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff --output protein_coding_list_range_chr_strand.csv
+cat ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff |
+    perl -nla -e '
+        next if /^#/;
+        next unless $F[2] eq q{mRNA};
+        my $annotation = $F[8];
+        $annotation =~ /ID=(.*)_mRNA;Name=/;
+        my $ID = $1;
+        my $chr = $F[0];
+        $chr =~ s/^chr//i;
+        print join qq{,}, $ID, $chr, $F[6], $F[3], $F[4];
+    ' \
+    > protein_coding_list_range_chr_strand.csv
 
 # sgd non-overlap
 perl ~/Scripts/pars/program/protein_coding_overlap.pl --file ~/data/mrna-structure/gene_filiter/protein_coding_list_range_chr_strand.csv --output ~/data/mrna-structure/gene_filiter/protein_coding_overlap.csv
