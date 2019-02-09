@@ -325,15 +325,46 @@ cat ~/data/mrna-structure/sgd/saccharomyces_cerevisiae.gff |
         my $ID = $1;
         my $chr = $F[0];
         $chr =~ s/^chr//i;
-        print join qq{,}, $ID, $chr, $F[6], $F[3], $F[4];
+        next if $chr eq q{mt}; # Skip genes on mitochondria
+        print join qq{,}, $ID, qq{$chr($F[6]):$F[3]-$F[4]};
     ' \
-    > protein_coding_list_range_chr_strand.csv
+    > protein_coding_list.csv
 
-# sgd non-overlap
+mkdir -p mRNAs
+cat protein_coding_list.csv |
+    parallel --colsep ',' --no-run-if-empty --linebuffer -k -j 12 '
+        echo {1}
+        echo {2} | jrunlist cover stdin -o mRNAs/{1}.yml
+    ' 
+jrunlist merge mRNAs/*.yml -o mRNAs.merge.yml
+rm -fr mRNAs
+
+# overlapped regions
+cut -d, -f 2 protein_coding_list.csv |
+    jrunlist cover -c 2 stdin -o overlapped.yml
+
+jrunlist statop \
+    ../GENOMES/S288c/chr.sizes \
+    mRNAs.merge.yml \
+    overlapped.yml \
+    --op intersect --all \
+    -o stdout |
+    grep -v "^key" |
+    perl -nla -F, -e '
+        $F[4] == 0 and print $F[0];
+    ' \
+    > non-overlapped.lst
+
 perl ~/Scripts/pars/program/protein_coding_overlap.pl --file ~/data/mrna-structure/gene_filiter/protein_coding_list_range_chr_strand.csv --output ~/data/mrna-structure/gene_filiter/protein_coding_overlap.csv
 perl ~/Scripts/pars/program/protein_coding_overlap_yml.pl --file ~/data/mrna-structure/gene_filiter/protein_coding_overlap.csv --output ~/data/mrna-structure/gene_filiter/protein_coding_overlap.yml
-cat ~/data/mrna-structure/gene_filiter/protein_coding_overlap.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sort | uniq | sed -e "/target_gene/d"  > protein_coding_overlap_unique.csv
-cat protein_coding_list.csv protein_coding_overlap_unique.csv | sort | uniq -u > protein_coding_non_overlap_unique.csv
+cat ~/data/mrna-structure/gene_filiter/protein_coding_overlap.csv |
+    perl -nl -a -F"," -e 'print qq{$F[0]};' | 
+    sort | 
+    uniq | 
+    sed -e "/target_gene/d"  > protein_coding_overlap_unique.csv
+cat protein_coding_list.csv protein_coding_overlap_unique.csv | 
+    sort | 
+    uniq -u > protein_coding_non_overlap_unique.csv
 
 # PARS genes
 perl ~/Scripts/pars/program/PARS_genes_list_range.pl --file ~/data/mrna-structure/blast/sce_genes.blast.tsv --output ~/data/mrna-structure/gene_filiter/PARS_genes_list_range.csv
