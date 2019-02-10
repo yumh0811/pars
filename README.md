@@ -17,10 +17,10 @@
     - [PacBio](#pacbio)
     - [Illumina](#illumina)
 - [Blast](#blast)
-- [Gene filiter](#gene-filiter)
+- [Gene filter](#gene-filter)
     - [create protein coding gene list](#create-protein-coding-gene-list)
-    - [cut mRNA alignments](#cut-mrna-alignments)
-- [Extract SNP-list](#extract-snp-list)
+    - [Intact mRNAs](#intact-mrnas)
+    - [Cut mRNA alignments and extract SNP list](#cut-mrna-alignments-and-extract-snp-list)
 - [Features](#features)
 - [Real Processing n7](#real-processing-n7)
 - [Real Processing n7p](#real-processing-n7p)
@@ -360,7 +360,7 @@ jrunlist split mRNAs.non-overlapped.yml -o mRNAs
 
 ```
 
-## cut mRNA alignments
+## Intact mRNAs
 
 ```bash
 cd ~/data/mrna-structure/gene-filter
@@ -413,64 +413,36 @@ wc -l *.lst ../blast/*.tsv* |
 | ../blast/sce_genes.blast.tsv      |  2980 |
 | ../blast/sce_genes.blast.tsv.skip |   216 |
 
-# mRNA slices
-for NAME in Scer_n7_Spar Scer_n7p_Spar ; do
-    echo "==> ${NAME}"
-    mkdir -p mRNA_${NAME}
-    pushd mRNA_${NAME} > /dev/null
-    
-    cat ../${NAME}.intact.lst |
-        parallel --no-run-if-empty --linebuffer -k -j 12 "
-           fasops slice ../${NAME}.fas.gz ../mRNAs/{}.yml -n S288c -o {}.fas
-        "
-
-    popd > /dev/null
-done
-
-```
-
-# Extract SNP-list
+## Cut mRNA alignments and extract SNP list
 
 ```bash
-mkdir -p ~/data/mrna-structure/xlsx
-cd ~/data/mrna-structure/xlsx
+cd ~/data/mrna-structure/gene-filter
 
-export NAME=Scer_n7_Spar
-mkdir -p ${NAME}_snp
-cat ../gene_filiter/${NAME}_final_genes.csv |
-   parallel --line-buffer -j 16 '
-       fasops vars --nosingle --outgroup --nocomplex ../gene_filiter/${NAME}_gene_alignment_mRNA/{}.fas.fas -o ${NAME}_snp/{}.SNPs.tsv
-   '
-cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
-unset NAME
+# mRNA slices
+for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
+    echo "==> ${NAME}"
+    mkdir -p mRNA_${NAME}
+    
+    cat ${NAME}.intact.lst |
+        parallel --no-run-if-empty --linebuffer -k -j 12 "
+           fasops slice ${NAME}.fas.gz mRNAs/{}.yml -n S288c -o mRNA_${NAME}/{}.fas
+        "
+done
 
-export NAME=Scer_n7p_Spar
-mkdir -p ${NAME}_snp
-cat ../gene_filiter/${NAME}_final_genes.csv |
-   parallel --line-buffer -j 16 '
-       fasops vars --nosingle --outgroup --nocomplex ../gene_filiter/${NAME}_gene_alignment_mRNA/{}.fas.fas -o ${NAME}_snp/{}.SNPs.tsv
-   '
-cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
-unset NAME
+# SNP list
+for NAME in Scer_n7_Spar Scer_n7p_Spar ; do
+    echo "==> ${NAME}"
+    mkdir -p SNP_${NAME}
+    
+    cat ${NAME}.intact.lst |
+        parallel --no-run-if-empty --linebuffer -k -j 12 "
+           fasops vars --nosingle --outgroup --nocomplex mRNA_${NAME}/{}.fas -o SNP_${NAME}/{}.SNPs.tsv
+        "
+    
+    cat SNP_${NAME}/*.SNPs.tsv |
+        perl -nla -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
 
-export NAME=Scer_n128_Spar
-mkdir -p ${NAME}_snp
-cat ../gene_filiter/${NAME}_final_genes.csv |
-   parallel --line-buffer -j 16 '
-       fasops vars --nosingle --outgroup --nocomplex ../gene_filiter/${NAME}_gene_alignment_mRNA/{}.fas.fas -o ${NAME}_snp/{}.SNPs.tsv
-   '
-cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
-unset NAME
-
-export NAME=Scer_n128_Seub
-mkdir -p ${NAME}_snp
-cat ../gene_filiter/${NAME}_final_genes.csv |
-   parallel --line-buffer -j 16 '
-       fasops vars --nosingle --outgroup --nocomplex ../gene_filiter/${NAME}_gene_alignment_mRNA/{}.fas.fas -o ${NAME}_snp/{}.SNPs.tsv
-   '
-cat ${NAME}_snp/*.SNPs.tsv | perl -nl -a -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' > ${NAME}.total.SNPs.tsv
-unset NAME
-
+done
 
 ```
 
