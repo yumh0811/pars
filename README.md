@@ -17,12 +17,9 @@
     - [PacBio](#pacbio)
     - [Illumina](#illumina)
 - [Blast](#blast)
-- [Gene_filiter](#gene_filiter)
+- [Gene filiter](#gene-filiter)
     - [create protein coding gene list](#create-protein-coding-gene-list)
-    - [cut mRNA alignment](#cut-mrna-alignment)
-        - [create mRNA_yml](#create-mrna_yml)
-        - [cut alignment by mRNA_yml](#cut-alignment-by-mrna_yml)
-        - [count mRNA_alignment proporation in sgd](#count-mrna_alignment-proporation-in-sgd)
+    - [cut mRNA alignments](#cut-mrna-alignments)
 - [Extract SNP-list](#extract-snp-list)
 - [Features](#features)
 - [Real Processing n7](#real-processing-n7)
@@ -307,13 +304,13 @@ perl ~/Scripts/pars/blastn_transcript.pl -f sce_genes.blast -m 0
 
 ```
 
-# Gene_filiter
+# Gene filter
 
 ## create protein coding gene list
 
 ```bash
-mkdir -p ~/data/mrna-structure/gene_filiter
-cd ~/data/mrna-structure/gene_filiter
+mkdir -p ~/data/mrna-structure/gene-filter
+cd ~/data/mrna-structure/gene-filter
 
 # sgd/saccharomyces_cerevisiae.gff → protein coding gene list
 cat ../sgd/saccharomyces_cerevisiae.gff |
@@ -363,118 +360,59 @@ jrunlist split mRNAs.non-overlapped.yml -o mRNAs
 
 ```
 
-## cut mRNA alignment
-
-### cut alignment by mRNA_yml
+## cut mRNA alignments
 
 ```bash
+cd ~/data/mrna-structure/gene-filter
 
-export NAME=Scer_n7_Spar
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi8/${NAME}_refined ~/data/mrna-structure/gene_filiter/${NAME}_refined
-cd ~/data/mrna-structure/gene_filiter/${NAME}_refined
-gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_mRNA
-cd ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_mRNA
-cat ../PARS_genes_non_overlap_unique_protein_coding.csv |
-   parallel --line-buffer -j 16 '
-       fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
-   '
-unset NAME
+gzip -dcf ../alignment/n7/Scer_n7_Spar_refined/*.gz |
+    pigz > Scer_n7_Spar.fas.gz
+gzip -dcf ../alignment/n7p/Scer_n7p_Spar_refined/*.gz |
+    pigz > Scer_n7p_Spar.fas.gz
 
-export NAME=Scer_n7p_Spar
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi8p/${NAME}_refined ~/data/mrna-structure/gene_filiter/${NAME}_refined
-cd ~/data/mrna-structure/gene_filiter/${NAME}_refined
-gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_mRNA
-cd ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_mRNA
-cat ../PARS_genes_non_overlap_unique_protein_coding.csv |
-   parallel --line-buffer -j 16 '
-       fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
-   '
-unset NAME
+gzip -dcf ../alignment/n128/Scer_n128_Spar_refined/*.gz |
+    pigz > Scer_n128_Spar.fas.gz
+gzip -dcf ../alignment/n128/Scer_n128_Seub_refined/*.gz |
+    pigz > Scer_n128_Seub.fas.gz
 
-export NAME=Scer_n128_Spar
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Spar/${NAME}_refined ~/data/mrna-structure/gene_filiter/${NAME}_refined
-cd ~/data/mrna-structure/gene_filiter/${NAME}_refined
-gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_mRNA
-cd ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_mRNA
-cat ../PARS_genes_non_overlap_unique_protein_coding.csv |
-   parallel --line-buffer -j 16 '
-       fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
-   '
-unset NAME
+for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
+    echo "==> ${NAME}"
+    fasops covers -n S288c ${NAME}.fas.gz -o ${NAME}.yml
+done
 
-export NAME=Scer_n128_Seub
-cp -rf ~/data/mrna-structure/alignment/scer_wgs/multi128_Seub/${NAME}_refined ~/data/mrna-structure/gene_filiter/${NAME}_refined
-cd ~/data/mrna-structure/gene_filiter/${NAME}_refined
-gunzip -rfvc *.maf.gz.fas.gz > species.fas
-mkdir -p ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_mRNA
-cd ~/data/mrna-structure/gene_filiter/${NAME}_gene_alignment_mRNA
-cat ../PARS_genes_non_overlap_unique_protein_coding.csv |
-   parallel --line-buffer -j 16 '
-       fasops slice ../${NAME}_refined/species.fas ../gene_mRNA_yml/{}.yml -n S288c -o {}.fas.fas
-   '
-unset NAME
-```
+# intact mRNAs
+for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
+    echo "==> ${NAME}"
+    jrunlist statop \
+        ../blast/S288c.sizes \
+        mRNAs.non-overlapped.yml ${NAME}.yml \
+        --op intersect --all -o stdout |
+        grep -v "^key" |
+        perl -nla -F, -e '
+            $F[2] == $F[4] and print $F[0];
+        ' \
+        > ${NAME}.intact.lst
+done
 
-### count mRNA_alignment proporation in sgd
+# mRNA slices
+for NAME in Scer_n7_Spar Scer_n7p_Spar ; do
+    echo "==> ${NAME}"
+    mkdir -p mRNA_${NAME}
+    pushd mRNA_${NAME} > /dev/null
+    
+    cat ../${NAME}.intact.lst |
+        parallel --no-run-if-empty --linebuffer -k -j 12 "
+           fasops slice ../${NAME}.fas.gz ../mRNAs/{}.yml -n S288c -o {}.fas
+        "
 
-```bash
+    popd > /dev/null
+done
 
-export NAME=Scer_n7_Spar
-cd ~/data/mrna-structure/gene_filiter
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_protein_coding_range.csv
-unset NAME
-
-export NAME=Scer_n7p_Spar
-cd ~/data/mrna-structure/gene_filiter
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_protein_coding_range.csv
-unset NAME
-
-export NAME=Scer_n128_Spar
-cd ~/data/mrna-structure/gene_filiter
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_protein_coding_range.csv
-unset NAME
-
-export NAME=Scer_n128_Seub
-cd ~/data/mrna-structure/gene_filiter
-perl ~/Scripts/pars/program/count_gene_range.pl --file protein_coding_list_range.csv --dir ${NAME}_gene_alignment_mRNA --output ${NAME}_protein_coding_range.csv
-unset NAME
-```
-
-```bash
-#生成alignment_proporation_1.list
-
-export NAME=Scer_n7_Spar
-cd ~/data/mrna-structure/gene_filiter
-Rscript ~/Scripts/pars/program/proporation_1.R -i ${NAME}_protein_coding_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_non-overlap_pro_1.csv
-cat ~/data/mrna-structure/gene_filiter/${NAME}_non-overlap_pro_1.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sed "s/\"//g" | sed -e "/gene/d" > ${NAME}_final_genes.csv
-unset NAME
-
-export NAME=Scer_n7p_Spar
-cd ~/data/mrna-structure/gene_filiter
-Rscript ~/Scripts/pars/program/proporation_1.R -i ${NAME}_protein_coding_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_non-overlap_pro_1.csv
-cat ~/data/mrna-structure/gene_filiter/${NAME}_non-overlap_pro_1.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sed "s/\"//g" | sed -e "/gene/d" > ${NAME}_final_genes.csv
-unset NAME
-
-export NAME=Scer_n128_Spar
-cd ~/data/mrna-structure/gene_filiter
-Rscript ~/Scripts/pars/program/proporation_1.R -i ${NAME}_protein_coding_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_non-overlap_pro_1.csv
-cat ~/data/mrna-structure/gene_filiter/${NAME}_non-overlap_pro_1.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sed "s/\"//g" | sed -e "/gene/d" > ${NAME}_final_genes.csv
-unset NAME
-
-export NAME=Scer_n128_Seub
-cd ~/data/mrna-structure/gene_filiter
-Rscript ~/Scripts/pars/program/proporation_1.R -i ${NAME}_protein_coding_range.csv -r protein_coding_list_range_chr.csv -o ${NAME}_non-overlap_pro_1.csv
-cat ~/data/mrna-structure/gene_filiter/${NAME}_non-overlap_pro_1.csv | perl -nl -a -F"," -e 'print qq{$F[0]};' | sed "s/\"//g" | sed -e "/gene/d" > ${NAME}_final_genes.csv
-unset NAME
 ```
 
 # Extract SNP-list
 
 ```bash
-
 mkdir -p ~/data/mrna-structure/xlsx
 cd ~/data/mrna-structure/xlsx
 
