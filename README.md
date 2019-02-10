@@ -430,7 +430,7 @@ for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
 done
 
 # SNP list
-for NAME in Scer_n7_Spar Scer_n7p_Spar ; do
+for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
     echo "==> ${NAME}"
     mkdir -p SNP_${NAME}
     
