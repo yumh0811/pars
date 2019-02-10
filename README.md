@@ -394,6 +394,25 @@ for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
         > ${NAME}.intact.lst
 done
 
+wc -l *.lst ../blast/*.tsv* |
+    grep -v "total$" |
+    datamash reverse -W |
+    (echo -e "File\tCount" && cat) |
+    mlr --itsv --omd cat
+
+```
+
+| File                              | Count |
+|:----------------------------------|------:|
+| non-overlapped.lst                |  5344 |
+| PARS-non-overlapped.lst           |  2541 |
+| Scer_n128_Seub.intact.lst         |  1506 |
+| Scer_n128_Spar.intact.lst         |  2026 |
+| Scer_n7p_Spar.intact.lst          |  2303 |
+| Scer_n7_Spar.intact.lst           |  2269 |
+| ../blast/sce_genes.blast.tsv      |  2980 |
+| ../blast/sce_genes.blast.tsv.skip |   216 |
+
 # mRNA slices
 for NAME in Scer_n7_Spar Scer_n7p_Spar ; do
     echo "==> ${NAME}"
