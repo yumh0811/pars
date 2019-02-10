@@ -354,29 +354,16 @@ jrunlist statop \
     > non-overlapped.lst
 
 # PARS genes
-cat ../blast/sce_genes.blast.tsv |
-    perl -nla -e '
-        print join qq{,}, $F[0], qq{$F[2]($F[5]):$F[3]-$F[4]};
-    ' \
-    > PARS_list.csv
+cat non-overlapped.lst |
+    grep -F -f <(cut -f 1 ../blast/sce_genes.blast.tsv) \
+    > PARS-non-overlapped.lst
 
-cat PARS_list.csv |
-    grep -F -f non-overlapped.lst \
-    > PARS_non_overlap_list.csv
+jrunlist some mRNAs.merge.yml PARS-non-overlapped.lst -o mRNAs.non-overlapped.yml
+jrunlist split mRNAs.non-overlapped.yml -o mRNAs
 
 ```
 
 ## cut mRNA alignment
-
-### create mRNA_yml
-
-```bash
-cd ~/data/mrna-structure/gene_filiter
-
-#cut mRNA in PARS_Blast
-mkdir -p ~/data/mrna-structure/gene_filiter/gene_mRNA_yml
-perl ~/Scripts/pars/program/cut_mRNA_yml.pl --file protein_coding_list_range_chr.csv --output gene_mRNA_yml
-```
 
 ### cut alignment by mRNA_yml
 
