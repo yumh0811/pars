@@ -444,7 +444,20 @@ for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
 
 done
 
+wc -l *.total.SNPs.tsv |
+    grep -v "total$" |
+    datamash reverse -W |
+    (echo -e "File\tCount" && cat) |
+    mlr --itsv --omd cat
+
 ```
+
+| File                          | Count |
+|:------------------------------|------:|
+| Scer_n128_Seub.total.SNPs.tsv | 21671 |
+| Scer_n128_Spar.total.SNPs.tsv | 32892 |
+| Scer_n7p_Spar.total.SNPs.tsv  | 17923 |
+| Scer_n7_Spar.total.SNPs.tsv   | 15225 |
 
 # Features
 
