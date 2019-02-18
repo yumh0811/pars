@@ -13,13 +13,14 @@ xlsx
 
 .RData
 .Rhistory
+.Rapp.history
 
 *.xls
 *.xlsx
 *.doc
 *.docx
 *.csv
-*.tsv
+.tmp
 
 *.bed
 *.yml
