@@ -215,6 +215,10 @@ bash n7p/3_multi.sh
 bash n7p/6_chr_length.sh
 bash n7p/7_multi_aligndb.sh
 
+# clean
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
+
 ```
 
 ## Illumina
@@ -274,6 +278,10 @@ egaz template \
 bash n128/3_multi.sh
 bash n128/6_chr_length.sh
 bash n128/7_multi_aligndb.sh
+
+# clean
+find . -mindepth 1 -maxdepth 3 -type d -name "*_raw"   | parallel -r rm -fr
+find . -mindepth 1 -maxdepth 3 -type d -name "*_fasta" | parallel -r rm -fr
 
 ```
 
@@ -352,7 +360,7 @@ jrunlist statop \
 
 # PARS genes
 cat non-overlapped.lst |
-    grep -F -f <(cut -f 1 ../blast/sce_genes.blast.tsv) \
+    grep -Fx -f <(cut -f 1 ../blast/sce_genes.blast.tsv) \
     > PARS-non-overlapped.lst
 
 jrunlist some mRNAs.merge.yml PARS-non-overlapped.lst -o mRNAs.non-overlapped.yml
