@@ -973,6 +973,7 @@ cat ${NAME}_data_SNPs_PARS_mRNA.merge.wild.Chi.tsv |
 
 unset NAME
 
+```
 | File                          | Count |
 |:------------------------------|------:|
 | Scer_n128_Spar_data_SNPs_PARS_mRNA.pars.tsv | 48789 |
@@ -984,7 +985,7 @@ unset NAME
 | Scer_n128_Spar_data_SNPs_PARS_mRNA.merge.wild.Chi.tsv | 43032 |
 | Scer_n128_Spar.mRNA.wild.snp.update.filter.txt | 32767 |
 
-```
+
 
 ## count GO KEGG
 
