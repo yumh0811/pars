@@ -3,7 +3,6 @@
 library(plyr)
 library(getopt)
 library(ape)
-
 library(ggplot2)
 library(scales)
 library(reshape)
@@ -40,44 +39,45 @@ spec = matrix(
 )
 opt = getopt(spec)
 
+# name <- "Scer_n128_Spar"
 name <- opt$name
 area <- opt$area
 path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
 setwd(path)
 
 #输入csv
-file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_cds.update_codon.csv',collapse = NULL)
+file_SNPs_PARS_cds <- paste0(path,'/data_SNPs_PARS_syn_codon.csv',collapse = NULL)
 data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
 
 #codon
-data_SNPs_PARS_4D <- sqldf('SELECT * FROM [data_SNPs_PARS_cds] where snp_codons ==  
-                           "CCT->CCC" OR snp_codons == "CCT->CCA" OR snp_codons == "CCT->CCG" OR snp_codons == "CCC->CCT" OR snp_codons == "CCC->CCA" OR snp_codons == "CCC->CCG" OR snp_codons == "CCA->CCC" OR snp_codons == "CCA->CCT" OR snp_codons == "CCA->CCG" OR snp_codons == "CCG->CCC" OR snp_codons == "CCG->CCT" OR snp_codons == "CCG->CCA" OR snp_codons == 
-                           "GTT->GTC" OR snp_codons == "GTT->GTA" OR snp_codons == "GTT->GTG" OR snp_codons == "GTC->GTT" OR snp_codons == "GTC->GTA" OR snp_codons == "GTC->GTG" OR snp_codons == "GTA->GTC" OR snp_codons == "GTA->GTT" OR snp_codons == "GTA->GTG" OR snp_codons == "GTG->GTC" OR snp_codons == "GTG->GTT" OR snp_codons == "GTG->GTA" OR snp_codons == 
-                           "ACT->ACC" OR snp_codons == "ACT->ACA" OR snp_codons == "ACT->ACG" OR snp_codons == "ACC->ACT" OR snp_codons == "ACC->ACA" OR snp_codons == "ACC->ACG" OR snp_codons == "ACA->ACC" OR snp_codons == "ACA->ACT" OR snp_codons == "ACA->ACG" OR snp_codons == "ACG->ACC" OR snp_codons == "ACG->ACT" OR snp_codons == "ACG->ACA" OR snp_codons == 
-                           "GCT->GCC" OR snp_codons == "GCT->GCA" OR snp_codons == "GCT->GCG" OR snp_codons == "GCC->GCT" OR snp_codons == "GCC->GCA" OR snp_codons == "GCC->GCG" OR snp_codons == "GCA->GCC" OR snp_codons == "GCA->GCT" OR snp_codons == "GCA->GCG" OR snp_codons == "GCG->GCC" OR snp_codons == "GCG->GCT" OR snp_codons == "GCG->GCA" OR snp_codons == 
-                           "GGT->GGC" OR snp_codons == "GGT->GGA" OR snp_codons == "GGT->GGG" OR snp_codons == "GGC->GGT" OR snp_codons == "GGC->GGA" OR snp_codons == "GGC->GGG" OR snp_codons == "GGA->GGC" OR snp_codons == "GGA->GGT" OR snp_codons == "GGA->GGG" OR snp_codons == "GGG->GGC" OR snp_codons == "GGG->GGT" OR snp_codons == "GGG->GGA"
+data_SNPs_PARS_4D <- sqldf('SELECT * FROM [data_SNPs_PARS_cds] where Codons ==  
+                           "CCT->CCC" OR Codons == "CCT->CCA" OR Codons == "CCT->CCG" OR Codons == "CCC->CCT" OR Codons == "CCC->CCA" OR Codons == "CCC->CCG" OR Codons == "CCA->CCC" OR Codons == "CCA->CCT" OR Codons == "CCA->CCG" OR Codons == "CCG->CCC" OR Codons == "CCG->CCT" OR Codons == "CCG->CCA" OR Codons == 
+                           "GTT->GTC" OR Codons == "GTT->GTA" OR Codons == "GTT->GTG" OR Codons == "GTC->GTT" OR Codons == "GTC->GTA" OR Codons == "GTC->GTG" OR Codons == "GTA->GTC" OR Codons == "GTA->GTT" OR Codons == "GTA->GTG" OR Codons == "GTG->GTC" OR Codons == "GTG->GTT" OR Codons == "GTG->GTA" OR Codons == 
+                           "ACT->ACC" OR Codons == "ACT->ACA" OR Codons == "ACT->ACG" OR Codons == "ACC->ACT" OR Codons == "ACC->ACA" OR Codons == "ACC->ACG" OR Codons == "ACA->ACC" OR Codons == "ACA->ACT" OR Codons == "ACA->ACG" OR Codons == "ACG->ACC" OR Codons == "ACG->ACT" OR Codons == "ACG->ACA" OR Codons == 
+                           "GCT->GCC" OR Codons == "GCT->GCA" OR Codons == "GCT->GCG" OR Codons == "GCC->GCT" OR Codons == "GCC->GCA" OR Codons == "GCC->GCG" OR Codons == "GCA->GCC" OR Codons == "GCA->GCT" OR Codons == "GCA->GCG" OR Codons == "GCG->GCC" OR Codons == "GCG->GCT" OR Codons == "GCG->GCA" OR Codons == 
+                           "GGT->GGC" OR Codons == "GGT->GGA" OR Codons == "GGT->GGG" OR Codons == "GGC->GGT" OR Codons == "GGC->GGA" OR Codons == "GGC->GGG" OR Codons == "GGA->GGC" OR Codons == "GGA->GGT" OR Codons == "GGA->GGG" OR Codons == "GGG->GGC" OR Codons == "GGG->GGT" OR Codons == "GGG->GGA"
                            ')
-write.csv(data_SNPs_PARS_4D,file=paste0(path,"/data_SNPs_PARS_4D.update.csv",collapse = NULL),row.names = FALSE)
+write.csv(data_SNPs_PARS_4D,file=paste0(path,"/data_SNPs_PARS_4D.csv",collapse = NULL),row.names = FALSE)
 
 #tRNA
 data_SNPs_PARS_tRNA <- sqldf('SELECT * FROM [data_SNPs_PARS_cds] where 
-                             snp_codons == "CTA->CTG" OR snp_codons == "CTG->CTA" OR 
-                             snp_codons == "GTT->GTC" OR snp_codons == "GTT->GTA" OR snp_codons == "GTC->GTT" OR snp_codons == "GTC->GTA" OR snp_codons == "GTA->GTT" OR snp_codons == "GTA->GTC" OR
-                             snp_codons == "GGT->GGC" OR snp_codons == "GGC->GGT" OR
-                             snp_codons == "GCT->GCC" OR snp_codons == "GCT->GCA" OR snp_codons == "GCC->GCT" OR snp_codons == "GCC->GCA" OR snp_codons == "GCA->GCT" OR snp_codons == "GCA->GCC" OR
-                             snp_codons == "AGA->AGG" OR snp_codons == "AGG->AGA" OR
-                             snp_codons == "CGT->CGC" OR snp_codons == "CGT->CGA" OR snp_codons == "CGC->CGT" OR snp_codons == "CGC->CGA" OR snp_codons == "CGA->CGT" OR snp_codons == "CGA->CGC" OR
-                             snp_codons == "AAA->AAG" OR snp_codons == "AAG->AAA" OR
-                             snp_codons == "GAA->GAG" OR snp_codons == "GAG->GAA" OR
-                             snp_codons == "GAT->GAC" OR snp_codons == "GAC->GAT" OR
-                             snp_codons == "ACT->ACC" OR snp_codons == "ACT->ACA" OR snp_codons == "ACC->ACT" OR snp_codons == "ACC->ACA" OR snp_codons == "ACA->ACT" OR snp_codons == "ACA->ACC" OR
-                             snp_codons == "TAT->TAC" OR snp_codons == "TAC->TAT" OR
-                             snp_codons == "TCT->TCC" OR snp_codons == "TCT->TCA" OR snp_codons == "TCC->TCT" OR snp_codons == "TCC->TCA" OR snp_codons == "TCA->TCT" OR snp_codons == "TCA->TCC" OR
-                             snp_codons == "TCA->TCG" OR snp_codons == "TCG->TCA" OR
-                             snp_codons == "CAT->CAC" OR snp_codons == "CAC->CAT" OR
-                             snp_codons == "TTT->TTC" OR snp_codons == "TTC->TTT" OR
-                             snp_codons == "TGT->TGC" OR snp_codons == "TGC->TGT" ')
-write.csv(data_SNPs_PARS_tRNA,file=paste0(path,"/data_SNPs_PARS_tRNA.update.csv",collapse = NULL),row.names = FALSE)
+                             Codons == "CTA->CTG" OR Codons == "CTG->CTA" OR 
+                             Codons == "GTT->GTC" OR Codons == "GTT->GTA" OR Codons == "GTC->GTT" OR Codons == "GTC->GTA" OR Codons == "GTA->GTT" OR Codons == "GTA->GTC" OR
+                             Codons == "GGT->GGC" OR Codons == "GGC->GGT" OR
+                             Codons == "GCT->GCC" OR Codons == "GCT->GCA" OR Codons == "GCC->GCT" OR Codons == "GCC->GCA" OR Codons == "GCA->GCT" OR Codons == "GCA->GCC" OR
+                             Codons == "AGA->AGG" OR Codons == "AGG->AGA" OR
+                             Codons == "CGT->CGC" OR Codons == "CGT->CGA" OR Codons == "CGC->CGT" OR Codons == "CGC->CGA" OR Codons == "CGA->CGT" OR Codons == "CGA->CGC" OR
+                             Codons == "AAA->AAG" OR Codons == "AAG->AAA" OR
+                             Codons == "GAA->GAG" OR Codons == "GAG->GAA" OR
+                             Codons == "GAT->GAC" OR Codons == "GAC->GAT" OR
+                             Codons == "ACT->ACC" OR Codons == "ACT->ACA" OR Codons == "ACC->ACT" OR Codons == "ACC->ACA" OR Codons == "ACA->ACT" OR Codons == "ACA->ACC" OR
+                             Codons == "TAT->TAC" OR Codons == "TAC->TAT" OR
+                             Codons == "TCT->TCC" OR Codons == "TCT->TCA" OR Codons == "TCC->TCT" OR Codons == "TCC->TCA" OR Codons == "TCA->TCT" OR Codons == "TCA->TCC" OR
+                             Codons == "TCA->TCG" OR Codons == "TCG->TCA" OR
+                             Codons == "CAT->CAC" OR Codons == "CAC->CAT" OR
+                             Codons == "TTT->TTC" OR Codons == "TTC->TTT" OR
+                             Codons == "TGT->TGC" OR Codons == "TGC->TGT" ')
+write.csv(data_SNPs_PARS_tRNA,file=paste0(path,"/data_SNPs_PARS_tRNA.csv",collapse = NULL),row.names = FALSE)
 
 group = c("4D","tRNA")
 for (g in group){

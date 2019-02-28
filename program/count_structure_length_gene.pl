@@ -21,8 +21,7 @@ use List::Util qw/min max/;
 =head1 SYNOPSIS
 
     perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure stem --output stem_length_mRNA.csv
-		perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure loop --output loop_length_mRNA.csv
-
+		
 =cut
 
 Getopt::Long::GetOptions(

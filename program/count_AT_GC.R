@@ -39,20 +39,21 @@ spec = matrix(
 )
 opt = getopt(spec)
 
+#name <- "Scer_n7_Spar"
 name <- opt$name
 path <- paste0("~/data/mrna-structure/result/", name, collapse = NULL)
 setwd(path)
 
 #输入csv
-file_SNPs_PARS_cds <- paste0("data_SNPs_PARS_cds.update",opt$outfile,".csv", collapse = NULL)
+file_SNPs_PARS_cds <- paste0("data_SNPs_PARS_cds",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_cds <- read.csv(file_SNPs_PARS_cds,header = TRUE,sep = ",")
-file_SNPs_PARS_utr <- paste0("data_SNPs_PARS_utr.update",opt$outfile,".csv", collapse = NULL)
+file_SNPs_PARS_utr <- paste0("data_SNPs_PARS_utr",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_utr <- read.csv(file_SNPs_PARS_utr,header = TRUE,sep = ",")
-file_SNPs_PARS_syn <- paste0("data_SNPs_PARS_syn.update",opt$outfile,".csv", collapse = NULL)
+file_SNPs_PARS_syn <- paste0("data_SNPs_PARS_syn",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_syn <- read.csv(file_SNPs_PARS_syn,header = TRUE,sep = ",")
-file_SNPs_PARS_nsy <- paste0("data_SNPs_PARS_nsy.update",opt$outfile,".csv", collapse = NULL)
+file_SNPs_PARS_nsy <- paste0("data_SNPs_PARS_nsy",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_nsy <- read.csv(file_SNPs_PARS_nsy,header = TRUE,sep = ",")
-file_SNPs_PARS_mRNA <- paste0("data_SNPs_PARS_mRNA.update",opt$outfile,".csv", collapse = NULL)
+file_SNPs_PARS_mRNA <- paste0("data_SNPs_PARS_mRNA",opt$outfile,".csv", collapse = NULL)
 data_SNPs_PARS_mRNA <- read.csv(file_SNPs_PARS_mRNA,header = TRUE,sep = ",")
 
 group = c("cds","utr","syn","nsy","mRNA")

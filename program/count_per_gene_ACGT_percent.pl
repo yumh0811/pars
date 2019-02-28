@@ -23,7 +23,7 @@ use Data::Dumper "Dumper";
 
 =head1 SYNOPSIS
 
-    perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_nsy.csv --output data_SNPs_PARS_nsy_per_gene_ATGC.csv
+    perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_per_gene_ATGC.csv
 
 =cut
 
@@ -57,7 +57,7 @@ while (<$csv_fh>) {
     s/\"//g;
     my @content = split /,/, $_;
     my @content_new;
-    if ( $content[1] eq "gene" ) {
+    if ( $content[8] eq "gene" ) {
         $content_new[0] = "gene";
         $content_new[1] = "stem_AT_GC";
         $content_new[2] = "stem_GC_AT";
@@ -76,31 +76,31 @@ while (<$csv_fh>) {
     }
     else {
 
-        if ( exists $gene_name{ $content[1] } ) {
+        if ( exists $gene_name{ $content[8] } ) {
 
-            if ( $content[7] eq "stem" ) {
-                if ( exists $mutation_AT_GC{ $content[10] } ) {
+            if ( $content[6] eq "stem" ) {
+                if ( exists $mutation_AT_GC{ $content[11] } ) {
                     $count_SNPs{'stem_AT_GC'} += 1;
                 }
-                elsif ( exists $mutation_GC_AT{ $content[10] } ) {
+                elsif ( exists $mutation_GC_AT{ $content[11] } ) {
                     $count_SNPs{'stem_GC_AT'} += 1;
-                }elsif ( exists $mutation_other{ $content[10] } ) {
+                }elsif ( exists $mutation_other{ $content[11] } ) {
                 	  $count_SNPs{'stem_other'} += 1;
                 }
             }
             else {
-                if ( exists $mutation_AT_GC{ $content[10] } ) {
+                if ( exists $mutation_AT_GC{ $content[11] } ) {
                     $count_SNPs{'loop_AT_GC'} += 1;
                 }
-                elsif ( exists $mutation_GC_AT{ $content[10] } ) {
+                elsif ( exists $mutation_GC_AT{ $content[11] } ) {
                     $count_SNPs{'loop_GC_AT'} += 1;
-                }elsif ( exists $mutation_other{ $content[10] } ) {
+                }elsif ( exists $mutation_other{ $content[11] } ) {
                 	  $count_SNPs{'loop_other'} += 1;
                 }
             }
 
             #my %hash = %count_SNPs;
-            $gene_name{ $content[1] } = {%count_SNPs};
+            $gene_name{ $content[8] } = {%count_SNPs};
 
             #print $content[1],"\n";
             #print Dumper(\%gene_name);sleep 2;
@@ -116,29 +116,29 @@ while (<$csv_fh>) {
                 'loop_other' => 0
             );
 
-            if ( $content[7] eq "stem" ) {
-                if ( exists $mutation_AT_GC{ $content[10] } ) {
+            if ( $content[6] eq "stem" ) {
+                if ( exists $mutation_AT_GC{ $content[11] } ) {
                     $count_SNPs{'stem_AT_GC'} += 1;
                 }
-                elsif ( exists $mutation_GC_AT{ $content[10] } ) {
+                elsif ( exists $mutation_GC_AT{ $content[11] } ) {
                     $count_SNPs{'stem_GC_AT'} += 1;
-                }elsif ( exists $mutation_other{ $content[10] } ) {
+                }elsif ( exists $mutation_other{ $content[11] } ) {
                 	  $count_SNPs{'stem_other'} += 1;
                 }
             }
-            elsif ( $content[7] eq "loop" ) {
-                if ( exists $mutation_AT_GC{ $content[10] } ) {
+            elsif ( $content[6] eq "loop" ) {
+                if ( exists $mutation_AT_GC{ $content[11] } ) {
                     $count_SNPs{'loop_AT_GC'} += 1;
                 }
-                elsif ( exists $mutation_GC_AT{ $content[10] } ) {
+                elsif ( exists $mutation_GC_AT{ $content[11] } ) {
                     $count_SNPs{'loop_GC_AT'} += 1;
-                }elsif ( exists $mutation_other{ $content[10] } ) {
+                }elsif ( exists $mutation_other{ $content[11] } ) {
                 	  $count_SNPs{'loop_other'} += 1;
                 }
             }
 
             #my %hash = %count_SNPs;
-            $gene_name{ $content[1] } = {%count_SNPs};
+            $gene_name{ $content[8] } = {%count_SNPs};
 
             #print $content[1],"\n";
             #print Dumper(\%gene_name);sleep 2;
