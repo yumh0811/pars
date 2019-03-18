@@ -53,9 +53,9 @@ while (<$csv_fh>) {
     s/"//g;
     my @snp = split /,/, $_;
 
-    if ( $snp[1] eq "gene" ) {
-        $snp[61] = "snp_pos";
-        $snp[62] = "island_length";
+    if ( $snp[0] eq "location" ) {
+        $snp[63] = "snp_pos";
+        $snp[64] = "island_length";
         my $snp = join ",", @snp;
 
         open OUT,'>>',$output;
@@ -64,12 +64,12 @@ while (<$csv_fh>) {
     }
     else {
 
-        if ( $snp[7] eq "stem" ) {
+        if ( $snp[6] eq "stem" ) {
 
-            if ( grep ( $snp[1], keys %{$gene_info_of} ) )
-            {    # $snp[1] represents snp in which gene
+            if ( grep ( $snp[8], keys %{$gene_info_of} ) )
+            {    # $snp[8] represents snp in which gene
 
-                my $info = $gene_info_of->{ $snp[1] };
+                my $info = $gene_info_of->{ $snp[8] };
 
                 my $stem = AlignDB::IntSpan->new;
 
@@ -83,8 +83,8 @@ while (<$csv_fh>) {
                 my @positon       = ();
 
                 foreach my $junction (@stem_junction) {
-                    push( @positon, abs( $junction - $snp[4] ) )
-                      ;    # $snp[4] represents snp absolute position
+                    push( @positon, abs( $junction - $snp[3] ) )
+                      ;    # $snp[3] represents snp absolute position
                     
                     
                 }
@@ -93,7 +93,7 @@ while (<$csv_fh>) {
 
                 push( @snp, $min );
                 
-                my $island = $stem ->find_islands( $snp[4] );
+                my $island = $stem ->find_islands( $snp[3] );
                 my $length = $island -> cardinality();
                 push( @snp, $length );
                 
@@ -105,10 +105,10 @@ while (<$csv_fh>) {
             print OUT $snp_processed, "\n";
         }
         else {
-            if ( grep ( $snp[1], keys %{$gene_info_of} ) )
-            {    # $snp[1] represents snp in which gene
+            if ( grep ( $snp[8], keys %{$gene_info_of} ) )
+            {    # $snp[8] represents snp in which gene
 
-                my $info = $gene_info_of->{ $snp[1] };
+                my $info = $gene_info_of->{ $snp[8] };
 
                 my $stem = AlignDB::IntSpan->new;
 
@@ -122,15 +122,15 @@ while (<$csv_fh>) {
                 my @positon       = ();
 
                 foreach my $junction (@stem_junction) {
-                    push( @positon, abs( $junction - $snp[4] ) )
-                      ;    # $snp[4] represents snp absolute position
+                    push( @positon, abs( $junction - $snp[3] ) )
+                      ;    # $snp[3] represents snp absolute position
                 }
 
                 my $min = List::Util::min @positon;
 
                 push( @snp, -$min );
 
-                my $island = $loop -> find_islands( $snp[4] );
+                my $island = $loop -> find_islands( $snp[3] );
                 my $length = $island -> cardinality();
                 push( @snp, $length );
 

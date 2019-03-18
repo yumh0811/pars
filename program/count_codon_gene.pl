@@ -34,7 +34,7 @@ Getopt::Long::GetOptions(
 # init
 #----------------------------------------------------------#
 my $stopwatch = AlignDB::Stopwatch->new;
-$stopwatch->start_message("Process folding info...");
+$stopwatch->start_message("Process codon info...");
 
 #----------------------------------------------------------#
 # start update
@@ -50,8 +50,9 @@ while (<$csv_fh>) {
     s/"//g;
     my @snp = split /,/, $_;
 
-    if ( $snp[1] eq "gene" ) {
+    if ( $snp[8] eq "gene" ) {
     
+        splice @snp, 19, 0, "Codon_pos";
         my $snp = join ",", @snp;
 
         open OUT,'>>',$output;
@@ -60,46 +61,34 @@ while (<$csv_fh>) {
     }
     else {
 				
-				my @codon_occured = split "\\|", $snp[17] if defined( $snp[17] );
-				my %count;
-        my @unicodon = grep { ++$count{$_} < 2; } @codon_occured;
-        my $codon_num = scalar( keys %count );
+				my @codon = split "/", $snp[18] if defined( $snp[18] );
+				my @mutant = split "->", $snp[11] if defined( $snp[11] );
 				my $codon_to;
-
-            if ( $codon_num != 2 ) {
-                $codon_to = join( '|', keys %count );
+				my $codon_pos;
+            
+        if ( $snp[7] eq '+' ){
+            if ($codon[0] =~ m/$mutant[0]/){
+                $codon_to = "$codon[0]->$codon[1]";
+                $codon_pos=index($codon[0],$mutant[0]);
+            }else{
+                $codon_to = "$codon[1]->$codon[0]";
+                $codon_pos=index($codon[1],$mutant[0]);
             }
-            else {
-                if ( $snp[10] eq 'Complex' ) {
-                    $codon_to = join( '|', keys %count );
-                }
-                else {
-                    #print YAML::Syck::Dump( \@unicodon );
-                    if ( $codon_num != 0 ) {
-                        if ( $count{ $unicodon[1] } ne $count{ $unicodon[0] } )
-                        {
-                            if ( $count{ $unicodon[1] } == $snp[11] ) {
-                                $codon_to = "$unicodon[0]->$unicodon[1]";
-                            }
-                            else {
-                                $codon_to = "$unicodon[1]->$unicodon[0]";
-                            }
-                        }else{
-                    	  		if ( $snp[8] eq '+'){
-                    	  				$codon_to = "$unicodon[0]->$unicodon[1]" if substr($unicodon[0], $snp[14], 1) eq substr($snp[10], 0 ,1);
-                    	  				$codon_to = "$unicodon[1]->$unicodon[0]" if substr($unicodon[1], $snp[14], 1) eq substr($snp[10], 0 ,1);
-                    	  		}else{
-                    	  				my $mutant_to = $snp[10];              
-                    	  		    $mutant_to =~ tr/ATGC/TACG/;
-                    	  				$codon_to = "$unicodon[0]->$unicodon[1]" if substr($unicodon[0], $snp[14], 1) eq substr($mutant_to, 0 ,1);
-                    	  				$codon_to = "$unicodon[1]->$unicodon[0]" if substr($unicodon[1], $snp[14], 1) eq substr($mutant_to, 0 ,1);
-                    	  		}
-                    	  }
-                    }
-                }
-            }
-
-        splice @snp, 17, 1, $codon_to if defined( $snp[17] );
+        }else{
+        	  $mutant[0] =~ tr/ATGC/TACG/;
+        	  $mutant[1] =~ tr/ATGC/TACG/;
+            if ($codon[0] =~ m/$mutant[0]/){
+                $codon_to = "$codon[0]->$codon[1]";
+                $codon_pos=index($codon[0],$mutant[0]);
+            }else{
+                $codon_to = "$codon[1]->$codon[0]";
+                $codon_pos=index($codon[1],$mutant[0]);
+            }        	                 	
+        }
+        $codon_to = uc($codon_to);
+        
+        splice @snp, 18, 1, $codon_to if defined( $snp[18] );
+        splice @snp, 19, 0, $codon_pos;
         my $snp = join ",", @snp;
         
         

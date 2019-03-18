@@ -471,21 +471,20 @@ for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
 
     cat ${NAME}.intact.lst | while read i
     do
-      file=SNP_${NAME}/${i}.SNPs.tsv
-      export prefix=$(echo ${file} | xargs basename | perl -p -e 's/\.SNPs\.tsv//')
-      cat ${file} | perl -nl -e 'print "$_\t$ENV{prefix}"' > SNP_${NAME}/${i}.tsv
-      unset prefix
-      unset file
+        file=SNP_${NAME}/${i}.SNPs.tsv
+        export prefix=$(echo ${file} | xargs basename | perl -p -e 's/\.SNPs\.tsv//')
+        cat ${file} | perl -nl -e 'print "$_\t$ENV{prefix}"' > SNP_${NAME}/${i}.tsv
+        unset prefix
+        unset file
     done
     rm -fr SNP_${NAME}/*.SNPs.tsv
-    cat SNP_${NAME}/*.tsv |
-        perl -nla -F"\t" -e 'print qq{$F[1]\t$F[3]\t$F[3]\t$F[5]/$F[6]};' | sort -u > ${NAME}.total.SNPs.tsv
     
     cat SNP_${NAME}/*.tsv |
-        perl -nla -F"\t" -e 'print qq{$F[4],$F[8],$F[9],$F[7],$F[13]};' > ${NAME}.total.SNPs.info.csv #Loccation,Mutant_to,Freq,Occured,Gene
+        perl -nla -F"\t" -e 'print qq{$F[4]\t$F[5]\t$F[6]\t$F[8]\t$F[9]\t$F[7]\t$F[13]};' > ${NAME}.total.SNPs.info.tsv #loccation,REF,ALT,mutant_to,freq,occured,gene
+
 done
 
-wc -l *.total.SNPs.tsv |
+wc -l *.total.SNPs.info.tsv |
     grep -v "total$" |
     datamash reverse -W |
     (echo -e "File\tCount" && cat) |
@@ -493,22 +492,151 @@ wc -l *.total.SNPs.tsv |
 
 ```
 
-| File                          | Count |
-|:------------------------------|------:|
-| Scer_n128_Seub.total.SNPs.tsv | 30720 |
-| Scer_n128_Spar.total.SNPs.tsv | 49991 |
-| Scer_n7p_Spar.total.SNPs.tsv  | 38256 |
-| Scer_n7_Spar.total.SNPs.tsv   | 29853 |
+| File | Count |
+| --- | --- |
+| Scer_n128_Seub.total.SNPs.info.tsv | 30834 |
+| Scer_n128_Spar.total.SNPs.info.tsv | 50268 |
+| Scer_n7p_Spar.total.SNPs.info.tsv | 38481 |
+| Scer_n7_Spar.total.SNPs.info.tsv | 30038 |
 
-# VEP
-upload ${NAME}.total.SNPs.tsv in https://asia.ensembl.org/Tools/VEP
-
-Species: Saccharomyces cerevisiae(Saccharomyces cerevisiae)
-Additional configurations: Additional_annotations: Upstream/Downstream distance (bp): 1
-Download VEP format profiles to `gene-filter`, and rename ${NAME}.total.SNPs.vep.txt
+## vcf
 
 ```bash
-cd ~/data/mrna-structure/gene-filter
+mkdir -p ~/data/mrna-structure/vcf
+cd ~/data/mrna-structure/vcf
+wget -c http://1002genomes.u-strasbg.fr/files/1011Matrix.gvcf.gz
+gzip -d 1011Matrix.gvcf.gz
+
+#rsync -av ymh@wq.nju.edu.cn:~/data/vcf/1011Matrix.gvcf /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/
+#ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf.gz .
+#mkdir -p ~/data/mrna-structure/vcf/1011Matrix.gvcf
+#cd 1011Matrix.gvcf/
+#ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/1011Matrix.gvcf .
+
+# 1011
+cd ~/data/mrna-structure/vcf/1011Matrix.gvcf
+
+perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.gvcf --output 1011Matrix.tsv
+cat 1011Matrix.tsv | 
+    perl -nla -F"\t" -e '
+        next if /^#/;
+        my $loca = $F[0];
+        $loca =~ /^chromosome(\d+)/;
+        $chr = &trans($1);
+        my $R = length $F[3];
+        my $A = length $F[4];
+        my @info = split /;/, $F[7];
+        my @AF = split /=/, $info[1];
+        my $Freq_vcf = $AF[1];
+        my @AC = split /=/, $info[0];
+        my @AN = split /=/, $info[2];
+        my $ALT_vcf = $AC[1];        
+        my $REF_vcf = $AN[1]-$AC[1];
+        if ($R == 1 && $A == 1){
+            print qq{$chr:$F[1]\t$F[3]\t$F[4]\t$Freq_vcf\t$REF_vcf\t$ALT_vcf};
+        } 
+        BEGIN{
+            print qq{Location\tREF\tALT\tFreq_vcf\tREF_vcf\tALT_vcf};
+            sub trans {
+              my %roman = (16=>"XVI",15=>"XV",14=>"XIV",13=>"XIII",12=>"XII",11=>"XI",10=>"X",9=>"IX",8=>"VIII",7=>"VII",6=>"VI",5=>"V",4=>"IV",3=>"III",2=>"II",1=>"I");
+              $roman{"$_[0]"};
+            }
+        }
+    ' \
+> 1011Matrix.ext.tsv
+cat 1011Matrix.ext.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > 1011Matrix.ext.txt
+
+# wili in 1011
+cd ~/data/mrna-structure/vcf/1011Matrix.gvcf
+
+perl -i -pe 's/chromosome4\t193242.*\n//g;s/chromosome4\t193246.*\n//g;s/chromosome4\t88:2:49\..*\n//g;s/chromosome4\t88:268.*\n//g;' 1011Matrix.gvcf
+bcftools view 1011Matrix.gvcf -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU | bcftools +fill-tags -o 1011Matrix.wild.gvcf
+perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.wild.gvcf --output 1011Matrix.wild.tsv
+
+cat 1011Matrix.wild.tsv | 
+    perl -nla -F"\t" -e '
+        next if /^#/;
+        my $loca = $F[0];
+        $loca =~ /^chromosome(\d+)/;
+        $chr = &trans($1);
+        my $R = length $F[3];
+        my $A = length $F[4];
+        my @info = split /;/, $F[7];
+        my @AF = split /=/, $info[1];
+        my $Freq_vcf = $AF[1];
+        my @AC = split /=/, $info[0];
+        my @AN = split /=/, $info[2];
+        my $ALT_vcf = $AC[1];        
+        my $REF_vcf = $AN[1]-$AC[1];
+        if ($R == 1 && $A == 1){
+            print qq{$chr:$F[1]\t$F[3]\t$F[4]\t$Freq_vcf\t$REF_vcf\t$ALT_vcf};
+        } 
+        BEGIN{
+            print qq{Location\tREF\tALT\tFreq_vcf\tREF_vcf\tALT_vcf};
+            sub trans {
+              my %roman = (16=>"XVI",15=>"XV",14=>"XIV",13=>"XIII",12=>"XII",11=>"XI",10=>"X",9=>"IX",8=>"VIII",7=>"VII",6=>"VI",5=>"V",4=>"IV",3=>"III",2=>"II",1=>"I");
+              $roman{"$_[0]"};
+            }
+        }
+    ' \
+> 1011Matrix.ext.wild.tsv
+cat 1011Matrix.ext.wild.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > 1011Matrix.ext.wild.txt
+
+```
+| File                          | Count |
+|:------------------------------|------:|
+| 1011Matrix.ext.tsv | 1544488 |
+| 1011Matrix.ext.wild.tsv | 1544485 |
+
+# VEP
+```bash
+mkdir -p ~/data/mrna-structure/vep
+cd ~/data/mrna-structure/vep
+
+for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
+    tsv-join --z \
+        ~/data/mrna-structure/vcf/1011Matrix.gvcf/1011Matrix.ext.txt \
+        -f ../gene-filter/${NAME}.total.SNPs.info.tsv \
+        --key-fields 1 \
+        --append-fields 2,3,4,5,6,7 \
+    > ${NAME}.total.SNPs.info.update.tsv
+    cat ${NAME}.total.SNPs.info.update.tsv | datamash check
+    cat ${NAME}.total.SNPs.info.update.tsv | 
+        perl -nla -F"\t" -e '
+            my $loca = $F[0];
+            $loca =~ /^(.*):(.*)/;
+            my $Chr = $1;
+            my $position = $2;
+            print qq{$Chr\t$position\t$position\t$F[1]\t$F[2]}; 
+        ' \
+    > ${NAME}.total.SNPs.update.tsv
+done
+
+wc -l *.total.SNPs.update.tsv |
+    grep -v "total$" |
+    datamash reverse -W |
+    (echo -e "File\tCount" && cat) |
+    mlr --itsv --omd cat
+
+```
+| File | Count |
+| --- | --- |
+| Scer_n128_Seub.total.SNPs.update.tsv | 27323 |
+| Scer_n128_Spar.total.SNPs.update.tsv | 44251 |
+| Scer_n7_Spar.total.SNPs.update.tsv | 26814 |
+| Scer_n7p_Spar.total.SNPs.update.tsv | 35078 |
+
+upload ${NAME}.total.SNPs.update.tsv in https://asia.ensembl.org/Tools/VEP
+
+Species: Saccharomyces cerevisiae(Saccharomyces cerevisiae)
+Additional configurations: 
+    Additional_annotations: 
+        Upstream/Downstream distance (bp): 1
+Download VEP format profiles to `vep`, and rename ${NAME}.total.SNPs.vep.txt
+
+
+```bash
+cd ~/data/mrna-structure/vep
 
 for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
     cat ${NAME}.total.SNPs.vep.txt | 
@@ -517,12 +645,24 @@ for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
             my $loca = $F[1];
             $loca =~ /^(.*)-[0-9]+/;
             my $ID = $1;
-            print qq{$ID,$F[2],$F[3],$F[6],$F[8],$F[10],$F[11],$F[12]}; #Location,Allele,Gene,Consequence,CDS_position,Amino_acids,Codons,Existing_variation
+            print qq{$ID\t$F[2]\t$F[3]\t$F[6]\t$F[8]\t$F[10]\t$F[11]\t$F[12]}; #location,allele,gene,consequence,CDS_position,amino_acids,codons,existing_variation
         ' \
-        > ${NAME}.total.SNPs.vep.csv
+    > ${NAME}.total.SNPs.vep.tsv
 done
 
+wc -l *.total.SNPs.vep.tsv |
+    grep -v "total$" |
+    datamash reverse -W |
+    (echo -e "File\tCount" && cat) |
+    mlr --itsv --omd cat
+
 ```
+| File | Count |
+| --- | --- |
+| Scer_n128_Seub.total.SNPs.vep.tsv | 27324 |
+| Scer_n128_Spar.total.SNPs.vep.tsv | 44252 |
+| Scer_n7_Spar.total.SNPs.vep.tsv | 26818 |
+| Scer_n7p_Spar.total.SNPs.vep.tsv | 35082 |
 
 # Process PARS data
 
@@ -535,8 +675,8 @@ perl ~/Scripts/pars/blastn_transcript.pl -f ../blast/sce_genes.blast -m 0
 for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
     echo "==> ${NAME}"
     
-    cat ../gene-filter/${NAME}.total.SNPs.info.csv | 
-        perl -nla -F"," -e 'print  qq{$F[0]};' | sort -u  > ${NAME}.snp.gene.pos.txt
+    cat ../vep/${NAME}.total.SNPs.info.update.tsv | 
+        perl -nla -F"\t" -e 'print  qq{$F[0]};' | sort -u  > ${NAME}.snp.gene.pos.txt
 
     perl ~/Scripts/pars/read_fold.pl \
         --pars ../PARS10/pubs/PARS10/data \
@@ -554,7 +694,7 @@ cd ~/data/mrna-structure/process
 #----------------------------------------------------------#
 
 # produce transcript set
-# YLR167W	568	chrXII	498888	499455	+
+# YLR167W 568 chrXII 498888 499455 +
 cat sce_genes.blast.tsv \
     | perl -nla -e 'print qq{$F[2]:$F[3]-$F[4]}' \
     | sort \
@@ -637,8 +777,8 @@ for f in genes intron orf_genomic utr mRNA cds; do
 done >> coverage.stat.md
 
 cat coverage.stat.md
-```
 
+```
 | Name | chrLength | size | coverage |
 |:--|--:|--:|--:|
 | genes | 12071326 | 4236728 | 0.3510 |
@@ -648,34 +788,16 @@ cat coverage.stat.md
 | mRNA | 12071326 | 4234684 | 0.3508 |
 | cds | 12071326 | 3717983 | 0.3080 |
 
-
 # SNP
 
 ## count per gene GC content
 
 ```bash
-export NAME=Scer_n7_Spar
-mkdir -p ~/data/mrna-structure/result/${NAME}
-cd ~/data/mrna-structure/result/${NAME}
-perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --varfold ~/data/mrna-structure/process/${NAME}.gene_variation.fold_class.tsv --output ${NAME}.gene_variation.fold_class.csv
-unset NAME
-
-export NAME=Scer_n7p_Spar
-mkdir -p ~/data/mrna-structure/result/${NAME}
-cd ~/data/mrna-structure/result/${NAME}
-perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --varfold ~/data/mrna-structure/process/${NAME}.gene_variation.fold_class.tsv --output ${NAME}.gene_variation.fold_class.csv
-unset NAME
-
-export NAME=Scer_n128_Spar
-mkdir -p ~/data/mrna-structure/result/${NAME}
-cd ~/data/mrna-structure/result/${NAME}
-perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --varfold ~/data/mrna-structure/process/${NAME}.gene_variation.fold_class.tsv --output ${NAME}.gene_variation.fold_class.csv
-unset NAME
-
-export NAME=Scer_n128_Seub
-mkdir -p ~/data/mrna-structure/result/${NAME}
-cd ~/data/mrna-structure/result/${NAME}
-perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --varfold ~/data/mrna-structure/process/${NAME}.gene_variation.fold_class.tsv --output ${NAME}.gene_variation.fold_class.csv
+for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
+    mkdir -p ~/data/mrna-structure/result/${NAME}
+    cd ~/data/mrna-structure/result/${NAME}
+    perl ~/Scripts/pars/program/count_ACGT_percent.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --varfold ~/data/mrna-structure/process/${NAME}.gene_variation.fold_class.tsv --output ${NAME}.gene_variation.fold_class.csv
+done
 unset NAME
 
 ```
@@ -699,24 +821,29 @@ Rscript -e 'install.packages("RSQLite", repos="https://mirrors.tuna.tsinghua.edu
 Rscript -e 'install.packages("sqldf", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 Rscript -e 'install.packages("sm", repos="https://mirrors.tuna.tsinghua.edu.cn/CRAN")'
 
-export NAME=Scer_n7_Spar
-cd ~/data/mrna-structure/result/${NAME}
-Rscript ~/Scripts/pars/program/stat_SNPs.R -n ${NAME} #中间有手工校正
-unset NAME
-
-export NAME=Scer_n7p_Spar
-cd ~/data/mrna-structure/result/${NAME}
-Rscript ~/Scripts/pars/program/stat_SNPs.R -n ${NAME} #中间有手工校正
-unset NAME
-
-export NAME=Scer_n128_Spar
-cd ~/data/mrna-structure/result/${NAME}
-Rscript ~/Scripts/pars/program/stat_SNPs.R -n ${NAME} #中间有手工校正
-unset NAME
-
-export NAME=Scer_n128_Seub
-cd ~/data/mrna-structure/result/${NAME}
-Rscript ~/Scripts/pars/program/stat_SNPs.R -n ${NAME} #中间有手工校正
+for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
+    cd ~/data/mrna-structure/result/${NAME}
+    tsv-join --z \
+        ~/data/mrna-structure/vep/${NAME}.total.SNPs.info.update.tsv \
+        -f ~/data/mrna-structure/vep/${NAME}.total.SNPs.vep.tsv \
+        --key-fields 1 \
+        --append-fields 2-8 \
+    >${NAME}.tsv
+    cat ${NAME}.tsv | 
+        perl -nla -F"\t" -e '
+            if ($F[8] eq "-" || $F[6] eq $F[8]){
+                splice @F, 8, 1 ;
+                my $F = join ("\t",@F);
+                print qq{$F};
+            }
+            BEGIN{
+                print qq{location\tREF\tALT\tmutant_to\tfreq\toccured\tgene\tallele\tconsequence\tCDS_position\tamino_acids\tcodons\texisting_variation};
+            }
+        ' \
+    > ${NAME}_SNPs_total_info_vep_non_overlapped.tsv
+    rm ${NAME}.tsv
+    Rscript ~/Scripts/pars/program/stat_SNPs.R -n ${NAME}  
+done
 unset NAME
 
 ```
@@ -730,14 +857,12 @@ for NAME in Scer_n7_Spar Scer_n7p_Spar; do
     mkdir -p ~/data/mrna-structure/result/${NAME}/freq_each
     
     Rscript ~/Scripts/pars/program/count_AT_GC.R -n ${NAME} 
-    
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_mRNA_stat.csv --output freq_each/PARS_mRNA_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_cds_stat.csv --output freq_each/PARS_cds_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_utr_stat.csv --output freq_each/PARS_utr_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_syn_stat.csv --output freq_each/PARS_syn_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_nsy_stat.csv --output freq_each/PARS_nsy_stat_chi_square.csv
-    unset NAME
+    for AREA  in mRNA cds utr syn nsy; do
+        perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_${AREA}_stat.csv --output freq_each/PARS_${AREA}_stat_chi_square.csv
+    done
+    unset AREA
 done
+unset NAME
 
 for NAME in Scer_n128_Spar Scer_n128_Seub; do
     cd ~/data/mrna-structure/result/${NAME}
@@ -745,19 +870,13 @@ for NAME in Scer_n128_Spar Scer_n128_Seub; do
     mkdir -p ~/data/mrna-structure/result/${NAME}/freq_10
     
     Rscript ~/Scripts/pars/program/count_AT_GC.R -n ${NAME} 
-    
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_mRNA_stat.csv --output freq_each/PARS_mRNA_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_cds_stat.csv --output freq_each/PARS_cds_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_utr_stat.csv --output freq_each/PARS_utr_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_syn_stat.csv --output freq_each/PARS_syn_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_nsy_stat.csv --output freq_each/PARS_nsy_stat_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_mRNA_stat_freq_10.csv --output freq_10/PARS_mRNA_stat_freq_10_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_cds_stat_freq_10.csv --output freq_10/PARS_cds_stat_freq_10_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_utr_stat_freq_10.csv --output freq_10/PARS_utr_stat_freq_10_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_syn_stat_freq_10.csv --output freq_10/PARS_syn_stat_freq_10_chi_square.csv
-    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_nsy_stat_freq_10.csv --output freq_10/PARS_nsy_stat_freq_10_chi_square.csv
-    unset NAME
+    for AREA  in mRNA cds utr syn nsy; do
+        perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_${AREA}_stat.csv --output freq_each/PARS_${AREA}_stat_chi_square.csv
+        perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_${AREA}_stat_freq_10.csv --output freq_10/PARS_${AREA}_stat_freq_10_chi_square.csv
+    done
+    unset AREA
 done
+unset NAME
 
 ```
 
@@ -772,14 +891,29 @@ perl ~/Scripts/pars/program/count_position_gene.pl --file ~/data/mrna-structure/
 
 Rscript ~/Scripts/pars/program/count_AT_GC_gene_trait.R -n ${NAME}
 
-cat data_SNPs_PARS_mRNA_pos.csv | perl -nl -a -F"," -e 'print qq{$F[8]};' | sort -u > mRNA.gene.list.csv
+for CATEGORY in stem_AT_GC stem_GC_AT loop_AT_GC loop_GC_AT; do
+    cat freq_10/stem_length/PARS_mRNA_1_stat_${CATEGORY}_freq_10.csv | csv2tsv > list.tmp
+    for ((i=2; i<=15; i++)) 
+    do     
+        tsv-join \
+            list.tmp \
+            -f <(cat freq_10/stem_length/PARS_mRNA_${i}_stat_${CATEGORY}_freq_10.csv | csv2tsv) \
+            --key-fields 1 \
+            --append-fields 2 \
+        > list.tmp.bak
+        cat list.tmp.bak > list.tmp
+    done
+    cat list.tmp > stem_length_PARS_mRNA_stat_${CATEGORY}_freq_10.tsv
+    rm list.tmp
+    rm list.tmp.bak
+done
 
-perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure stem --output stem_length_mRNA.csv
-perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure loop --output loop_length_mRNA.csv
+cat data_SNPs_PARS_mRNA.csv | perl -nl -a -F"," -e 'print qq{$F[8]};' | sort -u | perl -nl -a -F"," -e 'next if /"gene"/; print qq{$F[0]}; BEGIN{print qq{gene};}' > mRNA.gene.list.csv
 
-#perl ~/Scripts/pars/program/count_structure_length_gene.update.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.update.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure stem --output stem_length_cds.update.csv
-#perl ~/Scripts/pars/program/count_structure_length_gene.update.pl --file ~/data/mrna-structure/process/$NAME.gene_variation.process.update.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure loop --output loop_length_cds.update.csv
-
+for STRUCTURE in stem loop; do
+    perl ~/Scripts/pars/program/count_structure_length_gene.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --name ~/data/mrna-structure/result/${NAME}/mRNA.gene.list.csv --structure ${STRUCTURE} --output ${STRUCTURE}_length_mRNA.csv
+done
+unset STRUCTURE
 unset NAME
 
 ```
@@ -791,10 +925,11 @@ export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
 perl ~/Scripts/pars/program/count_codon_gene.pl --origin data_SNPs_PARS_syn.csv --output data_SNPs_PARS_syn_codon.csv
 Rscript ~/Scripts/pars/program/count_AT_GC_codon.R -n ${NAME}
-perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_tRNA_stat.csv --output freq_each/PARS_tRNA_stat_chi_square.csv
-perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_4D_stat.csv --output freq_each/PARS_4D_stat_chi_square.csv
-perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_tRNA_stat_freq_10.csv --output freq_10/PARS_tRNA_stat_freq_10_chi_square.csv
-perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_4D_stat_freq_10.csv --output freq_10/PARS_4D_stat_freq_10_chi_square.csv
+for AREA  in tRNA 4D; do
+    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_${AREA}_stat.csv --output freq_each/PARS_${AREA}_stat_chi_square.csv
+    perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_${AREA}_stat_freq_10.csv --output freq_10/PARS_${AREA}_stat_freq_10_chi_square.csv
+done
+unset AREA
 unset NAME
 
 ```
@@ -804,95 +939,27 @@ unset NAME
 ```bash
 export NAME=Scer_n128_Spar
 cd ~/data/mrna-structure/result/${NAME} 
-perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_cds.yml --output stem_loop_cds_length.csv 
-perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_utr.yml --output stem_loop_utr_length.csv
-perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_cds.csv --output data_SNPs_PARS_cds_per_gene_ATGC.csv
-perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_utr.csv --output data_SNPs_PARS_utr_per_gene_ATGC.csv
+for AREA in cds utr; do
+    perl ~/Scripts/pars/program/count_cut_range.pl --file ~/data/mrna-structure/process/${NAME}.gene_variation.process.yml --cut ~/data/mrna-structure/process/sce_${AREA}.yml --output stem_loop_${AREA}_length.csv
+    perl ~/Scripts/pars/program/count_per_gene_ACGT_percent.pl --file data_SNPs_PARS_${AREA}.csv --output data_SNPs_PARS_${AREA}_per_gene_ATGC.csv
+done
+
 Rscript ~/Scripts/pars/program/count_cds_utr.R -n ${NAME}
 unset NAME
 ```
 
 
-## vcf
-
+# GO/KEGG
 ```bash
-mkdir -p ~/data/mrna-structure/vcf
 cd ~/data/mrna-structure/vcf
-wget -c http://1002genomes.u-strasbg.fr/files/1011Matrix.gvcf.gz
-gzip -d 1011Matrix.gvcf.gz
-
-#rsync -av ymh@wq.nju.edu.cn:~/data/vcf/1011Matrix.gvcf /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/
-#ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf.gz .
-#mkdir -p ~/data/mrna-structure/vcf/1011Matrix.gvcf
-#cd 1011Matrix.gvcf/
-#ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/1011Matrix.gvcf .
-
-# 1011
-cd ~/data/mrna-structure/vcf/1011Matrix.gvcf
-
-perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.gvcf --output 1011Matrix.tsv
-cat 1011Matrix.tsv | 
-    perl -nla -F"\t" -e '
-        next if /^#/;
-        my $loca = $F[0];
-        $loca =~ /^chromosome(\d+)/;
-        $chr = &trans($1);
-        my @info = split /;/, $F[7];
-        my @AF = split /=/, $info[1];
-        my $Freq_vcf = $AF[1];
-        my @AC = split /=/, $info[0];
-        my $REF_vcf = $AC[1];
-        my @AN = split /=/, $info[2];
-        my $ALT_vcf = $AN[1]-$AC[1];
-        print qq{$chr:$F[1]\t$F[3]\t$F[4]\t$Freq_vcf\t$REF_vcf\t$ALT_vcf}; 
-        BEGIN{
-            print qq{Location\tREF\tALT\tFreq_vcf\tREF_vcf\tALT_vcf};
-            sub trans {
-		            my %roman = (16=>"XVI",15=>"XV",14=>"XIV",13=>"XIII",12=>"XII",11=>"XI",10=>"X",9=>"IX",8=>"VIII",7=>"VII",6=>"VI",5=>"V",4=>"IV",3=>"III",2=>"II",1=>"I");
-		            $roman{"$_[0]"};
-            }
-        }
-    ' \
-> 1011Matrix.ext.tsv
-
-# wili in 1011
-cd ~/data/mrna-structure/vcf/1011Matrix.gvcf
-
-perl -i -pe 's/chromosome4\t193242.*\n//g;s/chromosome4\t193246.*\n//g;s/chromosome4\t88:2:49\..*\n//g;s/chromosome4\t88:268.*\n//g;' 1011Matrix.gvcf
-bcftools view 1011Matrix.gvcf -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU | bcftools +fill-tags -o 1011Matrix.wild.gvcf
-perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.wild.gvcf --output 1011Matrix.wild.tsv
-
-cat 1011Matrix.wild.tsv | 
-    perl -nla -F"\t" -e '
-        next if /^#/;
-        my $loca = $F[0];
-        $loca =~ /^chromosome(\d+)/;
-        $chr = &trans($1);
-        my @info = split /;/, $F[7];
-        my @AF = split /=/, $info[1];
-        my $Freq_vcf = $AF[1];
-        my @AC = split /=/, $info[0];
-        my $REF_vcf = $AC[1];
-        my @AN = split /=/, $info[2];
-        my $ALT_vcf = $AN[1]-$AC[1];
-        print qq{$chr:$F[1]\t$F[3]\t$F[4]\t$Freq_vcf\t$REF_vcf\t$ALT_vcf}; 
-        BEGIN{
-            print qq{Location\tREF\tALT\tFreq_vcf\tREF_vcf\tALT_vcf};
-            sub trans {
-		            my %roman = (16=>"XVI",15=>"XV",14=>"XIV",13=>"XIII",12=>"XII",11=>"XI",10=>"X",9=>"IX",8=>"VIII",7=>"VII",6=>"VI",5=>"V",4=>"IV",3=>"III",2=>"II",1=>"I");
-		            $roman{"$_[0]"};
-            }
-        }
-    ' \
-> 1011Matrix.ext.wild.tsv
 
 export NAME=Scer_n128_Spar
 cat ~/data/mrna-structure/result/${NAME}/data_SNPs_PARS_mRNA.csv | sed 's/\"//g' |
     perl -nla -F"," -e '
-        next if /^Location/;
-        my $Freq = $F[10]/128;
+        next if /^location/;
+        my $Freq = $F[12]/128;
         my %count;
-        my @occured = split //, $F[11];
+        my @occured = split //, $F[13];
         my @uniq = grep { ++$count{$_} < 2; } @occured;
         my $REF_pars = $count{ $occured[0] };
         my $REF = $occured[0];
@@ -903,40 +970,33 @@ cat ~/data/mrna-structure/result/${NAME}/data_SNPs_PARS_mRNA.csv | sed 's/\"//g'
         }else{
             $ALT = $uniq[0];
         }
-        print qq{$F[0]\t$F[8]\t$F[6]\t$F[9]\t$REF\t$ALT\t$Freq\t$REF_pars\t$ALT_pars}; 
+        print qq{$F[0]\t$F[8]\t$F[6]\t$F[11]\t$REF\t$ALT\t$Freq\t$REF_pars\t$ALT_pars}; 
         BEGIN{
-            print qq{Location\tGene\tStructure\tMutant_to\tREF\tALT\tFreq_pars\tREF_pars\tALT_pars};
+            print qq{location\tgene\tstructure\tmutant_to\tREF\tALT\tfreq_pars\tREF_pars\tALT_pars};
         }
     ' \
 > ${NAME}_data_SNPs_PARS_mRNA.pars.tsv
 
-Rscript ~/Scripts/pars/program/vcf.merge.R -p ${NAME}_data_SNPs_PARS_mRNA.pars.tsv -v 1011Matrix.ext.tsv -o ${NAME}_data_SNPs_PARS_mRNA.merge.tsv
-Rscript ~/Scripts/pars/program/vcf.merge.R -p ${NAME}_data_SNPs_PARS_mRNA.pars.tsv -v 1011Matrix.ext.wild.tsv -o ${NAME}_data_SNPs_PARS_mRNA.merge.wild.tsv
-
-cat ${NAME}_data_SNPs_PARS_mRNA.merge.tsv | sed 's/\"//g' |
+tsv-join --z \
+    ${NAME}_data_SNPs_PARS_mRNA.pars.tsv \
+    -f 1011Matrix.gvcf/1011Matrix.ext.wild.tsv  \
+    --key-fields 1 \
+    --append-fields 2-6 |
     perl -nla -F"\t" -e '
-        next if /^Location/;
-        if ($F[4]eq$F[9] && $F[5]eq$F[10]){
-            my $minus = $F[6] - $F[11];
-            my $obs = [ [ $F[7], $F[8] ], [ $F[12], $F[13] ] ];
-            my $chi = new Statistics::ChisqIndep;
-            $chi->load_data($obs);
-            #$chi->print_summary();
-            $Chi = ${$chi}{'chisq_statistic'};
-            $P = ${$chi}{'p_value'};
-            my $chi = 
-            print qq{$F[0]\t$F[1]\t$F[2]\t$F[3]\t$F[4]\t$F[5]\t$F[6]\t$F[11]\t$minus\t$Chi\t$P}; 
+        my $mutant_to = $F[3];
+        $mutant_to =~ /^(.*)->/;
+        my $REF = $1;
+        if ($REF ne $F[9]){
+            $F[11] = 1 - $F[11];
         }
-        BEGIN{
-            print qq{Location\tGene\tStructure\tMutant_to\tREF\tALT\tFreq_pars\tFreq_vcf\tFreq_minus\tChi\tp};
-            use Statistics::ChisqIndep;
-        }
+        my $F = join("\t",@F);
+        print qq{$F};
     ' \
-> ${NAME}_data_SNPs_PARS_mRNA.merge.Chi.tsv
+> ${NAME}_data_SNPs_PARS_mRNA.merge.wild.tsv
 
 cat ${NAME}_data_SNPs_PARS_mRNA.merge.wild.tsv | sed 's/\"//g' |
     perl -nla -F"\t" -e '
-        next if /^Location/;
+        next if /^location/;
         if ($F[4]eq$F[9] && $F[5]eq$F[10]){
             my $minus = $F[6] - $F[11];
             my $obs = [ [ $F[7], $F[8] ], [ $F[12], $F[13] ] ];
@@ -949,24 +1009,24 @@ cat ${NAME}_data_SNPs_PARS_mRNA.merge.wild.tsv | sed 's/\"//g' |
             print qq{$F[0]\t$F[1]\t$F[2]\t$F[3]\t$F[4]\t$F[5]\t$F[6]\t$F[11]\t$minus\t$Chi\t$P}; 
         }
         BEGIN{
-            print qq{Location\tGene\tStructure\tMutant_to\tREF\tALT\tFreq_pars\tFreq_vcf\tFreq_minus\tChi\tp};
+            print qq{location\tgene\tstructure\tmutant_to\tREF\tALT\tfreq_pars\tfreq_vcf\tfreq_minus\tchi\tp};
             use Statistics::ChisqIndep;
         }
     ' \
 > ${NAME}_data_SNPs_PARS_mRNA.merge.wild.Chi.tsv
 
-# extract SNP list, 1011=1011_wild
-cat ${NAME}_data_SNPs_PARS_mRNA.merge.Chi.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > ${NAME}.mRNA.snp.update.txt
+## extract SNP list, 1011=1011_wild
 cat ${NAME}_data_SNPs_PARS_mRNA.merge.wild.Chi.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > ${NAME}.mRNA.wild.snp.update.txt
-#extract freq_minus>0,p<0.05 in 1011.wild
+
+## extract freq_minus>0,p<0.05 in 1011.wild
 cat ${NAME}_data_SNPs_PARS_mRNA.merge.wild.Chi.tsv | 
     perl -nla -F"\t" -e '
-        next if /^Location/;
+        next if /^location/;
         if ($F[8]>0 && $F[10]<0.05){
             print qq{$F[0]};
         }
         BEGIN{
-            print qq{Location};
+            print qq{location};
         }
     ' \
 > ${NAME}.mRNA.wild.snp.update.filter.txt
@@ -974,80 +1034,210 @@ cat ${NAME}_data_SNPs_PARS_mRNA.merge.wild.Chi.tsv |
 unset NAME
 
 ```
-| File                          | Count |
-|:------------------------------|------:|
-| Scer_n128_Spar_data_SNPs_PARS_mRNA.pars.tsv | 48789 |
-| 1011Matrix.ext.tsv | 1754866 |
-| 1011Matrix.ext.wild.tsv | 1754862 |
-| Scer_n128_Spar_data_SNPs_PARS_mRNA.merge.tsv | 46431 |
-| Scer_n128_Spar_data_SNPs_PARS_mRNA.merge.wild.tsv | 46431 |
-| Scer_n128_Spar_data_SNPs_PARS_mRNA.merge.Chi.tsv | 43032 |
-| Scer_n128_Spar_data_SNPs_PARS_mRNA.merge.wild.Chi.tsv | 43032 |
-| Scer_n128_Spar.mRNA.wild.snp.update.filter.txt | 32767 |
 
-
-
-## count GO KEGG
+## update wild
 
 ```bash
 export NAME=Scer_n128_Spar
 mkdir -p ~/data/mrna-structure/result/${NAME}.update
-cd ~/data/mrna-structure/result/${NAME}.update
-
 mkdir -p ~/data/mrna-structure/result/${NAME}.update/freq_each
 mkdir -p ~/data/mrna-structure/result/${NAME}.update/freq_10
+
+cd ~/data/mrna-structure/result/${NAME}.update
+
+tsv-join --z \
+    ~/data/mrna-structure/vcf/${NAME}.mRNA.wild.snp.update.filter.txt \
+    -f <(cat ../${NAME}/data_SNPs_PARS_mRNA.csv | sed 's/\"//g' | csv2tsv) \
+    --key-fields 1 \
+    --append-fields 2-63 \
+> data_SNPs_PARS_mRNA.tsv
 
 Rscript ~/Scripts/pars/program/count_AT_GC.update.R -n ${NAME}
 
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_each/PARS_mRNA_stat.csv --output freq_each/PARS_mRNA_stat_chi_square.csv
 perl ~/Scripts/pars/program/count_stem_loop_chi_square.pl --file freq_10/PARS_mRNA_stat_freq_10.csv --output freq_10/PARS_mRNA_stat_freq_10_chi_square.csv
 
-#将Scer_n128_Spar.update/mRNA.gene.list.update.csv输入 https://david.ncifcrf.gov/ 中，得到GO，KEGG信息
+unset NAME
+
+```
+
+upload Scer_n128_Spar.update/mRNA.gene.list.update.csv in https://david.ncifcrf.gov/ , get GO/KEGG information
+
+```bash
+export NAME=Scer_n128_Spar
+
+cd ~/data/mrna-structure/result/${NAME}.update
+
 mkdir -p freq_10/GO
 mkdir -p freq_10/KEGG
-Rscript ~/Scripts/pars/program/count_AT_GC_GO.R -n ${NAME}
-Rscript ~/Scripts/pars/program/count_AT_GC_KEGG.R -n ${NAME}
+Rscript ~/Scripts/pars/program/count_AT_GC_GO_KEGG.R -n ${NAME}.update
 
-#得到Scer_n128_Spar_go_kegg.csv
+# process
+##BP
+for CATEGORY in stem_AT_GC; do
+    cat freq_10/GO/BP_1_stat_${CATEGORY}_freq_10.csv | csv2tsv > list.tmp
+    for ((i=2; i<=123; i++)) 
+    do     
+        tsv-join \
+            list.tmp \
+            -f <(cat freq_10/GO/BP_${i}_stat_${CATEGORY}_freq_10.csv | csv2tsv) \
+            --key-fields 1 \
+            --append-fields 2 \
+        > list.tmp.bak
+        cat list.tmp.bak > list.tmp
+    done
+    cat list.tmp > BP_stat_${CATEGORY}_freq_10.tsv
+    rm list.tmp
+    rm list.tmp.bak
+done
+
+##CC
+for CATEGORY in stem_AT_GC; do
+    cat freq_10/GO/CC_1_stat_${CATEGORY}_freq_10.csv | csv2tsv > list.tmp
+    for ((i=2; i<=72; i++)) 
+    do     
+        tsv-join \
+            list.tmp \
+            -f <(cat freq_10/GO/CC_${i}_stat_${CATEGORY}_freq_10.csv | csv2tsv) \
+            --key-fields 1 \
+            --append-fields 2 \
+        > list.tmp.bak
+        cat list.tmp.bak > list.tmp
+    done
+    cat list.tmp > CC_stat_${CATEGORY}_freq_10.tsv
+    rm list.tmp
+    rm list.tmp.bak
+done
+
+##MF
+for CATEGORY in stem_AT_GC; do
+    cat freq_10/GO/MF_1_stat_${CATEGORY}_freq_10.csv | csv2tsv > list.tmp
+    for ((i=2; i<=52; i++)) 
+    do     
+        tsv-join \
+            list.tmp \
+            -f <(cat freq_10/GO/MF_${i}_stat_${CATEGORY}_freq_10.csv | csv2tsv) \
+            --key-fields 1 \
+            --append-fields 2 \
+        > list.tmp.bak
+        cat list.tmp.bak > list.tmp
+    done
+    cat list.tmp > MF_stat_${CATEGORY}_freq_10.tsv
+    rm list.tmp
+    rm list.tmp.bak
+done
+
+##KEGG
+for CATEGORY in stem_AT_GC; do
+    cat freq_10/KEGG/KEGG_1_stat_${CATEGORY}_freq_10.csv | csv2tsv > list.tmp
+    for ((i=2; i<=30; i++)) 
+    do     
+        tsv-join \
+            list.tmp \
+            -f <(cat freq_10/KEGG/KEGG_${i}_stat_${CATEGORY}_freq_10.csv | csv2tsv) \
+            --key-fields 1 \
+            --append-fields 2 \
+        > list.tmp.bak
+        cat list.tmp.bak > list.tmp
+    done
+    cat list.tmp > KEGG_stat_${CATEGORY}_freq_10.tsv
+    rm list.tmp
+    rm list.tmp.bak
+done
+
+#evaluate γ (Matlab), obtain Scer_n128_Spar_go_kegg.csv
 
 mkdir -p freq_10/go_kegg
 mkdir -p freq_10/go_kegg/syn
 mkdir -p freq_10/go_kegg/nsy
-Rscript ~/Scripts/pars/program/count_AT_GC_go_kegg.R -n ${NAME}
+Rscript ~/Scripts/pars/program/count_AT_GC_GO_KEGG_SN.R -n ${NAME}.update
 
+# process
+##go_kegg
+for AREA in syn nsy; do
+    for CATEGORY in stem_AT_GC; do
+        cat freq_10/go_kegg/${AREA}/go_kegg_1_stat_${CATEGORY}_freq_10.csv | csv2tsv > list.tmp
+        for ((i=2; i<=41; i++)) 
+        do     
+            tsv-join \
+            list.tmp \
+                -f <(cat freq_10/go_kegg/${AREA}/go_kegg_${i}_stat_${CATEGORY}_freq_10.csv | csv2tsv) \
+                --key-fields 1 \
+                --append-fields 2 \
+            > list.tmp.bak
+            cat list.tmp.bak > list.tmp
+        done
+        cat list.tmp > go_kegg_stat_${CATEGORY}_freq_10_${AREA}.tsv
+        rm list.tmp
+        rm list.tmp.bak
+    done
+done
 unset NAME
 
 ```
 
+#subpop
 ## stat subpopulation SNPs frequency
 
 ```bash
 export NAME=Scer_n128_Spar
-mkdir -p ~/data/mrna-structure/result/${NAME}/subpop
-cd ~/data/mrna-structure/result/${NAME}/subpop
+mkdir -p ~/data/mrna-structure/result/${NAME}.update/subpop
+cd ~/data/mrna-structure/result/${NAME}.update/subpop
+
+#get genelist by filtering strong selection from GO/KEGG annotation (mt) and deleting repeating item
+echo -e "YLR305C\nYHR037W\nYHR063C\nYML110C\nYDR232W\nYER183C\nYMR205C\nYER017C\nYDL126C\nYBR111C\nYBR085W\nYBL030C\nYDR477W\nYMR301C\nYOR153W\nYLR188W\nYPL270W\nYDR011W\nYBL022C\nYDR194C\nYDL181W\nYGR008C\nYDL203C\nYEL052W\nYHL021C\nYHR198C\nYIL087C\nYMR157C\nYOR215C\nYPR004C\nYHR199C\nYLR370C\nYJL178C\nYLR356W\nYNL315C\nYER155C\nYNL305C\nYPR113W\nYER026C\nYJR060W\nYPL215W\nYIL043C\nYLR390W-A\nYGR207C\nYKL137W\nYPL189C-A\nYPL132W\nYML129C\nYER141W\nYHR116W\nYLR380W\nYBR291C\nYBR037C\nYMR264W\nYML086C\nYDL174C\nYDL178W\nYGL120C\nYOR151C\nYLL006W\nYLR390W\nYOR246C\nYAR002C-A\nYGL002W\nYNL125C\nYPL078C\nYDR298C\nYJR121W\nYKL016C\nYDL004W\nYPL271W\nYDR377W\nYPR020W\nYBR039W\nYOL077W-A\nYKR052C\nYGL091C\nYLL027W\nYIL065C\nYLR077W\nYFL046W\nYNL168C\nYER004W\nYOR271C\nYGL225W\nYGL020C\nYBR004C\nYOR355W\nYLR091W\nYDL198C\nYGL008C\nYKL084W\nYOR020C\nYJR045C\nYPR067W\nYER048W-A\nYJL094C\nYCL064C\nYCL005W\nYIL070C\nYBR185C\nYOR298C-A\nYLR253W\nYKL053C-A\nYLR069C\nYOR232W\nYJR144W\nYCL044C\nYDR296W\nYKL195W\nYCL057C-A\nYGR235C\nYNL100W\nYMR002W\nYLR190W\nYML128C\nYOR354C\nYGR028W\nYLR203C\nYGR257C\nYCL033C\nYDR493W\nYMR145C\nYML120C\nYNL200C\nYHR179W\nYPR048W\nYER125W\nYHR086W\nYGR147C\nYPR149W\nYHR042W\nYPL226W\nYKL120W\nYBR129C\nYKR065C\nYLR008C\nYGR178C\nYGR193C\nYGR222W\nYNL003C\nYBR106W\nYGL023C\nYMR129W\nYFL005W\nYOR089C\nYFL038C\nYER031C\nYML001W\nYEL037C\nYKL205W\nYLR084C\nYNR018W\nYLR059C\nYPR165W\nYDR233C\nYNL063W\nYHR083W\nYNL026W\nYKR042W\nYDR511W\nYBR269C\nYGL228W\nYIL016W\nYEL059C-A\nYML052W\nYPL105C\nYML072C\nYBR091C\nYOR297C\nYGR033C\nYJL054W\nYKL056C\nYGR082W\nYNL131W\nYMR203W\nYPR133W-A\nYOR045W\nYNL070W\nYCR083W\nYLR193C\nYOL129W\nYLR090W\nYMR241W\nYMR152W\nYBR054W\nYHR017W\nYDR326C\nYOL109W\nYNL310C\nYMR243C\nYOR221C\nYMR108W\nYNR016C\nYBL015W\nYOL140W\nYLR304C\nYJL200C\nYKL192C\nYKL094W\nYIL124W\nYJL005W\nYDR226W\nYLR089C\nYMR083W\nYGL256W\nYOR374W\nYPL061W\nYIL125W\nYDR148C\nYJR062C\nYDR046C\nYHR189W\nYER078C\nYEL063C\nYKL106W\nYLR027C\nYDR375C\nYOL066C\nYDL168W\nYJL130C\nYHR190W\nYIR038C\nYJR073C\nYJR057W\nYHR208W\nYLR259C\nYNR001C\nYCR005C\nYLL009C\nYGR155W\nYJR048W\nYGL187C\nYMR256C\nYLR395C\nYDL067C\nYGL191W\nYLR038C\nYNL052W\nYKL087C\nYKL150W\nYKR066C\nYFL018C\nYNL071W\nYJR016C\nYPR183W\nYKR001C\nYLL001W\nYKR071C\nYOL021C\nYOR176W\nYDL120W\nYIL134W\nYCR004C\nYKL060C\nYPL262W\nYEL047C\nYBR229C\nYBR196C\nYMR062C\nYDL215C\nYDL171C\nYGL245W\nYHL032C\nYOL059W\nYAL044C\nYMR189W\nYBR263W\nYER020W\nYMR110C\nYGL253W\nYPR033C\nYPL148C\nYAL039C\nYDR234W\nYGL221C\nYDL157C\nYDR061W\nYGR266W\nYJL127C-B\nYJL133C-A\nYJR085C\nYKR018C\nYKR070W\nYMR252C\nYNL122C\nYNL320W\nYNR040W\nYPR024W\nYJL104W\nYMR267W\nYER019W\nYEL031W\nYDL066W\nYBL098W\nYJL060W\nYPL004C\nYGR086C\nYOR317W\nYNL073W\nYPR140W\nYMR089C\nYOR206W\nYKL085W\nYGR062C\nYER154W\nYOR316C\nYFR044C\nYKR087C\nYCL057W\nYLR389C\nYPL134C\nYOR222W\nYDR347W\nYPL118W\nYPL013C\nYDR337W\nYBR251W\nYMR158W\nYBR146W\nYNL137C\nYER050C\nYNR037C\nYIL093C\nYFR049W\nYDL045W-A\nYKL003C\nYNL306W\nYCR046C\nYKL167C\nYDR116C\nYNR022C\nYDL202W\nYKR006C\nYLR312W-A\nYHR147C\nYNL005C\nYKR085C\nYOR150W\nYDR462W\nYMR024W\nYKL138C\nYMR286W\nYBR122C\nYBR268W\nYML009C\nYLR439W\nYBL038W\nYJL096W\nYDR237W\nYJL063C\nYHR162W\nYHR024C\nYBL016W\nYKL113C\nYAL029C\nYKL067W\nYBR104W\nYKL196C\nYDL040C\nYML078W\nYNL135C\nYIR037W\nYPL206C\nYKL212W\nYBR200W\nYGR254W\nYNL055C\nYGR231C\nYGL011C\nYOL038W\nYFR004W\nYLR164W\nYNL121C\nYHR117W\nYIL022W\nYPL063W\nYHR005C-A\nYJL143W\nYNR017W\nYJR135W-A\nYPL154C\nYPL172C\nYNL292W\nYDR384C\nYGR012W\nYDR196C\nYOR356W\nYLR351C\nYER057C\nYOR196C\nYNR036C\nYNL081C\nYPL183W-A\nYOR125C\nYIL114C\nYKR049C\nYER178W\nYBR221C\nYOR347C\nYGL080W\nYOR004W\nYGR101W\nYDR236C\nYOL027C\nYCR008W\nYHR135C\nYJL109C\nYML008C\nYKL141W\nYKL148C\nYLL041C\nYDR178W\nYGR244C\nYJR010W\nYJR104C\nYHR008C\nYDR120C\nYER168C\nYLR105C\nYPL083C\nYHR003C\nYKR079C\nYKL182W\nYGR096W\nYLR043C\nYBL064C\nYDR353W\nYHR106W\nYOR286W\nYER086W\nYDL015C\nYBR003W\nYOR187W\nYLR291C\nYGR162W\nYAL035W\nYDL217C\nYDR074W\nYOR086C\nYNL256W\nYPL231W\nYBR084W\nYDR050C\nYDR268W\nYDL230W\nYOR065W\nYEL024W\nYPR191W\nYFR033C\nYDR529C\nYJL166W\nYLR290C\nYDR204W\nYOL008W\nYML021C\nYGR094W\nYGR285C" | sort -u | perl -nl -a -F"\t" -e 'print qq{$F[0]};BEGIN{print qq{gene};}'> genelist.csv
 
 #generate strainlist, order same as egaz template
-echo -e "S288c\nbeer001\nbeer003\nbeer004\nbeer005\nbeer006\nbeer007\nbeer008\nbeer009\nbeer010\nbeer011\nbeer012\nbeer013\nbeer014\nbeer015\nbeer016\nbeer020\nbeer021\nbeer022\nbeer023\nbeer024\nbeer025\nbeer026\nbeer027\nbeer028\nbeer029\nbeer030\nbeer031\nbeer032\nbeer033\nbeer034\nbeer036\nbeer037\nbeer038\nbeer040\nbeer041\nbeer043\nbeer044\nbeer045\nbeer046\nbeer047\nbeer048\nbeer049\nbeer050\nbeer051\nbeer052\nbeer053\nbeer054\nbeer055\nbeer056\nbeer059\nbeer061\nbeer062\nbeer063\nbeer064\nbeer065\nbeer066\nbeer067\nbeer068\nbeer069\nbeer070\nbeer071\nbeer073\nbeer075\nbeer076\nbeer077\nbeer078\nbeer079\nbeer080\nbeer081\nbeer082\nbeer083\nbeer084\nbeer085\nbeer086\nbeer087\nbeer088\nbeer089\nbeer090\nbeer091\nbeer092\nbeer094\nbeer095\nbeer096\nbeer097\nbeer098\nbeer099\nbeer100\nbeer101\nbeer102\nbioethanol001\nbioethanol003\nbioethanol004\nbread001\nbread002\nbread003\nbread004\nsake001\nsake002\nsake003\nsake004\nsake005\nsake006\nsake007\nspirits001\nspirits002\nspirits003\nspirits004\nspirits005\nspirits011\nwine001\nwine003\nwine004\nwine005\nwine006\nwine007\nwine009\nwine010\nwine011\nwine012\nwine013\nwine014\nwine015\nwine017\nwine018\nwild005\nwild006\nwild007" > strainlist.csv
- 
+cat ~/Scripts/pars/group_phylo.tsv | grep -v "^#" | cut -f 2 | tr "," "\n" | perl -nl -a -F"\t" -e 'print qq{$F[0]};BEGIN{print qq{S288c};}' > strainlist.tsv
 
-#download total SNPs from MySQL → total_snp.csv
-cat total_snp.csv | wc -l #check number
+tsv-join --z \
+    <(cat ~/data/mrna-structure/vcf/${NAME}_data_SNPs_PARS_mRNA.merge.wild.Chi.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]\t$F[6]\t$F[7]\t$F[8]\t$F[10]};') \
+    -f ../data_SNPs_PARS_mRNA.tsv \
+    --key-fields 1 \
+    --append-fields 2-63 \
+> data_SNPs_PARS_mRNA_all.tsv
 
-#get genelist by filtering strong selection from GO/KEGG annotation and deleting repeating item
+rm data_SNPs_PARS_mRNA_filiter.tsv
+cat genelist.csv | while read i
+    do
+        export GENE=${i}
+        cat data_SNPs_PARS_mRNA_all.tsv | 
+            perl -nl -a -F"\t" -e '
+                if ($F[12] eq $ENV{GENE}){
+                    my $F = join("\t",@F);
+                    print qq{$F};
+                }
+            ' >> data_SNPs_PARS_mRNA_filiter.tsv
+    done
 
-echo -e "gene\nYDL174C\nYKR066C\nYNR001C\nYDR487C\nYOR065W\nYCL057W\nYIR037W\nYMR203W\nYPL132W\nYLR304C\nYJL054W\nYNL055C\nYJR104C\nYKR071C\nYKL150W\nYBR056W\nYDR226W\nYDR375C\nYKL053C-A\nYKL087C\nYGL187C\nYLR259C\nYFR033C\nYJR121W\nYMR145C\nYAL039C\nYKL067W\nYDL120W\nYDR353W\nYLL009C\nYDR511W\nYPR140W\nYJL143W\nYHR116W\nYNR022C\nYDR296W\nYHR147C\nYBR268W\nYDR116C\nYKR006C\nYLR439W\nYPL183W-A\nYMR286W\nYDL202W\nYKL138C\nYJL063C\nYMR024W\nYNL005C\nYBR122C\nYJL096W\nYOR150W\nYDR237W\nYBL038W\nYLR312W-A\nYKL167C\nYKR085C\nYLR008C\nYKL016C\nYDR204W\nYMR241W\nYKL148C\nYGR096W\nYJL166W\nYOR065W\nYOR297C\nYMR089C\nYGR257C\nYPL134C\nYCL044C\nYPR024W\nYJR045C\nYKR087C\nYGL187C\nYBR039W\nYEL052W\nYGR222W\nYER017C\nYKR065C\nYLR259C\nYFR033C\nYMR035W\nYBR185C\nYMR256C\nYOR176W\nYGR033C\nYPR140W\nYML110C\nYKL141W\nYLR203C\nYHR024C\nYBR085W\nYDL174C\nYMR301C\nYER078C\nYML120C\nYPL270W\nYLR253W\nYLL041C\nYLR164W\nYNL003C\nYER141W\nYPR191W\nYGR235C\nYPL132W\nYJL054W\nYBL030C\nYGR062C\nYOL008W\nYPL063W\nYDR298C\nYLR188W\nYDR236C\nYDR375C\nYKR052C\nYKL087C\nYEL024W\nYGR101W\nYHR037W\nYDR377W\nYPL078C\nYPL271W\nYJR121W\nYOR232W\nYOR356W\nYBR291C\nYNL100W\nYAL039C\nYBR003W\nYDL120W\nYDL004W\nYPL189C-A\nYOR125C\nYCL057C-A\nYKL120W\nYIL134W\nYIL022W\nYOR222W\nYJL143W\nYOL027C\nYGR082W\nYNL026W\nYLR099W-A\nYLR090W\nYML086C\nYNL055C\nYKL150W\nYNL131W\nYMR110C\nYNL121C\nYER019W\nYPR140W\nYNL070W\nYHR117W\nYLR008C\nYGR082W\nYER017C\nYKR065C\nYOR232W\nYMR203W\nYLR090W\nYPL063W\nYPR024W\nYNL131W\nYJR045C\nYNL121C\nYGR033C\nYIL022W\nYNL070W\nYJL143W\nYHR024C\nYLR008C\nYDL174C\nYNR001C\nYOR065W\nYMR203W\nYOR297C\nYLR304C\nYJL054W\nYNL055C\nYPL063W\nYDR375C\nYKL053C-A\nYGL187C\nYNL121C\nYHR117W\nYNL070W\nYGR082W\nYKR065C\nYNL026W\nYLR259C\nYOR027W\nYJR121W\nYOR232W\nYHR083W\nYGR028W\nYNL064C\nYDL120W\nYNL131W\nYLL009C\nYPR140W\nYGR033C\nYIL022W\nYJL143W\nYMR301C\nYIL003W\nYPL270W\nYMR312W\nYCR011C\nYHR169W\nYGL008C\nYMR089C\nYDL007W\nYPR173C\nYLR397C\nYOR259C\nYDR091C\nYLR188W\nYDL166C\nYNL329C\nYHR187W\nYJR045C\nYGR262C\nYDR375C\nYBR039W\nYGR210C\nYBL022C\nYDL126C\nYFL028C\nYER017C\nYER036C\nYDR377W\nYLR259C\nYDR061W\nYPL271W\nYJR121W\nYJR072C\nYNL290W\nYCL047C\nYOR291W\nYEL031W\nYOR117W\nYGR028W\nYDL100C\nYLR249W\nYDL004W\nYPL226W\nYOR153W\nYKL073W\nYGL048C\nYBR080C\nYDR011W\nYOR278W\nYAL039C\nYDR047W\nYDL120W\nYDR232W\nYKL087C\nYER141W\nYGL040C\nYDR044W\nYGL245W\nYPL172C\nYOR176W\nYDL174C\nYDL078C\nYPL061W\nYDR272W\nYML004C\nYBL015W\nYBR218C\nYOR374W\nYOR347C\nYPL262W\nYKL085W\nYPL028W\nYER178W\nYMR110C\nYLR153C\nYNL071W\nYBR221C\nYNR016C" | sort | uniq | perl -e 'print reverse <>' > genelist.csv
+perl ~/Scripts/pars/program/subpop.pl data_SNPs_PARS_mRNA_filiter.tsv strainlist.tsv > subpop.csv
+rm data_SNPs_PARS_mRNA_all.tsv
 
-#filter SNPs
-RScript ~/Scripts/pars/program/subpop.R -n ${NAME} -i genelist.csv -o filter_snp.csv
-
-#delete "double quotation marks" and "blank" in filter_snp.csv
-
-#calculate subpopulation SNPs proporation
-perl ~/Scripts/pars/program/subpop.pl filter_snp.csv strainlist.csv > subpop.csv
-
-RScript ~/Scripts/pars/program/subpop_merge.R -n ${NAME}
-
-unset NAME
+tsv-join --z \
+    <(cat ~/data/mrna-structure/result/${NAME}/data_SNPs_PARS_syn.csv | sed 's/\"//g' \
+        | perl -nl -a -F"," -e '
+              next if /^location/;
+              if (($F[6]eq"stem")&&($F[11]eq"A->G"||$F[11]eq"A->C"||$F[11]eq"T->G"||$F[11]eq"T->C")) {
+                  my $F = join ("\t",@F);
+                  print qq{$F};
+              }
+              BEGIN{
+                  print qq{location\tfold_length\tgene_base\tgene_pos\tpars\tpair_base\tstructure\tstrand\tgene\tREF\tALT\tmutant_to\tfreq\toccured\tallele\tconsequence\tCDS_position\tamino_acids\tcodons\texisting_variation\tlength\tmF\tfold_dot_length\tfold_dot_vars\tfold_left_length\tfold_left_vars\tfold_right_length\tfold_right_vars\tstem_A_num\tstem_A_per\tstem_C_num\tstem_C_per\tstem_G_num\tstem_G_per\tstem_U_num\tstem_U_per\tloop_A_num\tloop_A_per\tloop_C_num\tloop_C_per\tloop_G_num\tloop_G_per\tloop_U_num\tloop_U_per\tA_num\tA_per\tC_num\tC_per\tG_num\tG_per\tU_num\tU_per\tstem_AU_num\tstem_CG_num\tloop_AU_num\tloop_CG_num\tAU_num\tCG_num\tstem_CG_content\tloop_CG_content\tCG_content\tX2\tP};
+              }
+          ') \
+    -f <(cat subpop.csv | csv2tsv) \
+    --key-fields 1 \
+    --append-fields 3-11 \
+> subpop.syn.tsv
 
 ```
+
+
+
+
+
+
+
+
+
 
