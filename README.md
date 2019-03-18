@@ -40,8 +40,17 @@
 # Install needed softwares
 
 ```bash
+brew install bcftools blast pigz samtools   
+
+brew tap brewsci/bio
+brew install mafft raxml
+
 brew tap wang-q/tap
-brew install multiz faops
+brew install faops lastz multiz sparsemem
+
+curl -fsSL https://raw.githubusercontent.com/wang-q/App-Egaz/master/share/check_dep.sh | bash
+
+cpanm App::Fasops App::Rangeops App::Egaz
 
 ```
 
