@@ -21,20 +21,19 @@
     - [create protein coding gene list](#create-protein-coding-gene-list)
     - [Intact mRNAs](#intact-mrnas)
     - [Cut mRNA alignments and extract SNP list](#cut-mrna-alignments-and-extract-snp-list)
-- [Features](#features)
-- [Real Processing n7](#real-processing-n7)
-- [Real Processing n7p](#real-processing-n7p)
-- [Real Processing n128](#real-processing-n128)
+    - [vcf](#vcf)
+- [VEP](#vep)
+- [Process PARS data](#process-pars-data)
 - [SNP](#snp)
     - [count per gene GC content](#count-per-gene-gc-content)
     - [count SNPs and gene](#count-snps-and-gene)
-    - [vcf](#vcf)
-    - [update](#update)
     - [count A/T <-> G/C](#count-at---gc)
     - [count stem length selection](#count-stem-length-selection)
     - [count_codon_gene](#count_codon_gene)
     - [count per gene cds_utr](#count-per-gene-cds_utr)
-    - [count GO KEGG](#count-go-kegg)
+- [GO/KEGG](#gokegg)
+    - [update wild](#update-wild)
+- [subpop](#subpop)
     - [stat subpopulation SNPs frequency](#stat-subpopulation-snps-frequency)
 
 
@@ -492,12 +491,12 @@ wc -l *.total.SNPs.info.tsv |
 
 ```
 
-| File | Count |
-| --- | --- |
+| File                               | Count |
+|:-----------------------------------|:------|
 | Scer_n128_Seub.total.SNPs.info.tsv | 30834 |
 | Scer_n128_Spar.total.SNPs.info.tsv | 50268 |
-| Scer_n7p_Spar.total.SNPs.info.tsv | 38481 |
-| Scer_n7_Spar.total.SNPs.info.tsv | 30038 |
+| Scer_n7p_Spar.total.SNPs.info.tsv  | 38481 |
+| Scer_n7_Spar.total.SNPs.info.tsv   | 30038 |
 
 ## vcf
 
@@ -583,12 +582,14 @@ cat 1011Matrix.wild.tsv |
 cat 1011Matrix.ext.wild.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > 1011Matrix.ext.wild.txt
 
 ```
-| File                          | Count |
-|:------------------------------|------:|
-| 1011Matrix.ext.tsv | 1544488 |
+
+| File                    |   Count |
+|:------------------------|--------:|
+| 1011Matrix.ext.tsv      | 1544488 |
 | 1011Matrix.ext.wild.tsv | 1544485 |
 
 # VEP
+
 ```bash
 mkdir -p ~/data/mrna-structure/vep
 cd ~/data/mrna-structure/vep
@@ -619,20 +620,19 @@ wc -l *.total.SNPs.update.tsv |
     mlr --itsv --omd cat
 
 ```
-| File | Count |
-| --- | --- |
+
+| File                                 | Count |
+|:-------------------------------------|:------|
 | Scer_n128_Seub.total.SNPs.update.tsv | 27323 |
 | Scer_n128_Spar.total.SNPs.update.tsv | 44251 |
-| Scer_n7_Spar.total.SNPs.update.tsv | 26814 |
-| Scer_n7p_Spar.total.SNPs.update.tsv | 35078 |
+| Scer_n7_Spar.total.SNPs.update.tsv   | 26814 |
+| Scer_n7p_Spar.total.SNPs.update.tsv  | 35078 |
 
 upload ${NAME}.total.SNPs.update.tsv in https://asia.ensembl.org/Tools/VEP
 
-Species: Saccharomyces cerevisiae(Saccharomyces cerevisiae)
-Additional configurations: 
-    Additional_annotations: 
-        Upstream/Downstream distance (bp): 1
-Download VEP format profiles to `vep`, and rename ${NAME}.total.SNPs.vep.txt
+Species: Saccharomyces cerevisiae(Saccharomyces cerevisiae) Additional configurations:
+Additional_annotations: Upstream/Downstream distance (bp): 1 Download VEP format profiles to `vep`,
+and rename ${NAME}.total.SNPs.vep.txt
 
 
 ```bash
@@ -657,12 +657,13 @@ wc -l *.total.SNPs.vep.tsv |
     mlr --itsv --omd cat
 
 ```
-| File | Count |
-| --- | --- |
+
+| File                              | Count |
+|:----------------------------------|:------|
 | Scer_n128_Seub.total.SNPs.vep.tsv | 27324 |
 | Scer_n128_Spar.total.SNPs.vep.tsv | 44252 |
-| Scer_n7_Spar.total.SNPs.vep.tsv | 26818 |
-| Scer_n7p_Spar.total.SNPs.vep.tsv | 35082 |
+| Scer_n7_Spar.total.SNPs.vep.tsv   | 26818 |
+| Scer_n7p_Spar.total.SNPs.vep.tsv  | 35082 |
 
 # Process PARS data
 
@@ -779,14 +780,15 @@ done >> coverage.stat.md
 cat coverage.stat.md
 
 ```
-| Name | chrLength | size | coverage |
-|:--|--:|--:|--:|
-| genes | 12071326 | 4236728 | 0.3510 |
-| intron | 12071326 | 65144 | 0.0054 |
-| orf_genomic | 12071326 | 8895737 | 0.7369 |
-| utr | 12071326 | 516701 | 0.0428 |
-| mRNA | 12071326 | 4234684 | 0.3508 |
-| cds | 12071326 | 3717983 | 0.3080 |
+
+| Name        | chrLength |    size | coverage |
+|:------------|----------:|--------:|---------:|
+| genes       |  12071326 | 4236728 |   0.3510 |
+| intron      |  12071326 |   65144 |   0.0054 |
+| orf_genomic |  12071326 | 8895737 |   0.7369 |
+| utr         |  12071326 |  516701 |   0.0428 |
+| mRNA        |  12071326 | 4234684 |   0.3508 |
+| cds         |  12071326 | 3717983 |   0.3080 |
 
 # SNP
 
@@ -950,6 +952,7 @@ unset NAME
 
 
 # GO/KEGG
+
 ```bash
 cd ~/data/mrna-structure/vcf
 
@@ -1061,7 +1064,8 @@ unset NAME
 
 ```
 
-upload Scer_n128_Spar.update/mRNA.gene.list.update.csv in https://david.ncifcrf.gov/ , get GO/KEGG information
+upload Scer_n128_Spar.update/mRNA.gene.list.update.csv in https://david.ncifcrf.gov/ , get GO/KEGG
+information
 
 ```bash
 export NAME=Scer_n128_Spar
@@ -1176,7 +1180,8 @@ unset NAME
 
 ```
 
-#subpop
+# subpop
+
 ## stat subpopulation SNPs frequency
 
 ```bash
@@ -1231,13 +1236,5 @@ tsv-join --z \
 > subpop.syn.tsv
 
 ```
-
-
-
-
-
-
-
-
 
 
