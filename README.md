@@ -21,7 +21,7 @@
     - [create protein coding gene list](#create-protein-coding-gene-list)
     - [Intact mRNAs](#intact-mrnas)
     - [Cut mRNA alignments and extract SNP list](#cut-mrna-alignments-and-extract-snp-list)
-    - [vcf](#vcf)
+- [VCF of 1011 project](#vcf-of-1011-project)
 - [VEP](#vep)
 - [Process PARS data](#process-pars-data)
 - [SNP](#snp)
@@ -403,14 +403,14 @@ jrunlist split PARS.non-overlapped.yml -o PARS
 ```bash
 cd ~/data/mrna-structure/gene-filter
 
-gzip -dcf ../alignment/n7/Scer_n7_Spar_refined/*.gz |
+pigz -dcf ../alignment/n7/Scer_n7_Spar_refined/*.gz |
     pigz > Scer_n7_Spar.fas.gz
-gzip -dcf ../alignment/n7p/Scer_n7p_Spar_refined/*.gz |
+pigz -dcf ../alignment/n7p/Scer_n7p_Spar_refined/*.gz |
     pigz > Scer_n7p_Spar.fas.gz
 
-gzip -dcf ../alignment/n128/Scer_n128_Spar_refined/*.gz |
+pigz -dcf ../alignment/n128/Scer_n128_Spar_refined/*.gz |
     pigz > Scer_n128_Spar.fas.gz
-gzip -dcf ../alignment/n128/Scer_n128_Seub_refined/*.gz |
+pigz -dcf ../alignment/n128/Scer_n128_Seub_refined/*.gz |
     pigz > Scer_n128_Seub.fas.gz
 
 for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
@@ -507,88 +507,129 @@ wc -l *.total.SNPs.info.tsv |
 | Scer_n7p_Spar.total.SNPs.info.tsv  | 38481 |
 | Scer_n7_Spar.total.SNPs.info.tsv   | 30038 |
 
-## vcf
+# VCF of 1011 project
 
 ```bash
 mkdir -p ~/data/mrna-structure/vcf
 cd ~/data/mrna-structure/vcf
-wget -c http://1002genomes.u-strasbg.fr/files/1011Matrix.gvcf.gz
-gzip -d 1011Matrix.gvcf.gz
-
-#rsync -av ymh@wq.nju.edu.cn:~/data/vcf/1011Matrix.gvcf /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/
-#ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf.gz .
-#mkdir -p ~/data/mrna-structure/vcf/1011Matrix.gvcf
-#cd 1011Matrix.gvcf/
-#ln -s /Volumes/Backup/yumh/data/vcf/1011Matrix.gvcf/1011Matrix.gvcf .
+aria2c -c http://1002genomes.u-strasbg.fr/files/1011Matrix.gvcf.gz
+pigz -dcf 1011Matrix.gvcf.gz > 1011Matrix.gvcf
 
 # 1011
-cd ~/data/mrna-structure/vcf/1011Matrix.gvcf
-
-perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.gvcf --output 1011Matrix.tsv
-cat 1011Matrix.tsv | 
+cat 1011Matrix.gvcf |
     perl -nla -F"\t" -e '
+        /^\#\#/ and next;
+        splice @F, 8;
+        print join qq{\t}, @F;
+    ' \
+    > 1011Matrix.tsv
+
+cat 1011Matrix.tsv |
+    perl -nla -F"\t" -e '
+        BEGIN {
+            print qq{Location\tREF\tALT\tFreq_vcf\tREF_vcf\tALT_vcf};
+            our %roman = (
+                16 => "XVI",
+                15 => "XV",
+                14 => "XIV",
+                13 => "XIII",
+                12 => "XII",
+                11 => "XI",
+                10 => "X",
+                9  => "IX",
+                8  => "VIII",
+                7  => "VII",
+                6  => "VI",
+                5  => "V",
+                4  => "IV",
+                3  => "III",
+                2  => "II",
+                1  => "I"
+            );
+        }
         next if /^#/;
         my $loca = $F[0];
         $loca =~ /^chromosome(\d+)/;
-        $chr = &trans($1);
-        my $R = length $F[3];
-        my $A = length $F[4];
-        my @info = split /;/, $F[7];
-        my @AF = split /=/, $info[1];
+        $chr = $roman{$1};
+        my $R        = length $F[3];
+        my $A        = length $F[4];
+        my @info     = split /;/, $F[7];
+        my @AF       = split /=/, $info[1];
         my $Freq_vcf = $AF[1];
-        my @AC = split /=/, $info[0];
-        my @AN = split /=/, $info[2];
-        my $ALT_vcf = $AC[1];        
-        my $REF_vcf = $AN[1]-$AC[1];
-        if ($R == 1 && $A == 1){
+        my @AC       = split /=/, $info[0];
+        my @AN       = split /=/, $info[2];
+        my $ALT_vcf  = $AC[1];
+        my $REF_vcf  = $AN[1] - $AC[1];
+
+        if ( $R == 1 && $A == 1 ) {
             print qq{$chr:$F[1]\t$F[3]\t$F[4]\t$Freq_vcf\t$REF_vcf\t$ALT_vcf};
-        } 
-        BEGIN{
-            print qq{Location\tREF\tALT\tFreq_vcf\tREF_vcf\tALT_vcf};
-            sub trans {
-              my %roman = (16=>"XVI",15=>"XV",14=>"XIV",13=>"XIII",12=>"XII",11=>"XI",10=>"X",9=>"IX",8=>"VIII",7=>"VII",6=>"VI",5=>"V",4=>"IV",3=>"III",2=>"II",1=>"I");
-              $roman{"$_[0]"};
-            }
         }
     ' \
-> 1011Matrix.ext.tsv
-cat 1011Matrix.ext.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > 1011Matrix.ext.txt
+    > 1011Matrix.ext.tsv
+cut -f 1 1011Matrix.ext.tsv > 1011Matrix.ext.txt
 
-# wili in 1011
-cd ~/data/mrna-structure/vcf/1011Matrix.gvcf
-
-perl -i -pe 's/chromosome4\t193242.*\n//g;s/chromosome4\t193246.*\n//g;s/chromosome4\t88:2:49\..*\n//g;s/chromosome4\t88:268.*\n//g;' 1011Matrix.gvcf
-bcftools view 1011Matrix.gvcf -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU | bcftools +fill-tags -o 1011Matrix.wild.gvcf
-perl ~/Scripts/pars/program/vcf.cut.pl --file 1011Matrix.wild.gvcf --output 1011Matrix.wild.tsv
+# wild strains in 1011
+#perl -pi -e '
+#    s/chromosome4\t193242.*\n//g;
+#    s/chromosome4\t193246.*\n//g;
+#    s/chromosome4\t88:2:49\..*\n//g;
+#    s/chromosome4\t88:268.*\n//g;
+#    ' 1011Matrix.gvcf
+bcftools view 1011Matrix.gvcf -s CCL,BBQ,BBS,BFP,BTG,CLC,CLB,CLD,BAM,BAQ,BAG,BAH,BAL,AMH,CEG,CEI,CCQ,CCR,CCS,BAK,BAI,ACQ,CCN,CDL,SACE_YCR,BMA,AKM,BMB,BMC,SACE_MAL,SACE_YCY,BAN,BAP,CMP,CCH,ACC,CCC,CCD,CCE,CCF,CCG,CCI,CMQ,CDF,CDG,CDH,CDI,AVI,ACD,ANF,ANH,ANC,ANE,ANG,AND,ANK,ANI,AKN,SACE_YBS,SACE_YCU |
+    bcftools +fill-tags -o 1011Matrix.wild.gvcf
+cat 1011Matrix.wild.gvcf |
+    perl -nla -F"\t" -e '
+        /^\#\#/ and next;
+        splice @F, 8;
+        print join qq{\t}, @F;
+    ' \
+    > 1011Matrix.wild.tsv
 
 cat 1011Matrix.wild.tsv | 
     perl -nla -F"\t" -e '
+        BEGIN {
+            print qq{Location\tREF\tALT\tFreq_vcf\tREF_vcf\tALT_vcf};
+            our %roman = (
+                16 => "XVI",
+                15 => "XV",
+                14 => "XIV",
+                13 => "XIII",
+                12 => "XII",
+                11 => "XI",
+                10 => "X",
+                9  => "IX",
+                8  => "VIII",
+                7  => "VII",
+                6  => "VI",
+                5  => "V",
+                4  => "IV",
+                3  => "III",
+                2  => "II",
+                1  => "I"
+            );
+        }
         next if /^#/;
         my $loca = $F[0];
         $loca =~ /^chromosome(\d+)/;
-        $chr = &trans($1);
-        my $R = length $F[3];
-        my $A = length $F[4];
-        my @info = split /;/, $F[7];
-        my @AF = split /=/, $info[1];
+        $chr = $roman{$1};
+        my $R        = length $F[3];
+        my $A        = length $F[4];
+        my @info     = split /;/, $F[7];
+        my @AF       = split /=/, $info[1];
         my $Freq_vcf = $AF[1];
-        my @AC = split /=/, $info[0];
-        my @AN = split /=/, $info[2];
-        my $ALT_vcf = $AC[1];        
-        my $REF_vcf = $AN[1]-$AC[1];
-        if ($R == 1 && $A == 1){
+        my @AC       = split /=/, $info[0];
+        my @AN       = split /=/, $info[2];
+        my $ALT_vcf  = $AC[1];
+        my $REF_vcf  = $AN[1] - $AC[1];
+
+        if ( $R == 1 && $A == 1 ) {
             print qq{$chr:$F[1]\t$F[3]\t$F[4]\t$Freq_vcf\t$REF_vcf\t$ALT_vcf};
-        } 
-        BEGIN{
-            print qq{Location\tREF\tALT\tFreq_vcf\tREF_vcf\tALT_vcf};
-            sub trans {
-              my %roman = (16=>"XVI",15=>"XV",14=>"XIV",13=>"XIII",12=>"XII",11=>"XI",10=>"X",9=>"IX",8=>"VIII",7=>"VII",6=>"VI",5=>"V",4=>"IV",3=>"III",2=>"II",1=>"I");
-              $roman{"$_[0]"};
-            }
         }
     ' \
-> 1011Matrix.ext.wild.tsv
-cat 1011Matrix.ext.wild.tsv | perl -nl -a -F"\t" -e 'print qq{$F[0]};' > 1011Matrix.ext.wild.txt
+    > 1011Matrix.ext.wild.tsv
+cut -f 1 1011Matrix.ext.wild.tsv > 1011Matrix.ext.wild.txt
+
+rm 1011Matrix.gvcf 1011Matrix.wild.gvcf
 
 ```
 
@@ -605,7 +646,7 @@ cd ~/data/mrna-structure/vep
 
 for NAME in Scer_n7_Spar Scer_n7p_Spar Scer_n128_Spar Scer_n128_Seub; do
     tsv-join --z \
-        ~/data/mrna-structure/vcf/1011Matrix.gvcf/1011Matrix.ext.txt \
+        ~/data/mrna-structure/vcf/1011Matrix.ext.txt \
         -f ../gene-filter/${NAME}.total.SNPs.info.tsv \
         --key-fields 1 \
         --append-fields 2,3,4,5,6,7 \
@@ -637,11 +678,14 @@ wc -l *.total.SNPs.update.tsv |
 | Scer_n7_Spar.total.SNPs.update.tsv   | 26814 |
 | Scer_n7p_Spar.total.SNPs.update.tsv  | 35078 |
 
-upload ${NAME}.total.SNPs.update.tsv in https://asia.ensembl.org/Tools/VEP
+Upload ${NAME}.total.SNPs.update.tsv to https://asia.ensembl.org/Tools/VEP
 
-Species: Saccharomyces cerevisiae(Saccharomyces cerevisiae) Additional configurations:
-Additional_annotations: Upstream/Downstream distance (bp): 1 Download VEP format profiles to `vep`,
-and rename ${NAME}.total.SNPs.vep.txt
+* Additional configurations:
+    * Species: Saccharomyces cerevisiae(Saccharomyces cerevisiae)
+    * Additional_annotations:
+    * Upstream/Downstream distance (bp): 1
+
+* Download VEP format profiles to `vep/`, and rename it to ${NAME}.total.SNPs.vep.txt
 
 
 ```bash
