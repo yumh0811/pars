@@ -680,12 +680,11 @@ wc -l *.total.SNPs.update.tsv |
 
 Upload ${NAME}.total.SNPs.update.tsv to https://asia.ensembl.org/Tools/VEP
 
-* Additional configurations:
-    * Species: Saccharomyces cerevisiae(Saccharomyces cerevisiae)
-    * Additional_annotations:
+* Species: Saccharomyces cerevisiae (Saccharomyces cerevisiae)
+* Additional_annotations:
     * Upstream/Downstream distance (bp): 1
 
-* Download VEP format profiles to `vep/`, and rename it to ${NAME}.total.SNPs.vep.txt
+* Download VEP format profiles to `vep/`, and rename it to `${NAME}.total.SNPs.vep.txt`
 
 
 ```bash
